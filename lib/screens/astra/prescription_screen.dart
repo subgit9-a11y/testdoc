@@ -11,13 +11,15 @@ class PrescriptionScreen extends StatefulWidget {
   final String patientName;
   final String? patientPhone; // Added
   final String? doctorId;
+  final Map<String, dynamic>? astraFillData; // Added
 
   const PrescriptionScreen({
     Key? key,
     required this.patientId,
     required this.patientName,
-    this.patientPhone, // Added
+    this.patientPhone,
     this.doctorId,
+    this.astraFillData, // Added
   }) : super(key: key);
 
   @override
@@ -35,7 +37,22 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPatientData();
+    if (widget.astraFillData != null && widget.astraFillData!.isNotEmpty) {
+      _patientData = {'latest_astra_fill': widget.astraFillData};
+      _processAstraFillData(widget.astraFillData!);
+    } else {
+      _loadPatientData();
+    }
+  }
+
+  void _processAstraFillData(Map<String, dynamic> astraFill) {
+    if (astraFill['extracted_symptoms'] != null) {
+      dynamic symptoms = astraFill['extracted_symptoms'];
+      if (symptoms != null) {
+        String symptomsText = (symptoms is List) ? symptoms.join(', ') : symptoms.toString();
+        _diagnosisController.text = "Possible condition related to: $symptomsText";
+      }
+    }
   }
 
   Future<void> _loadPatientData() async {
@@ -44,13 +61,8 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
       final data = await _astraService.getPatientView(widget.patientId);
       setState(() {
         _patientData = data;
-        // Auto-fill diagnosis if available from AI intake
-        if (data['latest_astra_fill'] != null && data['latest_astra_fill']['extracted_symptoms'] != null) {
-           dynamic symptoms = data['latest_astra_fill']['extracted_symptoms'];
-           if(symptoms != null) {
-             String symptomsText = (symptoms is List) ? symptoms.join(', ') : symptoms.toString();
-             _diagnosisController.text = "Possible condition related to: $symptomsText";
-           }
+        if (data['latest_astra_fill'] != null) {
+          _processAstraFillData(data['latest_astra_fill']);
         }
       });
     } catch (e) {
@@ -63,7 +75,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   void _addMedicine(Map<String, dynamic> medicine) {
     setState(() {
       _medicines.add({
-        "name": medicine['medicine_name'], // Standardized key
+        "medicine_name": medicine['medicine_name'], // Standardized key
         "shopify_variant_id": medicine['shopify_variant_id'],
         "price": medicine['price'],
         "dosage": "1 tablet", // Standardized key
@@ -269,32 +281,6 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     );
   }
 
-  Widget _buildAISummaryCard(Map data) {
-    return Card(
-      color: Colors.purple.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.auto_awesome, color: Colors.purple),
-                SizedBox(width: 8),
-                Text("Astra AI Summary", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
-              ],
-            ),
-            SizedBox(height: 8),
-            if (data['extracted_symptoms'] != null)
-              Text("Symptoms: ${(data['extracted_symptoms'] as List).join(', ')}"),
-            if (data['severity_score'] != null)
-              Text("Severity Score: ${data['severity_score']}/10"),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class SearchMedicineSheet extends StatefulWidget {

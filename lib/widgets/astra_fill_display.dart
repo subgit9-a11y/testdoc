@@ -109,8 +109,12 @@ class _AstraFillDisplayWidgetState extends State<AstraFillDisplayWidget> {
 
   Widget _buildAstraFillCard() {
     // Extract data from Astra Fill response
-    final symptoms = _astraFillData?['extracted_symptoms'] ?? 
-                     _astraFillData?['symptoms'] ?? [];
+    final rawSymptoms = _astraFillData?['extracted_symptoms'] ?? 
+                        _astraFillData?['symptoms'];
+    final List<String> symptoms = rawSymptoms is List 
+        ? List<String>.from(rawSymptoms)
+        : (rawSymptoms != null ? [rawSymptoms.toString()] : []);
+    
     final vitals = _astraFillData?['vitals'] ?? {};
     final medicalHistory = _astraFillData?['medical_history'] ?? 
                            _astraFillData?['history'] ?? {};
@@ -462,8 +466,11 @@ class AstraFillCompactWidget extends StatelessWidget {
       return SizedBox.shrink();
     }
 
-    final symptoms = astraFillData?['extracted_symptoms'] ?? 
-                     astraFillData?['symptoms'] ?? [];
+    final rawSymptoms = astraFillData?['extracted_symptoms'] ?? 
+                        astraFillData?['symptoms'];
+    final List<String> symptoms = rawSymptoms is List 
+        ? List<String>.from(rawSymptoms)
+        : (rawSymptoms != null ? [rawSymptoms.toString()] : []);
     final severityScore = astraFillData?['severity_score'];
 
     return Card(

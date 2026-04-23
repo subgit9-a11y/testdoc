@@ -136,12 +136,38 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
     });
   }
 
-  /// Load Astra Fill data (health intake submitted by patient in their app)
-  Future<void> _loadAstraFillData() async {
-    if (userId == null) return;
+  /// Load Astra Fill data (health intake submitted by patient)
+  Future<void> _loadAstraFillData({String? patientId, String? searchPhone}) async {
+    final targetId = patientId ?? userId?.toString();
+    final targetPhone = searchPhone ?? phoneNo;
+    
+    if (targetId == null && targetPhone == null) return;
+    
     setState(() => _isLoadingAstraFill = true);
     try {
-      final data = await _astraService.getLatestAstraFill(userId.toString());
+      Map<String, dynamic> data = {};
+      
+      // 1. Try loading by ID if available
+      if (targetId != null) {
+        data = await _astraService.getLatestAstraFill(targetId);
+      }
+      
+      // 2. Fallback: If no data or loading by ID failed, try searching by phone in Astra
+      if ((data == null || data.isEmpty) && targetPhone != null && targetPhone.isNotEmpty) {
+        // Clean phone number (remove +, spaces, etc. for search)
+        String cleanPhone = targetPhone.replaceAll(RegExp(r'\D'), '');
+        final searchResults = await _astraService.searchPatients(cleanPhone);
+        
+        if (searchResults.isNotEmpty) {
+          // Found matching patient in Astra! Use their Astra ID
+          final astraPatient = searchResults[0];
+          final astraId = astraPatient['id']?.toString() ?? astraPatient['uid']?.toString();
+          if (astraId != null) {
+            data = await _astraService.getLatestAstraFill(astraId);
+          }
+        }
+      }
+
       if (mounted) {
         setState(() {
           _astraFillData = data;
@@ -1046,6 +1072,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                                     patientId: userId.toString(), 
                                                     patientName: name ?? "Patient",
                                                     patientPhone: phoneNo,
+                                                    astraFillData: _astraFillData,
                                                   ))
                                                 );
                                               },
@@ -1616,6 +1643,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         policyNumber = response.data!.policyNumber ?? "";
         appointmentStatus == 'Approve' ? hideButton = false : hideButton = true;
         appointmentStatus == 'pending' ? hideButton = true : hideButton = false;
+        
+        // After loading appointment details, refresh Astra Fill data with resolved IDs
+        _loadAstraFillData(patientId: userId.toString(), searchPhone: phoneNo);
       });
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");

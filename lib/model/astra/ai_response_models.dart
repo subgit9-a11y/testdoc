@@ -35,7 +35,7 @@ class AIChatResponse {
 
 /// AI Chat Request
 class AIChatRequest {
-  final String message;
+  final String q;
   final String userId;
   final String? profileId;
   final Map<String, dynamic>? userMetadata;
@@ -43,7 +43,7 @@ class AIChatRequest {
   final String? context;
 
   AIChatRequest({
-    required this.message,
+    required this.q,
     required this.userId,
     this.profileId,
     this.userMetadata,
@@ -53,7 +53,7 @@ class AIChatRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'message': message,
+      'q': q,
       'user_id': userId,
       if (profileId != null) 'profile_id': profileId,
       if (userMetadata != null) 'user_metadata': userMetadata,

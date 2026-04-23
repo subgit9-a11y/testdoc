@@ -93,14 +93,14 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         // After voice processing, we might get an extraction or just text
         String extractedText = voiceResponse['text'] ?? "Voice processed successfully.";
         response = await _apiService.brainChat({
-          'message': "I just dictated this: $extractedText. Please analyze it.",
+          'q': "I just dictated this: $extractedText. Please analyze it.",
           'user_id': user.uid,
           'user_metadata': {'role': 'doctor', 'source': 'voice'}
         });
       } else {
         // Regular text chat
         response = await _apiService.brainChat({
-          'message': message,
+          'q': message,
           'user_id': user.uid,
           'user_metadata': {'role': 'doctor'}
         });

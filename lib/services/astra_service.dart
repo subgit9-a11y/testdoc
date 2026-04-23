@@ -256,7 +256,7 @@ class AstraService {
   Future<Map<String, dynamic>> chatWithAstra(String message, String userId, {Map<String, dynamic>? metadata}) async {
     try {
       final response = await _dio.post('/api/v1/brain/chat', data: {
-        'message': message,
+        'q': message,
         'user_id': userId,
         'user_metadata': metadata ?? {'role': 'doctor'},
       });
