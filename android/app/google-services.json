@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "298839588168",
+    "project_id": "ayurease-healthcare",
+    "storage_bucket": "ayurease-healthcare.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298839588168:android:ae85ad77aedf34a5a1c77d",
+        "android_client_info": {
+          "package_name": "com.ayureze.ayureze"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298839588168-6ut75u7g4rqc8grmujtcl4m7obnq3oml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbeOvU5nkgLkYCc8CFMnlrK5duMQySKf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298839588168-6ut75u7g4rqc8grmujtcl4m7obnq3oml.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "298839588168-hushpnva1pukg3s4ffprl09ieth8rco3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.ayureze.patient"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,46 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    // Fix for Agora module conflict
+    configurations.all {
+        exclude group: "io.agora.rtc", module: "full-screen-sharing"
+    }
+}
+
+rootProject.buildDir = '../build'
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(':app')
+
+    // Force compileSdk 35 for all subprojects except :app (fixes agora_rtc_engine android-31)
+    // Skip :app because evaluationDependsOn already evaluated it
+    if (project.name != 'app') {
+        afterEvaluate {
+            if (project.hasProperty('android')) {
+                project.android.compileSdk = 36
+            }
+        }
+    }
+
+    // Resolve dependency conflicts safely
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+
+            // AndroidX Lifecycle fix
+            if (details.requested.group == 'androidx.lifecycle') {
+                details.useVersion "2.8.2"
+            }
+
+            // ⚠️ REMOVE Kotlin forcing (AGP 9 handles this internally)
+            // ❌ DO NOT FORCE Kotlin version anymore
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

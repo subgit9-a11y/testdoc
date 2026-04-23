@@ -1,0 +1,41 @@
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        def localPropertiesFile = file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withInputStream { properties.load(it) }
+        }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        if (flutterSdkPath == null) {
+            flutterSdkPath = System.getenv("FLUTTER_ROOT")
+        }
+        if (flutterSdkPath == null) {
+            throw new GradleException("Flutter SDK not found. Define flutter.sdk in local.properties or set FLUTTER_ROOT environment variable.")
+        }
+        return flutterSdkPath
+    }
+    settings.ext.flutterSdkPath = flutterSdkPath()
+
+    includeBuild("${settings.ext.flutterSdkPath}/packages/flutter_tools/gradle")
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    
+    // UPDATED: AGP 9.1.0 is required for AndroidX 1.17.0 dependencies
+    id "com.android.application" version "9.1.0" apply false
+    
+    // UPDATED: Kotlin 2.3.20 is the current stable for 2026
+    id "org.jetbrains.kotlin.android" version "2.3.20" apply false
+    
+    id "com.google.gms.google-services" version "4.4.2" apply false
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
+}
+
+include ":app"

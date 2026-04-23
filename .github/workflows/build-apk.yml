@@ -1,0 +1,62 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # This prevents the 5-hour hang. It forces the runner to stop if it gets stuck.
+    timeout-minutes: 60 
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 1. Clear unnecessary files from the runner to prevent the "No space left" error
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # 2. Use the official Flutter setup action (faster and takes up less disk space)
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Flutter Clean for next build
+        run: flutter clean
+
+      - name: Build Debug APK
+        run: flutter build apk --debug
+
+      # 3. Upload Debug APK
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
