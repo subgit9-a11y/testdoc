@@ -27,8 +27,8 @@ class AstraApiService {
   AstraApiService._internal() {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      connectTimeout: const Duration(seconds: 45),
+      receiveTimeout: const Duration(seconds: 90),
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(

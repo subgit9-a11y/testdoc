@@ -5,13 +5,16 @@ import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/widgets/astra_fill_display.dart';
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:ui' as ui;
 
 class PrescriptionScreen extends StatefulWidget {
   final String patientId;
   final String patientName;
-  final String? patientPhone; // Added
+  final String? patientPhone;
   final String? doctorId;
-  final Map<String, dynamic>? astraFillData; // Added
+  final Map<String, dynamic>? astraFillData;
 
   const PrescriptionScreen({
     Key? key,
@@ -19,7 +22,7 @@ class PrescriptionScreen extends StatefulWidget {
     required this.patientName,
     this.patientPhone,
     this.doctorId,
-    this.astraFillData, // Added
+    this.astraFillData,
   }) : super(key: key);
 
   @override
@@ -33,6 +36,13 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   List<Map<String, dynamic>> _medicines = [];
   bool _isLoading = false;
   Map<String, dynamic>? _patientData;
+  Uint8List? _signatureBytes;
+
+  @override
+  void dispose() {
+    _diagnosisController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -59,32 +69,35 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     setState(() => _isLoading = true);
     try {
       final data = await _astraService.getPatientView(widget.patientId);
+      if (!mounted) return;
       setState(() {
         _patientData = data;
         var latestFill = data['latest_astra_fill'];
         if (latestFill != null && latestFill is Map<String, dynamic> && latestFill.isNotEmpty) {
           _processAstraFillData(latestFill);
         } else {
-          _patientData!['latest_astra_fill'] = null;
+          if (_patientData != null) _patientData!['latest_astra_fill'] = null;
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to load patient AI view")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to load patient AI view")));
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _addMedicine(Map<String, dynamic> medicine) {
     setState(() {
       _medicines.add({
-        "medicine_name": medicine['medicine_name'], // Standardized key
-        "shopify_variant_id": medicine['shopify_variant_id'],
-        "price": medicine['price'],
-        "dosage": "1 tablet", // Standardized key
-        "frequency": "twice_daily", // Standardized key (once_daily, twice_daily, etc.)
+        "medicine_name": medicine['medicine_name'] ?? medicine['title'],
+        "shopify_variant_id": medicine['shopify_variant_id'] ?? (medicine['variants'] != null && (medicine['variants'] as List).isNotEmpty ? medicine['variants'][0]['id'] : null),
+        "price": medicine['price'] ?? (medicine['variants'] != null && (medicine['variants'] as List).isNotEmpty ? medicine['variants'][0]['price'] : null),
+        "dosage": "1 tablet",
+        "frequency": "twice_daily",
         "timing": "After Food",
-        "duration_days": 5, // Standardized key (must be int)
+        "duration_days": 5,
         "quantity": 1,
         "instructions": "",
       });
@@ -97,31 +110,63 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     });
   }
 
+  Future<void> _suggestMedicines() async {
+    if (_diagnosisController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a diagnosis or symptoms first")));
+      return;
+    }
+    
+    setState(() => _isLoading = true);
+    try {
+      final suggestions = await _astraService.suggestMedicinesFromSymptoms([_diagnosisController.text]);
+      if (!mounted) return;
+      if (suggestions.isNotEmpty) {
+        for (var med in suggestions) {
+          _addMedicine(med);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added ${suggestions.length} AI suggested medicines")));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No AI suggestions found for this diagnosis")));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("AI Suggestion failed: $e")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _submitPrescription() async {
     if (_medicines.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please add at least one medicine")));
       return;
     }
 
+    if (_signatureBytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please provide your signature")));
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
-      // Check if all medicines have shopify_variant_id
       bool allHaveShopify = _medicines.every((m) => m['shopify_variant_id'] != null);
       
       final payload = {
         "doctor_id": widget.doctorId ?? SharedPreferenceHelper.getString(Preferences.doctorId),
         "patient_id": widget.patientId,
-        "patient_name": widget.patientName, // Mandatory for Shopify
-        "patient_phone": widget.patientPhone, // Mandatory for WhatsApp/Cart
+        "patient_name": widget.patientName,
+        "patient_phone": widget.patientPhone,
         "diagnosis": _diagnosisController.text,
         "medicines": _medicines,
         "lifestyle_advice": "Rest and hydration", 
         "auto_process": true,
-        "create_shopify_cart": allHaveShopify 
+        "create_shopify_cart": allHaveShopify,
+        "signature_image": base64Encode(_signatureBytes!),
       };
 
-      final response = await _astraService.submitPrescription(payload);
+      await _astraService.submitPrescription(payload);
       
+      if (!mounted) return;
+
       String msg = "Prescription Sent via WhatsApp!";
       if (allHaveShopify) {
         msg += " & Shopify Cart Created!";
@@ -137,9 +182,9 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
       
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Submission Failed: $e")));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Submission Failed: $e")));
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -172,13 +217,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Patient AI Summary - Health intake from patient's app
                   if (_patientData != null && _patientData!['latest_astra_fill'] != null)
                     AstraFillCompactWidget(astraFillData: _patientData!['latest_astra_fill']),
                   
                   SizedBox(height: 20),
                   
-                  // 2. Diagnosis
                   TextField(
                     controller: _diagnosisController,
                     decoration: InputDecoration(
@@ -190,7 +233,6 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                   
                   SizedBox(height: 20),
                   
-                  // 3. Medicines List
                   Text("Medicines", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   ..._medicines.asMap().entries.map((entry) {
@@ -209,7 +251,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                             child: Text("${idx + 1}", style: TextStyle(color: Colors.white))),
                           title: Row(
                             children: [
-                              Expanded(child: Text(med['medicine_name'], style: TextStyle(fontWeight: FontWeight.bold))),
+                              Expanded(child: Text(med['medicine_name'] ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.bold))),
                               if (noShopify)
                                 Tooltip(
                                   message: "Not available for Auto-Cart",
@@ -252,21 +294,65 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                   
                   SizedBox(height: 10),
                   
-                  // 4. Add Button
-                  ElevatedButton.icon(
-                    onPressed: _showSearchSheet,
-                    icon: Icon(Icons.add),
-                    label: Text("Add Medicine"),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50),
-                      backgroundColor: Colors.blue.shade50,
-                      foregroundColor: Colors.blue,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _showSearchSheet,
+                          icon: Icon(Icons.add),
+                          label: Text("Add Medicine"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade50,
+                            foregroundColor: Colors.blue,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isLoading ? null : _suggestMedicines,
+                          icon: Icon(Icons.auto_awesome),
+                          label: Text("AI Suggest"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple.shade50,
+                            foregroundColor: Colors.purple,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   
                   SizedBox(height: 30),
+
+                  Text("Doctor Digital Signature", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  Container(
+                    height: 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: DoctorSignaturePad(
+                      onChanged: (bytes) {
+                        setState(() {
+                          _signatureBytes = bytes;
+                        });
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () => setState(() => _signatureBytes = null), 
+                      icon: Icon(Icons.clear, size: 16),
+                      label: Text("Clear Signature", style: TextStyle(fontSize: 12)),
+                    ),
+                  ),
                   
-                  // 5. Submit Button
+                  SizedBox(height: 20),
+                  
                   ElevatedButton(
                     onPressed: _isLoading ? null : _submitPrescription,
                     child: _isLoading 
@@ -283,7 +369,6 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
             ),
     );
   }
-
 }
 
 class SearchMedicineSheet extends StatefulWidget {
@@ -301,10 +386,39 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   bool _isLoading = false;
   Timer? _debounce;
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableMedicines();
+  }
+
+  Future<void> _loadAvailableMedicines() async {
+    setState(() => _isLoading = true);
+    try {
+      final results = await _astraService.getAvailableMedicines();
+      if (mounted) setState(() => _results = results);
+    } catch (e) {
+      // handle error
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (query.isNotEmpty) _performSearch(query);
+      if (query.isNotEmpty) {
+        _performSearch(query);
+      } else {
+        _loadAvailableMedicines();
+      }
     });
   }
 
@@ -312,11 +426,11 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
     setState(() => _isLoading = true);
     try {
       final results = await _astraService.searchMedicines(query);
-      setState(() => _results = results);
+      if (mounted) setState(() => _results = results);
     } catch (e) {
       // handle error
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -347,8 +461,8 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
                   itemBuilder: (context, index) {
                     final item = _results[index];
                     return ListTile(
-                      title: Text(item['medicine_name'] ?? 'Unknown'),
-                      subtitle: Text("₹ ${item['price'] ?? '0'}"),
+                      title: Text(item['medicine_name'] ?? item['title'] ?? 'Unknown'),
+                      subtitle: Text("₹ ${item['price'] ?? (item['variants'] != null && (item['variants'] as List).isNotEmpty ? item['variants'][0]['price'] : '0')}"),
                       trailing: Icon(Icons.add_circle, color: Colors.green),
                       onTap: () => widget.onSelect(item),
                     );
@@ -359,4 +473,86 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
       ),
     );
   }
+}
+
+class DoctorSignaturePad extends StatefulWidget {
+  final Function(Uint8List) onChanged;
+  const DoctorSignaturePad({Key? key, required this.onChanged}) : super(key: key);
+
+  @override
+  _DoctorSignaturePadState createState() => _DoctorSignaturePadState();
+}
+
+class _DoctorSignaturePadState extends State<DoctorSignaturePad> {
+  final List<Offset?> _points = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onPanUpdate: (details) {
+        setState(() {
+          RenderBox renderBox = context.findRenderObject() as RenderBox;
+          _points.add(renderBox.globalToLocal(details.globalPosition));
+        });
+      },
+      onPanEnd: (details) async {
+        _points.add(null);
+        final bytes = await _captureSignature();
+        if (bytes != null) {
+          widget.onChanged(bytes);
+        }
+      },
+      child: CustomPaint(
+        painter: SignaturePainter(points: List.from(_points)),
+        size: Size.infinite,
+      ),
+    );
+  }
+
+  Future<Uint8List?> _captureSignature() async {
+    try {
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder, Rect.fromPoints(Offset(0, 0), Offset(500, 200)));
+      
+      final paint = Paint()
+        ..color = Colors.black
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 3.0;
+
+      for (int i = 0; i < _points.length - 1; i++) {
+        if (_points[i] != null && _points[i + 1] != null) {
+          canvas.drawLine(_points[i]!, _points[i + 1]!, paint);
+        }
+      }
+
+      final picture = recorder.endRecording();
+      final img = await picture.toImage(500, 200);
+      final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+class SignaturePainter extends CustomPainter {
+  final List<Offset?> points;
+  SignaturePainter({required this.points});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue.shade900
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3.0;
+
+    for (int i = 0; i < points.length - 1; i++) {
+      if (points[i] != null && points[i + 1] != null) {
+        canvas.drawLine(points[i]!, points[i + 1]!, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(SignaturePainter oldDelegate) => true;
 }

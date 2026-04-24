@@ -79,14 +79,16 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
       
       if (voicePath != null) {
         // Handle voice processing
-        setState(() {
-           _messages.add(ChatMessage(
-            text: "🎤 Processing voice recording...",
-            isMe: true,
-            time: DateTime.now(),
-            isSystem: true,
-          ));
-        });
+        if (mounted) {
+          setState(() {
+            _messages.add(ChatMessage(
+              text: "🎤 Processing voice recording...",
+              isMe: true,
+              time: DateTime.now(),
+              isSystem: true,
+            ));
+          });
+        }
         
         final voiceResponse = await _apiService.processVoice(File(voicePath), user.uid);
         
@@ -108,24 +110,28 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
 
       final aiResponse = AIChatResponse.fromJson(response);
 
-      setState(() {
-        _messages.add(ChatMessage(
-          text: aiResponse.response ?? "I apologize, I couldn't process that request.",
-          isMe: false,
-          time: DateTime.now(),
-        ));
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: aiResponse.response ?? "I apologize, I couldn't process that request.",
+            isMe: false,
+            time: DateTime.now(),
+          ));
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _messages.add(ChatMessage(
-          text: "Error: ${e.toString()}",
-          isMe: false,
-          time: DateTime.now(),
-          isError: true,
-        ));
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: "Error: ${e.toString()}",
+            isMe: false,
+            time: DateTime.now(),
+            isError: true,
+          ));
+          _isLoading = false;
+        });
+      }
     }
 
     _scrollToBottom();
