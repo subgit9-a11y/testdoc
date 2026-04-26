@@ -80,6 +80,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
       // Prepare history for memory (last 10 messages)
       List<Map<String, String>> history = _messages
           .where((m) => !m.isSystem && !m.isError)
+          .toList()
           .reversed
           .skip(1) // Skip the message we just added (or the voice processing message)
           .take(10)
