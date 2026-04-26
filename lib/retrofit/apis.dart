@@ -89,6 +89,7 @@ class Apis {
   static const String astra_create_draft_order = "api/v1/shopify/draft-order";
   static const String astra_product_search = "api/v1/shopify/products/search/{medicine_name}";
   static const String astra_available_medicines = "api/v1/shopify/products/available";
+  static const String astra_shopify_sync = "api/v1/shopify/sync";
   static const String astra_draft_order_status = "api/v1/shopify/draft-order/{draft_order_id}";
   static const String astra_validate_prescription = "api/v1/shopify/validate-prescription";
   static const String astra_order_details = "api/v1/shopify/order-details/{draft_order_id}";

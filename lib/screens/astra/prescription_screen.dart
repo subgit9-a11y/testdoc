@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:doctro/services/astra_service.dart';
+import 'package:doctro/services/astra_api_service.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
@@ -31,7 +31,7 @@ class PrescriptionScreen extends StatefulWidget {
 
 class _PrescriptionScreenState extends State<PrescriptionScreen> {
   final _diagnosisController = TextEditingController();
-  final AstraService _astraService = AstraService();
+  final AstraApiService _astraApiService = AstraApiService();
   
   List<Map<String, dynamic>> _medicines = [];
   bool _isLoading = false;
@@ -68,7 +68,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   Future<void> _loadPatientData() async {
     setState(() => _isLoading = true);
     try {
-      final data = await _astraService.getPatientView(widget.patientId);
+      final data = await _astraApiService.getPatientProfile(widget.patientId);
       if (!mounted) return;
       setState(() {
         _patientData = data;
@@ -118,13 +118,24 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     
     setState(() => _isLoading = true);
     try {
-      final suggestions = await _astraService.suggestMedicinesFromSymptoms([_diagnosisController.text]);
+      // Use the unified AI Shop Assist endpoint
+      final response = await _astraApiService.aiShopAssist({
+        'symptoms': [_diagnosisController.text],
+        'patient_id': widget.patientId,
+        'precise': true
+      });
+      
+      final suggestions = response['recommendations'] ?? [];
+      
       if (!mounted) return;
       if (suggestions.isNotEmpty) {
         for (var med in suggestions) {
           _addMedicine(med);
         }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added ${suggestions.length} AI suggested medicines")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Added ${suggestions.length} AI suggested medicines"),
+          backgroundColor: Colors.purple,
+        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No AI suggestions found for this diagnosis")));
       }
@@ -163,7 +174,8 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         "signature_image": base64Encode(_signatureBytes!),
       };
 
-      await _astraService.submitPrescription(payload);
+      // Use the unified executePrescriptionWorkflow instead of simple submit
+      await _astraApiService.executePrescriptionWorkflow(payload);
       
       if (!mounted) return;
 
@@ -381,9 +393,10 @@ class SearchMedicineSheet extends StatefulWidget {
 
 class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   final _searchController = TextEditingController();
-  final AstraService _astraService = AstraService();
+  final AstraApiService _astraApiService = AstraApiService();
   List _results = [];
   bool _isLoading = false;
+  bool _isSyncing = false;
   Timer? _debounce;
 
   @override
@@ -402,12 +415,34 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   Future<void> _loadAvailableMedicines() async {
     setState(() => _isLoading = true);
     try {
-      final results = await _astraService.getAvailableMedicines();
+      final results = await _astraApiService.getAvailableMedicines();
       if (mounted) setState(() => _results = results);
     } catch (e) {
       // handle error
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _syncShopify() async {
+    setState(() => _isSyncing = true);
+    try {
+      await _astraApiService.syncShopifyProducts();
+      await _loadAvailableMedicines();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Shopify Inventory Synced Successfully"),
+          backgroundColor: Colors.green,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Sync failed or already in progress: $e"),
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
     }
   }
 
@@ -425,7 +460,7 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   Future<void> _performSearch(String query) async {
     setState(() => _isLoading = true);
     try {
-      final results = await _astraService.searchMedicines(query);
+      final results = await _astraApiService.searchMedicineProducts(query);
       if (mounted) setState(() => _results = results);
     } catch (e) {
       // handle error
@@ -441,7 +476,20 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          Text("Search Medicines", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Search Medicines", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              if (_isSyncing)
+                SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+              else
+                TextButton.icon(
+                  onPressed: _syncShopify,
+                  icon: Icon(Icons.sync, size: 16),
+                  label: Text("Sync Shopify", style: TextStyle(fontSize: 12)),
+                ),
+            ],
+          ),
           SizedBox(height: 10),
           TextField(
             controller: _searchController,

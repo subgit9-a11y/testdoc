@@ -43,6 +43,8 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
     super.dispose();
   }
 
+  String? _sessionId;
+
   void _addInitialMessage() {
     setState(() {
       _messages.add(ChatMessage(
@@ -75,6 +77,20 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
 
+      // Prepare history for memory (last 10 messages)
+      List<Map<String, String>> history = _messages
+          .where((m) => !m.isSystem && !m.isError)
+          .reversed
+          .skip(1) // Skip the message we just added (or the voice processing message)
+          .take(10)
+          .toList()
+          .reversed
+          .map((m) => {
+                'role': m.isMe ? 'user' : 'assistant',
+                'content': m.text,
+              })
+          .toList();
+
       Map<String, dynamic> response;
       
       if (voicePath != null) {
@@ -91,24 +107,39 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         }
         
         final voiceResponse = await _apiService.processVoice(File(voicePath), user.uid);
-        
-        // After voice processing, we might get an extraction or just text
         String extractedText = voiceResponse['text'] ?? "Voice processed successfully.";
+        
         response = await _apiService.brainChat({
-          'q': "I just dictated this: $extractedText. Please analyze it.",
+          'q': extractedText,
           'user_id': user.uid,
-          'user_metadata': {'role': 'doctor', 'source': 'voice'}
+          'session_id': _sessionId,
+          'history': history,
+          'user_metadata': {
+            'role': 'doctor', 
+            'source': 'voice',
+            'precise': true // Request precise clinical response
+          }
         });
       } else {
         // Regular text chat
         response = await _apiService.brainChat({
           'q': message,
           'user_id': user.uid,
-          'user_metadata': {'role': 'doctor'}
+          'session_id': _sessionId,
+          'history': history,
+          'user_metadata': {
+            'role': 'doctor',
+            'precise': true // Request precise clinical response
+          }
         });
       }
 
       final aiResponse = AIChatResponse.fromJson(response);
+      
+      // Store session ID for memory
+      if (aiResponse.sessionId != null) {
+        _sessionId = aiResponse.sessionId;
+      }
 
       if (mounted) {
         setState(() {

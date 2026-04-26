@@ -382,6 +382,16 @@ class AstraApiService {
   // SMART AUTO-CART (Shopify Integration)
   // ============================================================
 
+  /// Sync Shopify products (Force sync from Shopify to Astra DB)
+  Future<Map<String, dynamic>> syncShopifyProducts() async {
+    try {
+      final response = await _dio.post('/api/v1/shopify/sync');
+      return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   /// AI Shop Assist - Smart medicine recommendations
   Future<Map<String, dynamic>> aiShopAssist(Map<String, dynamic> data) async {
     try {
@@ -447,8 +457,16 @@ class AstraApiService {
   // ============================================================
 
   /// General AI Chat with Astra Brain
+  /// Supports session_id and history for memory
   Future<Map<String, dynamic>> brainChat(Map<String, dynamic> data) async {
     try {
+      // Ensure role is doctor
+      if (data['user_metadata'] == null) {
+        data['user_metadata'] = {'role': 'doctor'};
+      } else if (data['user_metadata'] is Map && data['user_metadata']['role'] == null) {
+        data['user_metadata']['role'] = 'doctor';
+      }
+      
       final response = await _dio.post('/api/v1/brain/chat', data: data);
       return response.data;
     } catch (e) {
