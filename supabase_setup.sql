@@ -32,11 +32,18 @@ ALTER TABLE public.doctors ENABLE ROW LEVEL SECURITY;
 -- Drop existing policies first to allow re-running the script
 DROP POLICY IF EXISTS "Public Read Access" ON public.doctors;
 DROP POLICY IF EXISTS "Enable Insert for All" ON public.doctors;
-DROP POLICY IF EXISTS "Enable Update for All" ON public.doctors;
+DROP POLICY IF EXISTS "Enable update for authenticated users" ON public.doctors;
 
+-- Allow anyone to read doctor profiles. This is safe for public-facing data.
 CREATE POLICY "Public Read Access" ON public.doctors FOR SELECT USING (true);
-CREATE POLICY "Enable Insert for All" ON public.doctors FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable Update for All" ON public.doctors FOR UPDATE USING (true) WITH CHECK (true);
+
+-- Allow any authenticated user to create a new doctor profile.
+CREATE POLICY "Enable Insert for All" ON public.doctors FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- IMPORTANT: This allows any authenticated user (any doctor) to update any other doctor's record.
+-- For true security, you should add a user_id column that links to auth.users(id)
+-- and change this policy to: USING (auth.uid() = user_id)
+CREATE POLICY "Enable update for authenticated users" ON public.doctors FOR UPDATE USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 5. Initialize Storage Bucket
 -- Create the bucket if it doesn't exist
@@ -46,24 +53,23 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 6. Set Storage Policies (Allow app to upload/read)
 -- Drop existing storage policies first
-DROP POLICY IF EXISTS "Public Read Access" ON storage.objects;
-DROP POLICY IF EXISTS "Public Insert Access" ON storage.objects;
-DROP POLICY IF EXISTS "Public Update Access" ON storage.objects;
+DROP POLICY IF EXISTS "Allow public read access to profiles" ON storage.objects;
+DROP POLICY IF EXISTS "Allow authenticated inserts to profiles" ON storage.objects;
+-- NOTE: A secure update/delete policy would require linking file ownership to a user ID.
 
 -- Policy: Allow public access to read files
-CREATE POLICY "Public Read Access"
+CREATE POLICY "Allow public read access to profiles"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'doctor-profiles');
 
--- Policy: Allow public to upload files
-CREATE POLICY "Public Insert Access"
+-- Policy: Allow authenticated users to upload files (e.g., profile photo, certificate)
+CREATE POLICY "Allow authenticated inserts to profiles"
 ON storage.objects FOR INSERT
-WITH CHECK (bucket_id = 'doctor-profiles');
+WITH CHECK (bucket_id = 'doctor-profiles' AND auth.role() = 'authenticated');
 
--- Policy: Allow public to update their own files (if needed)
-CREATE POLICY "Public Update Access"
-ON storage.objects FOR UPDATE
-USING (bucket_id = 'doctor-profiles');
+-- WARNING: There is no UPDATE or DELETE policy. This means files cannot be easily overwritten or deleted.
+-- A secure implementation requires more complex logic, often using Postgres Functions,
+-- to check ownership before allowing updates or deletes. For now, this prevents malicious overwrites.
 
 -- 7. Trigger for updated_at
 CREATE OR REPLACE FUNCTION update_modified_column()

@@ -99,9 +99,6 @@ dependencies:
   image: ^4.2.0
   minio: ^3.5.8
 
-dependency_overrides:
-  http: ^1.0.0
-
   
 
 dev_dependencies:
