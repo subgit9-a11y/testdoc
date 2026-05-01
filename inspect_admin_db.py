@@ -1,14 +1,16 @@
+import os
 import pymysql
 
 DB_CONFIG = {
-    'host': '82.25.125.50',
-    'user': 'u656934180_ayureze_admin',
-    'password': 'nemke2-zokroj-Fibfez',
-    'database': 'u656934180_ayureze',
-    'port': 3306
+    'host': os.environ.get('DB_HOST', '82.25.125.50'),
+    'user': os.environ.get('DB_USER', 'u656934180_ayureze_admin'),
+    'password': os.environ.get('DB_PASSWORD', 'nemke2-zokroj-Fibfez'), # IMPORTANT: It is strongly recommended to remove the fallback password and set it strictly via environment variables.
+    'database': os.environ.get('DB_NAME', 'u656934180_ayureze'),
+    'port': int(os.environ.get('DB_PORT', 3306))
 }
 
 def inspect_db():
+    connection = None
     try:
         connection = pymysql.connect(**DB_CONFIG)
         with connection.cursor() as cursor:
@@ -33,7 +35,7 @@ def inspect_db():
     except Exception as e:
         print(f"Error: {e}")
     finally:
-        if 'connection' in locals():
+        if connection:
             connection.close()
 
 if __name__ == "__main__":

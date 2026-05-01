@@ -1,14 +1,12 @@
-import 'dart:async';
-
 import 'package:doctro/constant/app_string.dart';
-import 'package:doctro/constant/color_constant.dart';
+import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/model/Notification.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
-import 'package:doctro/screens/home%20page/patient_information.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 
 class ViewAllNotification extends StatefulWidget {
@@ -17,14 +15,10 @@ class ViewAllNotification extends StatefulWidget {
 }
 
 class _ViewAllAppointmentState extends State<ViewAllNotification> {
-  //Set Height/Width Using MediaQuery
   late double width;
   late double height;
 
-  //Set Loader
   Future? loadData;
-
-  //Notification List
   List<NotificationData> patientNotification = [];
 
   @override
@@ -39,184 +33,200 @@ class _ViewAllAppointmentState extends State<ViewAllNotification> {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-        appBar: PreferredSize(
-            preferredSize: Size(20, 58),
-            child: SafeArea(
-                top: true,
-                child: Column(children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: OslerTheme.canvas,
+      appBar: AppBar(
+        backgroundColor: OslerTheme.canvas,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: OslerTheme.forestDeep,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          getTranslated(context, AppString.notification_heading).toString(),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+      ),
+      body: FutureBuilder(
+        future: loadData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(color: OslerTheme.forestDeep),
+            );
+          }
+
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: OslerTheme.screenPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(22),
+                  decoration: OslerTheme.heroDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        margin: EdgeInsets.only(
-                            left: width * 0.06,
-                            right: width * 0.04,
-                            top: height * 0.01),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              getTranslated(
-                                      context, AppString.notification_heading)
-                                  .toString(),
-                              style: TextStyle(
-                                  fontSize: width * 0.05, color: hintColor),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(),
-                              child: IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(Icons.arrow_back_ios),
-                              ),
-                            ),
-                          ],
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.14),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          "Full inbox",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Text(
+                        "Every patient notification, in one scroll.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          height: 1.05,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
                   ),
-                ]))),
-        body: FutureBuilder(
-          future: loadData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: Center(
-                  child: patientNotification.length == 0
-                      ? Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: height * 0.3),
-                            child: Container(
-                              child: Image.asset("assets/images/no-data.png"),
-                            ),
-                          ),
-                        )
-                      : Column(
-                          children: [
-                            ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                reverse: true,
-                                itemCount: patientNotification.length,
-                                itemBuilder: (context, index) {
-                                  String date = DateUtil().formattedDate(
-                                      DateTime.parse(patientNotification[index]
-                                          .createdAt!));
-                                  return InkWell(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => new AlertDialog(
-                                          content: Text(
-                                              patientNotification[index]
-                                                  .message!),
-                                          actions: [
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(getTranslated(
-                                                        context,
-                                                        AppString
-                                                            .schedule_ok_button)
-                                                    .toString()))
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                            margin: EdgeInsets.only(
-                                                left: width * 0.02,
-                                                right: width * 0.02),
-                                            child: Column(children: <Widget>[
-                                              Container(
-                                                child: ListTile(
-                                                  isThreeLine: true,
-                                                  leading: SizedBox(
-                                                    height: 70,
-                                                    width: 60,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Container(
-                                                          decoration: new BoxDecoration(
-                                                              image: new DecorationImage(
-                                                                  fit: BoxFit
-                                                                      .fitHeight,
-                                                                  image: NetworkImage(
-                                                                      patientNotification[
-                                                                              index]
-                                                                          .user!
-                                                                          .fullImage!)))),
-                                                    ),
-                                                  ),
-                                                  title: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Container(
-                                                        child: Text(
-                                                            patientNotification[
-                                                                    index]
-                                                                .user!
-                                                                .name!,
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                    16.0)),
-                                                      ),
-                                                      Container(
-                                                          child: Text(
-                                                        '$date',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                passwordVisibility),
-                                                      )),
-                                                    ],
-                                                  ),
-                                                  subtitle: Container(
-                                                    child: Text(
-                                                      patientNotification[index]
-                                                          .message!,
-                                                      style: TextStyle(
-                                                          fontSize: 13,
-                                                          color:
-                                                              passwordVisibility),
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Divider(
-                                                thickness: 2,
-                                                color: divider,
-                                              ),
-                                            ])),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
                 ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ));
+                const SizedBox(height: 18),
+                if (patientNotification.isEmpty)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 36),
+                    decoration: OslerTheme.panelDecoration(),
+                    child: Column(
+                      children: [
+                        Image.asset("assets/images/no-data.png", height: 88),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "No notifications yet.",
+                          style: TextStyle(color: OslerTheme.textSecondary),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  ...patientNotification.map((item) => _buildNotificationCard(item)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNotificationCard(NotificationData item) {
+    final date = DateUtil().formattedDate(DateTime.parse(item.createdAt!));
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            content: Text(item.message!),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  getTranslated(context, AppString.schedule_ok_button)
+                      .toString(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: OslerTheme.panelDecoration(),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                item.user?.fullImage ?? "",
+                width: 58,
+                height: 58,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 58,
+                    height: 58,
+                    color: OslerTheme.surfaceMuted,
+                    child: const Icon(
+                      Icons.person_outline,
+                      color: OslerTheme.textSecondary,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.user?.name ?? "",
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: OslerTheme.textPrimary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        date,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: OslerTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.message ?? "",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: OslerTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<BaseModel<Notifications>> bookNotifications() async {
@@ -229,7 +239,6 @@ class _ViewAllAppointmentState extends State<ViewAllNotification> {
         patientNotification.addAll(response.data!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

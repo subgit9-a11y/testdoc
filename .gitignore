@@ -1,52 +1,37 @@
 # Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
 .DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-**/build/
+.pub
+.pub-cache
 
-# Android specific
-/android/.gradle/
+# IntelliJ
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Android
+/android/app/src/main/assets/flutter_assets/
+/android/app/build/
 /android/build/
-/android/app/debug
-/android/app/profile
-/android/app/release
-/android/app/.cxx/
+/android/.gradle/
+/android/key.properties
 
-# Cloud and diagnostics
-*.txt
-*.md
-!README.md
-!CHANGELOG.md
-deployment/
-*.ps1
-*.bat
-*.sh
-*.dart_test
+# iOS
+/ios/Pods/
+/ios/Runner/Assets.xcassets/
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
+/ios/Flutter/App.framework
+/ios/Flutter/engine.version
 
-# Specific files (Firebase allowed for Cloud Build)
-# android/app/google-services.json
-firebase.json
-devtools_options.yaml
+# Build artifacts
+/build/
+
+# Dart
+.dart_tool/
+
+# Local scripts with secrets
+supabase_to_mysql_sync.py
+test_supabase.py

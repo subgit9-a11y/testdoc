@@ -6,6 +6,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -31,6 +32,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: OslerTheme.canvas,
       appBar: PreferredSize(
         preferredSize: Size(width * 0.05, height * 0.05),
         child: SafeArea(
@@ -39,7 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               margin: EdgeInsets.only(
                   top: height * 0.025, left: width * 0.05, right: width * 0.05),
               child: GestureDetector(
-                child: Icon(Icons.arrow_back_ios),
+                child: const Icon(Icons.arrow_back_ios, color: OslerTheme.forestDeep),
                 onTap: () {
                   Navigator.pop(context);
                 },
@@ -68,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       style: TextStyle(
                           fontSize: width * 0.09,
                           fontWeight: FontWeight.bold,
-                          color: hintColor),
+                          color: OslerTheme.textPrimary),
                     ),
                   ),
                   Container(
@@ -78,7 +80,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               context, AppString.forgot_password_description)
                           .toString(),
                       style:
-                          TextStyle(fontSize: width * 0.040, color: hintColor),
+                          TextStyle(fontSize: width * 0.040, color: OslerTheme.textSecondary),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -88,7 +90,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         right: width * 0.020,
                         top: height * 0.052),
                     child: Card(
-                      color: cardColor,
+                      color: OslerTheme.surface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -109,7 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   .toString(),
                               hintStyle: TextStyle(
                                 fontSize: width * 0.034,
-                                color: hintColor,
+                                color: OslerTheme.textSecondary,
                               )),
                           validator: (String? value) {
                             Pattern pattern =

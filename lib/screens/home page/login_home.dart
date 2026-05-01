@@ -27,6 +27,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:doctro/screens/astra/astra_ai_chat_screen.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -209,13 +210,13 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       onWillPop: onWillPop,
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: Color(0xFFF8F9FE),
+        backgroundColor: OslerTheme.canvas,
         drawer: const ModernDrawer(),
         appBar: AppBar(
-          backgroundColor: Color(0xFFF8F9FE),
+          backgroundColor: OslerTheme.canvas,
           elevation: 0,
           leading: IconButton(
-            icon: SvgPicture.asset("assets/icons/dMenuBar.svg", height: 18, color: purple),
+            icon: SvgPicture.asset("assets/icons/dMenuBar.svg", height: 18, color: OslerTheme.forestDeep),
             onPressed: () => _scaffoldKey.currentState!.openDrawer(),
           ),
           actions: [
@@ -240,10 +241,10 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
         ),
         body: RefreshIndicator(
           onRefresh: todayAppointmentsFunction,
-          color: purple,
+          color: OslerTheme.forestDeep,
           child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: OslerTheme.screenPadding,
             child: FutureBuilder(
                 future: todayAppointment,
                 builder: (context, snapshot) {
@@ -276,7 +277,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
             },
             label: const Text("Astra AI", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             icon: const Icon(Icons.psychology_outlined, color: Colors.white),
-            backgroundColor: purple,
+            backgroundColor: OslerTheme.forestDeep,
           ),
         ),
       ),
@@ -286,29 +287,56 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
   Widget _buildWelcomeHeader() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [purple, Color(0xFF9C27B0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: purple.withOpacity(0.3), blurRadius: 15, offset: Offset(0, 8)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(22),
+      decoration: OslerTheme.heroDecoration(),
+      child: Row(
         children: [
-          Text(
-            "Hello, Dr. ${dName?.split(' ').first ?? 'Doctor'}",
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.14),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: const Text(
+                    "Daily overview",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Hello, Dr. ${dName?.split(' ').first ?? 'Doctor'}",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    height: 1.05,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "You have ${todayAppointments.length} appointments scheduled for today.",
+                  style: TextStyle(color: Colors.white.withOpacity(0.78), fontSize: 14),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 5),
-          Text(
-            "You have ${todayAppointments.length} appointments scheduled for today.",
-            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+          const SizedBox(width: 16),
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: OslerTheme.lime,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(Icons.monitor_heart_outlined, color: OslerTheme.forestDeep, size: 30),
           ),
         ],
       ),
@@ -316,9 +344,6 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
   }
 
   Widget _buildStatsGrid() {
-    double totalRevenue = 0;
-    todayAppointments.forEach((a) => totalRevenue += (double.tryParse(a.amount.toString()) ?? 0));
-
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -327,24 +352,18 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       mainAxisSpacing: 15,
       childAspectRatio: 1.6,
       children: [
-        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), Icons.calendar_today, Colors.blue),
-        _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", Icons.account_balance_wallet, Colors.green),
-        _buildStatCard(getTranslated(context, AppString.dashboard_active_patients).toString(), patientCount.toString(), Icons.people, Colors.orange),
-        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), Icons.star, Colors.red),
+        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), Icons.calendar_today, OslerTheme. forestDeep),
+        _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", Icons.account_balance_wallet, OslerTheme.lime),
+        _buildStatCard(getTranslated(context, AppString.dashboard_active_patients).toString(), patientCount.toString(), Icons.people, OslerTheme. lime),
+        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), Icons.star, OslerTheme. forestDeep),
       ],
     );
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: Offset(0, 4)),
-        ],
-      ),
+      padding: const EdgeInsets.all(16),
+      decoration: OslerTheme.panelDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -353,18 +372,19 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: color.withOpacity(0.18), borderRadius: BorderRadius.circular(12)),
                 child: Icon(icon, size: 18, color: color),
               ),
-              Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey[300]),
+              Icon(Icons.arrow_forward_ios, size: 12, color: OslerTheme.textSecondary.withOpacity(0.5)),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: hintColor)),
-              Text(title, style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: OslerTheme. textPrimary)),
+              const SizedBox(height: 2),
+              Text(title, style: const TextStyle(fontSize: 12, color: OslerTheme.textSecondary)),
             ],
           ),
         ],
@@ -376,15 +396,15 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(getTranslated(context, AppString.dashboard_quick_actions).toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: hintColor)),
+        Text(getTranslated(context, AppString.dashboard_quick_actions).toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: OslerTheme. textPrimary)),
         SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildActionButton(getTranslated(context, AppString.drawer_schedule_timing).toString(), Icons.schedule, Colors.indigo, () => Navigator.pushNamed(context, 'Schedule Timings')),
-            _buildActionButton(getTranslated(context, AppString.profile_personal_information).toString(), Icons.person_search, Colors.teal, () => Navigator.pushNamed(context, 'profile')),
-            _buildActionButton(getTranslated(context, AppString.chats).toString(), Icons.chat_bubble_outline, Colors.cyan, () => Navigator.pushNamed(context, 'ChatHome')),
-            _buildActionButton(getTranslated(context, AppString.drawer_setting).toString(), Icons.settings, Colors.blueGrey, () => Navigator.pushNamed(context, 'Settings')),
+            _buildActionButton(getTranslated(context, AppString.drawer_schedule_timing).toString(), Icons.schedule, OslerTheme. lime, () => Navigator.pushNamed(context, 'Schedule Timings')),
+            _buildActionButton(getTranslated(context, AppString.profile_personal_information).toString(), Icons.person_search, OslerTheme. forestDeep, () => Navigator.pushNamed(context, 'profile')),
+            _buildActionButton(getTranslated(context, AppString.chats).toString(), Icons.chat_bubble_outline, OslerTheme. lime, () => Navigator.pushNamed(context, 'ChatHome')),
+            _buildActionButton(getTranslated(context, AppString.drawer_setting).toString(), Icons.settings, OslerTheme. forestDeep, () => Navigator.pushNamed(context, 'Settings')),
           ],
         ),
       ],
@@ -392,23 +412,38 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
   }
 
   Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onTap) {
-    return Column(
-      children: [
-        GestureDetector(
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: GestureDetector(
           onTap: onTap,
           child: Container(
-            width: 55,
-            height: 55,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+            decoration: OslerTheme.panelDecoration(),
+            child: Column(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 11, color: OslerTheme. textPrimary, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            child: Icon(icon, color: color, size: 24),
           ),
         ),
-        SizedBox(height: 8),
-        Text(label, style: TextStyle(fontSize: 12, color: hintColor)),
-      ],
+      ),
     );
   }
 
@@ -416,16 +451,23 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: hintColor)),
+        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: OslerTheme. textPrimary)),
         if (count > 0)
-          Text("$count Active", style: TextStyle(fontSize: 12, color: purple, fontWeight: FontWeight.w600)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: OslerTheme.limeSoft,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text("$count Active", style: const TextStyle(fontSize: 12, color: OslerTheme.forestDeep, fontWeight: FontWeight.w700)),
+          ),
       ],
     );
   }
 
   Widget _buildAppointmentList(bool isLoading) {
     if (isLoading) {
-      return Center(child: CircularProgressIndicator(color: purple));
+      return Center(child: CircularProgressIndicator(color: OslerTheme.forestDeep));
     }
     
     List<Widget> sections = [];
@@ -454,13 +496,13 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       return Container(
         height: 150,
         width: double.infinity,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        decoration: OslerTheme.panelDecoration(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/images/no-data.png", height: 80),
             SizedBox(height: 10),
-            Text(getTranslated(context, AppString.no_user).toString(), style: TextStyle(color: Colors.grey)),
+            Text(getTranslated(context, AppString.no_user).toString(), style: const TextStyle(color: OslerTheme.textSecondary)),
           ],
         ),
       );
@@ -475,8 +517,8 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: hintColor)),
-          Text("${getTranslated(context, AppString.view_more).toString()} ($count)", style: TextStyle(fontSize: 12, color: purple)),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: OslerTheme. textPrimary)),
+          Text("${getTranslated(context, AppString.view_more).toString()} ($count)", style: const TextStyle(fontSize: 12, color: OslerTheme.forest)),
         ],
       ),
     );
@@ -488,13 +530,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       child: Container(
         margin: EdgeInsets.only(bottom: 12),
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: Offset(0, 4)),
-          ],
-        ),
+        decoration: OslerTheme.panelDecoration(),
         child: Row(
           children: [
             ClipRRect(
@@ -512,12 +548,13 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(app.patientName ?? "Patient", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: hintColor)),
-                  Text(app.time ?? "", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                  Text(app.patientName ?? "Patient", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: OslerTheme. textPrimary)),
+                  const SizedBox(height: 4),
+                  Text(app.time ?? "", style: const TextStyle(color: OslerTheme.textSecondary, fontSize: 13)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
+            Icon(Icons.chevron_right, color: OslerTheme.textSecondary.withOpacity(0.6)),
           ],
         ),
       ),
@@ -639,7 +676,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                     .toString(),
                 style: TextStyle(
                     fontSize: 20,
-                    color: hintColor,
+                    color: OslerTheme. textPrimary,
                     decoration: TextDecoration.none),
                 textAlign: TextAlign.center,
               )),

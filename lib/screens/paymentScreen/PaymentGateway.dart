@@ -11,6 +11,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -154,18 +155,22 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     flutterWave = SharedPreferenceHelper.getInt(Preferences.FlutterWave);
 
     return Scaffold(
+      backgroundColor: OslerTheme.canvas,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: OslerTheme.canvas,
         elevation: 0,
         title: Text(
           getTranslated(context, AppString.payment_method_heading).toString(),
-          style: TextStyle(color: hintColor),
+          style: const TextStyle(
+            color: OslerTheme.textPrimary,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.keyboard_backspace_outlined,
-            color: hintColor,
+            color: OslerTheme.forestDeep,
             size: 35.0,
           ),
           onPressed: () {
@@ -174,10 +179,57 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         ),
       ),
       body: Container(
+        color: OslerTheme.canvas,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 96, 16, 24),
           children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: OslerTheme.heroDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Text(
+                      "Checkout",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    "Choose the payment path that fits your clinic.",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      height: 1.05,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "The payment methods below now sit inside the same Osler workspace language as the rest of the app.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.78),
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Column(
               children: [
                 payPal == 1 &&
@@ -190,7 +242,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.2),
+                                    color: OslerTheme.textSecondary.withOpacity(0.2),
                                     spreadRadius: 2,
                                     blurRadius: 7,
                                     offset: Offset(
@@ -198,7 +250,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                                   ),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -249,7 +301,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.2),
+                                    color: OslerTheme.textSecondary.withOpacity(0.2),
                                     spreadRadius: 2,
                                     blurRadius: 7,
                                     offset: Offset(
@@ -257,7 +309,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                                   ),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -308,7 +360,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.2),
+                                    color: OslerTheme.textSecondary.withOpacity(0.2),
                                     spreadRadius: 2,
                                     blurRadius: 7,
                                     offset: Offset(
@@ -316,7 +368,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                                   ),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -367,13 +419,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                      color: grey.withOpacity(0.2),
+                                      color: OslerTheme.textSecondary.withOpacity(0.2),
                                       spreadRadius: 2,
                                       blurRadius: 7,
                                       offset: Offset(0, 3)),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -424,14 +476,14 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.2),
+                                    color: OslerTheme.textSecondary.withOpacity(0.2),
                                     spreadRadius: 2,
                                     blurRadius: 7,
                                     offset: Offset(0, 3),
                                   ),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -482,14 +534,14 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.2),
+                                    color: OslerTheme.textSecondary.withOpacity(0.2),
                                     spreadRadius: 2,
                                     blurRadius: 7,
                                     offset: Offset(0, 3),
                                   ),
                                 ],
                                 borderRadius: BorderRadius.circular(20),
-                                color: colorWhite),
+                                color: Colors.white),
                             height: MediaQuery.of(context).size.height * 0.1,
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
@@ -590,18 +642,18 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             child: Container(
               decoration: BoxDecoration(boxShadow: [
                 BoxShadow(
-                    color: grey.withOpacity(0.2),
+                    color: OslerTheme.textSecondary.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 7,
                     offset: Offset(0, 3)),
-              ], borderRadius: BorderRadius.circular(20), color: loginButton),
+              ], borderRadius: BorderRadius.circular(20), color: OslerTheme.forestDeep),
               height: MediaQuery.of(context).size.height * 0.07,
               width: MediaQuery.of(context).size.width,
               child: Center(
-                child: Text(
+            child: Text(
                   getTranslated(context, AppString.payment_gateway_pay)
                       .toString(),
-                  style: TextStyle(color: colorWhite, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/screens/home%20page/login_home.dart';
+import 'package:doctro/theme/osler_theme.dart';
 
 class ProfileCompleteScreen extends StatelessWidget {
   const ProfileCompleteScreen({Key? key}) : super(key: key);
@@ -8,7 +8,7 @@ class ProfileCompleteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: OslerTheme.canvas,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -23,7 +23,7 @@ class ProfileCompleteScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: purple,
+                  color: OslerTheme.textPrimary,
                   letterSpacing: -1,
                 ),
                 textAlign: TextAlign.center,
@@ -33,7 +33,7 @@ class ProfileCompleteScreen extends StatelessWidget {
                 "Your clinical profile and identity have been successfully verified and secured.",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: OslerTheme.textSecondary,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -51,12 +51,12 @@ class ProfileCompleteScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: purple,
+                    backgroundColor: OslerTheme.forestDeep,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                     elevation: 5,
-                    shadowColor: purple.withOpacity(0.4),
+                    shadowColor: OslerTheme.forestDeep.withOpacity(0.4),
                   ),
                   child: const Text(
                     "Go to Dashboard",

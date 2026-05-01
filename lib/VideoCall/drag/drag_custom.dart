@@ -22,12 +22,14 @@ typedef DragTargetAccept<T> = void Function(T data);
 /// this [DragTarget] and that will not be accepted by the [DragTarget].
 ///
 /// Used by [DragTarget.builder].
-typedef DragTargetBuilder<T> = Widget Function(BuildContext context, List<T> candidateData, List<dynamic> rejectedData);
+typedef DragTargetBuilder<T> = Widget Function(
+    BuildContext context, List<T> candidateData, List<dynamic> rejectedData);
 
 /// Signature for when a [Draggable] is dropped without being accepted by a [DragTarget].
 ///
 /// Used by [Draggable.onDraggableCanceled].
-typedef DraggableCanceledCallback = void Function(Velocity velocity, Offset offset);
+typedef DraggableCanceledCallback = void Function(
+    Velocity velocity, Offset offset);
 
 /// Signature for when the draggable is dropped.
 ///
@@ -249,7 +251,8 @@ class Draggable<T> extends StatefulWidget {
   /// Subclasses can override this function to customize when they start
   /// recognizing a drag.
   @protected
-  Future<MultiDragGestureRecognizer> createRecognizer(GestureMultiDragStartCallback onStart) async {
+  Future<MultiDragGestureRecognizer> createRecognizer(
+      GestureMultiDragStartCallback onStart) async {
     switch (affinity) {
       case Axis.horizontal:
         return HorizontalMultiDragGestureRecognizer()..onStart = onStart;
@@ -307,11 +310,13 @@ class LongPressDraggable<T> extends Draggable<T> {
   final bool hapticFeedbackOnStart;
 
   @override
-  Future<DelayedMultiDragGestureRecognizer> createRecognizer(GestureMultiDragStartCallback onStart) async {
+  Future<DelayedMultiDragGestureRecognizer> createRecognizer(
+      GestureMultiDragStartCallback onStart) async {
     return DelayedMultiDragGestureRecognizer()
       ..onStart = (Offset position) {
         final Drag? result = onStart(position);
-        if (result != null && hapticFeedbackOnStart) HapticFeedback.selectionClick();
+        if (result != null && hapticFeedbackOnStart)
+          HapticFeedback.selectionClick();
         return result;
       };
   }
@@ -321,7 +326,6 @@ class _DraggableState<T> extends State<Draggable<T>> {
   @override
   void initState() {
     super.initState();
-    // _recognizer = widget.createRecognizer(_startDrag) as GestureRecognizer ;
   }
 
   @override
@@ -346,13 +350,15 @@ class _DraggableState<T> extends State<Draggable<T>> {
   }
 
   void _routePointer(PointerDownEvent event) {
-    if (widget.maxSimultaneousDrags != null && _activeCount >= widget.maxSimultaneousDrags!) return;
+    if (widget.maxSimultaneousDrags != null &&
+        _activeCount >= widget.maxSimultaneousDrags!) return;
     // _recognizer
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool canDrag = widget.maxSimultaneousDrags == null || _activeCount < widget.maxSimultaneousDrags!;
+    final bool canDrag = widget.maxSimultaneousDrags == null ||
+        _activeCount < widget.maxSimultaneousDrags!;
     return Listener(
       onPointerDown: canDrag ? _routePointer : null,
       child: widget.child,
@@ -451,7 +457,8 @@ class _DragTargetState<T> extends State<DragTarget<T?>> {
   bool didEnter(_DragAvatar<Object?> avatar) {
     assert(!_candidateAvatars.contains(avatar));
     assert(!_rejectedAvatars.contains(avatar));
-    if (avatar is _DragAvatar<T> && (widget.onWillAccept == null || widget.onWillAccept!(avatar.data))) {
+    if (avatar is _DragAvatar<T> &&
+        (widget.onWillAccept == null || widget.onWillAccept!(avatar.data))) {
       setState(() {
         _candidateAvatars.add(avatar);
       });
@@ -465,7 +472,8 @@ class _DragTargetState<T> extends State<DragTarget<T?>> {
   }
 
   void didLeave(_DragAvatar<Object?> avatar) {
-    assert(_candidateAvatars.contains(avatar) || _rejectedAvatars.contains(avatar));
+    assert(_candidateAvatars.contains(avatar) ||
+        _rejectedAvatars.contains(avatar));
     if (!mounted) return;
     setState(() {
       _candidateAvatars.remove(avatar);
@@ -488,14 +496,16 @@ class _DragTargetState<T> extends State<DragTarget<T?>> {
     return MetaData(
       metaData: this,
       behavior: HitTestBehavior.translucent,
-      child: widget.builder(context, _mapAvatarsToData<T>(_candidateAvatars), _mapAvatarsToData<Object?>(_rejectedAvatars)),
+      child: widget.builder(context, _mapAvatarsToData<T>(_candidateAvatars),
+          _mapAvatarsToData<Object?>(_rejectedAvatars)),
     );
   }
 }
 
 enum _DragEndKind { dropped, canceled }
 
-typedef _OnDragEnd = void Function(Velocity velocity, Offset? offset, bool wasAccepted);
+typedef _OnDragEnd = void Function(
+    Velocity velocity, Offset? offset, bool wasAccepted);
 typedef _OnDragUpdate = void Function(Offset? offset);
 
 // The lifetime of this object is a little dubious right now. Specifically, it
@@ -559,10 +569,12 @@ class _DragAvatar<T> extends Drag {
     final HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPosition + feedbackOffset);
 
-    final List<_DragTargetState<T>> targets = _getDragTargets(result.path).toList();
+    final List<_DragTargetState<T>> targets =
+        _getDragTargets(result.path).toList();
 
     bool listsMatch = false;
-    if (targets.length >= _enteredTargets.length && _enteredTargets.isNotEmpty) {
+    if (targets.length >= _enteredTargets.length &&
+        _enteredTargets.isNotEmpty) {
       listsMatch = true;
       final Iterator<_DragTargetState<T>> iterator = targets.iterator;
       for (int i = 0; i < _enteredTargets.length; i += 1) {
@@ -593,7 +605,8 @@ class _DragAvatar<T> extends Drag {
     onDragUpdate!(_lastOffset);
   }
 
-  Iterable<_DragTargetState<T>> _getDragTargets(Iterable<HitTestEntry> path) sync* {
+  Iterable<_DragTargetState<T>> _getDragTargets(
+      Iterable<HitTestEntry> path) sync* {
     // Look for the RenderBoxes that corresponds to the hit target (the hit target
     // widgets build RenderMetaData boxes for us for this purpose).
     for (final HitTestEntry entry in path) {
@@ -606,7 +619,8 @@ class _DragAvatar<T> extends Drag {
   }
 
   void _leaveAllEntered() {
-    for (int i = 0; i < _enteredTargets.length; i += 1) _enteredTargets[i].didLeave(this);
+    for (int i = 0; i < _enteredTargets.length; i += 1)
+      _enteredTargets[i].didLeave(this);
     _enteredTargets.clear();
   }
 
@@ -622,7 +636,8 @@ class _DragAvatar<T> extends Drag {
     _entry!.remove();
     _entry = null;
     // TODO(Oanh): consider passing _entry as well so the client can perform an animation.
-    if (onDragEnd != null) onDragEnd!(velocity ?? Velocity.zero, _lastOffset, wasAccepted);
+    if (onDragEnd != null)
+      onDragEnd!(velocity ?? Velocity.zero, _lastOffset, wasAccepted);
   }
 
   Widget _build(BuildContext context) {
@@ -633,7 +648,6 @@ class _DragAvatar<T> extends Drag {
       top: _lastOffset!.dy - overlayTopLeft.dy,
       child: IgnorePointer(
         child: feedback,
-        // ignoringSemantics: ignoringFeedbackSemantics,
         ignoring: ignoringFeedbackSemantics,
       ),
     );

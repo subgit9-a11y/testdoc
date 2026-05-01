@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/providers/home_provider.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -195,21 +196,21 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    return Scaffold( backgroundColor: OslerTheme.canvas,
       appBar: PreferredSize(
         preferredSize: Size(width! * 0.3, height * 0.2),
         child: SafeArea(
           top: true,
           child: Container(
               margin: EdgeInsets.only(top: height * 0.02),
-              color: Colors.transparent,
+              color: OslerTheme.canvas,
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: Container(
                     margin: EdgeInsets.only(
                         left: width! * 0.9, right: width! * 0.02),
                     child: InkWell(
-                      child: Icon(Icons.arrow_back_ios),
+                      child: Icon(Icons.arrow_back_ios, color: OslerTheme.forestDeep),
                       onTap: () {
                         Navigator.pop(context);
                       },

@@ -1,13 +1,12 @@
 import 'package:doctro/constant/app_string.dart';
-import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/model/FinanceDetails.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 class SubscriptionHistory extends StatefulWidget {
@@ -18,20 +17,12 @@ class SubscriptionHistory extends StatefulWidget {
 }
 
 class _SubscriptionHistoryState extends State<SubscriptionHistory> {
-  //Set Loader
   Future? purchaseReq;
 
-  //Set Height/Width Using MediaQuery
-  late double width;
-  late double height;
-
-  //Add List Data
-  List<PurchaseDetails> purchaseDetail = [];
-
-  //Search Data
-  TextEditingController _search = TextEditingController();
-  List<PurchaseDetails> _searchResult = [];
-  List<PurchaseDetails> _subscriptionHistory = [];
+  final List<PurchaseDetails> purchaseDetail = [];
+  final TextEditingController _search = TextEditingController();
+  final List<PurchaseDetails> _searchResult = [];
+  final List<PurchaseDetails> _subscriptionHistory = [];
 
   @override
   void initState() {
@@ -41,569 +32,307 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 
   @override
   Widget build(BuildContext context) {
-    width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: PreferredSize(
-          preferredSize: Size(20, 200),
-          child: SafeArea(
-              top: true,
-              child: Column(children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                          left: width * 0.06,
-                          right: width * 0.04,
-                          top: height * 0.01),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            getTranslated(context,
-                                    AppString.subscription_history_heading)
-                                .toString(),
-                            style: TextStyle(
-                                fontSize: width * 0.05, color: hintColor),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(),
-                            child: IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(Icons.arrow_back_ios),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: height * 0.01),
-                  padding: EdgeInsets.all(10),
-                  child: Card(
-                    color: colorWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Container(
-                        height: height * 0.06,
-                        alignment: AlignmentDirectional.center,
-                        margin: EdgeInsets.only(
-                            left: width * 0.05, right: width * 0.05),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: height * 0.07,
-                              width: width * 0.7,
-                              child: TextField(
-                                controller: _search,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: getTranslated(context,
-                                          AppString.subscription_search_history)
-                                      .toString(),
-                                  hintStyle: TextStyle(
-                                    fontSize: width * 0.045,
-                                    color: hintColor.withOpacity(0.3),
-                                  ),
-                                ),
-                                onChanged: onSearchTextChanged,
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            Container(
-                              child: SvgPicture.asset(
-                                'assets/icons/dSearch.svg',
-                                height: 20,
-                              ),
-                            ),
-                          ],
-                        )),
-                  ),
-                ),
-                Container(
-                  color: divider,
-                  width: width * 1.0,
-                  child: Container(
-                    height: height * 0.05,
-                    margin: EdgeInsets.only(
-                        left: width * 0.06, right: width * 0.06),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          getTranslated(context,
-                                  AppString.subscription_history_heading)
-                              .toString(),
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          "${purchaseDetail.length} " +
-                              getTranslated(
-                                      context, AppString.subscription_title)
-                                  .toString(),
-                          style: TextStyle(
-                              fontSize: width * 0.035, color: loginButton),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ]))),
+      backgroundColor: OslerTheme.canvas,
+      appBar: AppBar(
+        backgroundColor: OslerTheme.canvas,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: OslerTheme.forestDeep,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          getTranslated(context, AppString.subscription_history_heading)
+              .toString(),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
+          FocusScope.of(context).requestFocus(FocusNode());
         },
         child: FutureBuilder(
-            future: purchaseReq,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return _search.text.isNotEmpty
-                    ? _searchResult.length > 0
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            // physics: NeverScrollableScrollPhysics(),
-                            itemCount: _searchResult.length,
-                            itemBuilder: (context, i) {
-                              return Container(
-                                height: 160,
-                                width: width * 0.87,
-                                child: Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                    ),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Container(
-                                            child: ListTile(
-                                              isThreeLine: true,
-                                              title: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .subscription_plan)
-                                                              .toString() +
-                                                          ":" +
-                                                          _searchResult[i]
-                                                              .subscription!
-                                                              .name!,
-                                                      style: TextStyle(
-                                                          fontSize: 16.0)),
-                                                ],
-                                              ),
-                                              trailing: _searchResult[i]
-                                                          .status ==
-                                                      1
-                                                  ? Card(
-                                                      color: green,
-                                                      child: Container(
-                                                        width: 50,
-                                                        child: Text(
-                                                          getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .subscription_active_button)
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                              color:
-                                                                  colorWhite),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                      ))
-                                                  : Container(
-                                                      margin: EdgeInsets.only(
-                                                          top: height * 0.008),
-                                                      child: Card(
-                                                          color: red,
-                                                          child: Container(
-                                                              width: 50,
-                                                              child: Text(
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .subscription_expired)
-                                                                      .toString(),
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          colorWhite),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center)))),
-                                              subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  _searchResult[i].amount ==
-                                                          null
-                                                      ? Container(
-                                                          child: Text(
-                                                            getTranslated(
-                                                                    context,
-                                                                    AppString
-                                                                        .subscription_free)
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                                color: text),
-                                                          ),
-                                                        )
-                                                      : Text(
-                                                          getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .subscription_payment)
-                                                                  .toString() +
-                                                              ":" +
-                                                              _searchResult[i]
-                                                                  .amount
-                                                                  .toString(),
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: hintColor),
-                                                        ),
-                                                  _searchResult[i]
-                                                              .paymentType ==
-                                                          null
-                                                      ? Container()
-                                                      : Text(
-                                                          getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .subscription_payment_type)
-                                                                  .toString() +
-                                                              _searchResult[i]
-                                                                  .paymentType!,
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: hintColor),
-                                                        ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Divider(
-                                            color: divider,
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                        getTranslated(
-                                                                context,
-                                                                AppString
-                                                                    .subscription_start_end)
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                passwordVisibility)),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                            _searchResult[i]
-                                                                .startDate!,
-                                                            style: TextStyle(
-                                                                fontSize: 14,
-                                                                color:
-                                                                    hintColor)),
-                                                        SizedBox(width: 5),
-                                                        Text(
-                                                            _searchResult[i]
-                                                                .endDate!,
-                                                            style: TextStyle(
-                                                                fontSize: 14,
-                                                                color:
-                                                                    hintColor)),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                      right: width * 0.02),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                          getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .subscription_doctor_name)
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color:
-                                                                  passwordVisibility)),
-                                                      Container(
-                                                        margin:
-                                                            EdgeInsets.only(),
-                                                        child: Text(
-                                                            _searchResult[i]
-                                                                .doctorName!,
-                                                            style: TextStyle(
-                                                                fontSize: 14,
-                                                                color:
-                                                                    hintColor)),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ])),
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Container(
-                            child: Text(getTranslated(
-                                    context, AppString.result_not_found)
-                                .toString()),
-                          ))
-                    : ListView.builder(
-                        shrinkWrap: false,
-                        physics: AlwaysScrollableScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        itemCount: purchaseDetail.length,
-                        itemBuilder: (context, index) {
-                          String startDate = DateUtil().formattedDate(
-                              DateTime.parse(purchaseDetail[index].startDate!));
-                          String endDate = DateUtil().formattedDate(
-                              DateTime.parse(purchaseDetail[index].endDate!));
+          future: purchaseReq,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(
+                child: CircularProgressIndicator(color: OslerTheme.forestDeep),
+              );
+            }
 
-                          return Container(
-                            height: 160,
-                            width: width * 0.87,
-                            child: Card(
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Container(
-                                        child: ListTile(
-                                          isThreeLine: true,
-                                          title: Text(
-                                              getTranslated(
-                                                          context,
-                                                          AppString
-                                                              .subscription_plan)
-                                                      .toString() +
-                                                  ":" +
-                                                  purchaseDetail[index]
-                                                      .subscription!
-                                                      .name!,
-                                              style: TextStyle(fontSize: 16.0)),
-                                          trailing: purchaseDetail[index]
-                                                      .status ==
-                                                  1
-                                              ? Card(
-                                                  color: green,
-                                                  child: Container(
-                                                    width: 50,
-                                                    child: Text(
-                                                      getTranslated(
-                                                              context,
-                                                              AppString
-                                                                  .subscription_active_button)
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: colorWhite),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  ))
-                                              : Container(
-                                                  margin: EdgeInsets.only(
-                                                      top: height * 0.008),
-                                                  child: Card(
-                                                      color: red,
-                                                      child: Container(
-                                                          width: 50,
-                                                          child: Text(
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .subscription_expired)
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      colorWhite),
-                                                              textAlign: TextAlign
-                                                                  .center)))),
-                                          subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              purchaseDetail[index].amount ==
-                                                      null
-                                                  ? Container(
-                                                      child: Text(
-                                                        getTranslated(
-                                                                context,
-                                                                AppString
-                                                                    .subscription_free)
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            color: text),
-                                                      ),
-                                                    )
-                                                  : Text(
-                                                      getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .subscription_payment)
-                                                              .toString() +
-                                                          ":" +
-                                                          purchaseDetail[index]
-                                                              .amount
-                                                              .toString(),
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: hintColor),
-                                                    ),
-                                              purchaseDetail[index]
-                                                          .paymentType ==
-                                                      null
-                                                  ? Container()
-                                                  : Text(
-                                                      getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .subscription_payment_type)
-                                                              .toString() +
-                                                          ":" +
-                                                          purchaseDetail[index]
-                                                              .paymentType!,
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: hintColor),
-                                                    ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Divider(
-                                        color: divider,
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                    getTranslated(
-                                                            context,
-                                                            AppString
-                                                                .subscription_start_end)
-                                                        .toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color:
-                                                            passwordVisibility)),
-                                                Row(
-                                                  children: [
-                                                    Text('$startDate',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: hintColor)),
-                                                    SizedBox(width: 5),
-                                                    Text('$endDate',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: hintColor)),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                  right: width * 0.02),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                      getTranslated(
-                                                              context,
-                                                              AppString
-                                                                  .subscription_doctor_name)
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          color:
-                                                              passwordVisibility)),
-                                                  Container(
-                                                    margin: EdgeInsets.only(),
-                                                    child: Text(
-                                                        purchaseDetail[index]
-                                                            .doctorName!,
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: hintColor)),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ])),
-                          );
-                        },
-                      );
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            }),
+            final activeSource =
+                _search.text.isNotEmpty ? _searchResult : purchaseDetail;
+
+            return SingleChildScrollView(
+              padding: OslerTheme.screenPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHero(),
+                  const SizedBox(height: 18),
+                  _buildSearchCard(),
+                  const SizedBox(height: 18),
+                  _buildSummary(),
+                  const SizedBox(height: 14),
+                  if (activeSource.isEmpty)
+                    _buildEmptyState()
+                  else
+                    ...activeSource.map((item) => _buildHistoryCard(item)),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: OslerTheme.heroDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              "Plan history",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            "Review every clinic subscription in one place.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              height: 1.05,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Search plan purchases, payment types, and expiry dates without falling back to the old utility layout.",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.78),
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchCard() {
+    return Container(
+      decoration: OslerTheme.panelDecoration(),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+      child: TextField(
+        controller: _search,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          filled: false,
+          hintText: getTranslated(
+            context,
+            AppString.subscription_search_history,
+          ).toString(),
+          hintStyle: const TextStyle(color: OslerTheme.textSecondary),
+          suffixIcon: const Icon(
+            Icons.search_rounded,
+            color: OslerTheme.forestDeep,
+          ),
+        ),
+        onChanged: onSearchTextChanged,
+      ),
+    );
+  }
+
+  Widget _buildSummary() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          getTranslated(context, AppString.subscription_history_heading)
+              .toString(),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: OslerTheme.limeSoft,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            "${purchaseDetail.length} ${getTranslated(context, AppString.subscription_title).toString()}",
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: OslerTheme.forestDeep,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryCard(PurchaseDetails item) {
+    final statusActive = item.status == 1;
+    final endDate = item.expireDate != null
+        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.expireDate!))
+        : "--";
+    final startDate = item.startDate != null
+        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.startDate!))
+        : "--";
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(18),
+      decoration: OslerTheme.panelDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  "${getTranslated(context, AppString.subscription_plan).toString()}: ${item.subscription?.name ?? ""}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: OslerTheme.textPrimary,
+                  ),
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: statusActive
+                      ? const Color(0xFFDDF0D0)
+                      : const Color(0xFFF8D6CF),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  statusActive
+                      ? getTranslated(
+                          context,
+                          AppString.subscription_active_button,
+                        ).toString()
+                      : getTranslated(
+                          context,
+                          AppString.subscription_expired,
+                        ).toString(),
+                  style: TextStyle(
+                    color: statusActive
+                        ? OslerTheme.forestDeep
+                        : OslerTheme.danger,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            item.amount == null
+                ? getTranslated(context, AppString.subscription_free).toString()
+                : "${getTranslated(context, AppString.subscription_payment).toString()}: ${item.amount}",
+            style: const TextStyle(
+              fontSize: 14,
+              color: OslerTheme.textSecondary,
+            ),
+          ),
+          if (item.paymentType != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              "${getTranslated(context, AppString.subscription_payment_type).toString()} ${item.paymentType!}",
+              style: const TextStyle(
+                fontSize: 14,
+                color: OslerTheme.textSecondary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: OslerTheme.mutedPanelDecoration(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _dateColumn("Start", startDate),
+                _dateColumn("Expiry", endDate),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dateColumn(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: OslerTheme.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 36),
+      decoration: OslerTheme.panelDecoration(),
+      child: Column(
+        children: [
+          Image.asset("assets/images/no-data.png", height: 88),
+          const SizedBox(height: 10),
+          const Text(
+            "No subscription history yet.",
+            style: TextStyle(color: OslerTheme.textSecondary),
+          ),
+        ],
       ),
     );
   }
@@ -611,14 +340,15 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   Future<BaseModel<FinanceDetails>> purchaseDetailsFunction() async {
     FinanceDetails response;
     try {
+      purchaseDetail.clear();
+      _subscriptionHistory.clear();
       response = await RestClient(await RetroApi().dioData(context))
-          .purchaseDetailsRequest();
+          .purchaseSubscriptionRequest();
       setState(() {
-        purchaseDetail.addAll(response.data!);
-        _subscriptionHistory.addAll(response.data!);
+        purchaseDetail.addAll(response.purchaseData!);
+        _subscriptionHistory.addAll(response.purchaseData!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -631,24 +361,13 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       return;
     }
 
-    _subscriptionHistory.forEach((subscriptionHistory) {
-      if (subscriptionHistory.doctorName!
-              .toLowerCase()
-              .contains(text.toLowerCase()) ||
-          subscriptionHistory.subscription!.name!
-              .toLowerCase()
-              .contains(text.toLowerCase()))
-        _searchResult.add(subscriptionHistory);
-    });
-
+    for (final subscription in _subscriptionHistory) {
+      if ((subscription.subscription?.name ?? "")
+          .toLowerCase()
+          .contains(text.toLowerCase())) {
+        _searchResult.add(subscription);
+      }
+    }
     setState(() {});
-  }
-}
-
-class DateUtil {
-  static const DATE_FORMAT = 'dd-MM-yyyy';
-
-  String formattedDate(DateTime dateTime) {
-    return DateFormat(DATE_FORMAT).format(dateTime);
   }
 }

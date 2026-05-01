@@ -11,6 +11,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/screens/paymentScreen/PaymentGateway.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 
 class SubSubscription extends StatefulWidget {
@@ -19,22 +20,10 @@ class SubSubscription extends StatefulWidget {
 }
 
 class _SubSubscriptionState extends State<SubSubscription> {
-  //Set Height/Width Using MediaQuery
   late double width;
   late double height;
 
-  //Set Custom Size
-  double customContainerSize = 123;
-  double customListViewSize = 50;
-
-  late bool customContainerSizeBool;
-
-  //Set Loader
   Future? subscriptions;
-  bool incrementBool = true;
-
-  //Set RadioButton
-  List<bool> radioSelectionBool = [];
   int? value;
 
   @override
@@ -44,352 +33,319 @@ class _SubSubscriptionState extends State<SubSubscription> {
     super.initState();
   }
 
-  setSelectedRadio(int val) {
-    setState(() {
-      value = val;
-    });
-  }
-
-  List<Data> subscribeReq = [];
-
-  List<PaymentData> pD = <PaymentData>[];
+  final List<Data> subscribeReq = [];
 
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(width * 0.05, height * 0.05),
-          child: SafeArea(
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      backgroundColor: OslerTheme.canvas,
+      appBar: AppBar(
+        backgroundColor: OslerTheme.canvas,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: OslerTheme.forestDeep,
+            size: 20,
+          ),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, 'loginHome');
+          },
+        ),
+        title: Text(
+          getTranslated(context, AppString.choose_your_best_plan).toString(),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+      ),
+      body: FutureBuilder(
+        future: subscriptions,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(color: OslerTheme.forestDeep),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: OslerTheme.screenPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                    alignment: AlignmentDirectional.topStart,
-                    margin: EdgeInsets.only(
-                        top: height * 0.025,
-                        left: width * 0.05,
-                        right: width * 0.05),
-                    child: GestureDetector(
-                      child: Icon(Icons.arrow_back_ios),
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, 'loginHome');
-                      },
-                    )),
-                Container(
-                  margin: EdgeInsets.only(
-                    left: width * 0.15,
-                    top: height * 0.02,
-                  ),
-                  child: Text(
-                    getTranslated(context, AppString.choose_your_best_plan)
-                        .toString(),
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: hintColor),
-                    textAlign: TextAlign.start,
+                _buildHero(),
+                const SizedBox(height: 18),
+                ...subscribeReq.asMap().entries.map(
+                  (entry) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildPlanCard(entry.key, entry.value),
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-        body: FutureBuilder(
-            future: subscriptions,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return SingleChildScrollView(
-                  child: Center(
-                    child: Container(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                itemCount: subscribeReq.length,
-                                itemBuilder: (context, index) {
-                                  List parseData =
-                                      json.decode(subscribeReq[index].plan!);
-                                  if (incrementBool == true) {
-                                    if (1 >= parseData.length) {
-                                      for (int i = 0;
-                                          i < parseData.length;
-                                          i++) {
-                                        customContainerSize += height * 0.05;
-                                        customListViewSize += height * 0.04;
-                                      }
-                                    }
-                                    incrementBool = false;
-                                  }
+          );
+        },
+      ),
+    );
+  }
 
-                                  1 >= parseData.length
-                                      ? customContainerSizeBool = false
-                                      : customContainerSizeBool = true;
-                                  for (int i = 0; i < parseData.length; i++) {
-                                    if (i == 0) {
-                                      radioSelectionBool.add(true);
-                                    } else {
-                                      radioSelectionBool.add(false);
-                                    }
-                                  }
-                                  return Container(
-                                    margin: EdgeInsets.only(top: width * 0.06),
-                                    height: customContainerSizeBool
-                                        ? customContainerSize
-                                        : height * 0.15,
-                                    width: width * 0.95,
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
-                                      ),
-                                      color: cardBorder,
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                          top: width * 0.04,
-                                        ),
-                                        alignment:
-                                            AlignmentDirectional.topStart,
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  width: width * 0.25,
-                                                  height: width * 0.15,
-                                                  child: Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0),
-                                                    ),
-                                                    color: card,
-                                                    child: Container(
-                                                      alignment:
-                                                          AlignmentDirectional
-                                                              .center,
-                                                      child: Text(
-                                                        subscribeReq[index]
-                                                            .name!,
-                                                        style: TextStyle(
-                                                            fontSize:
-                                                                width * 0.035,
-                                                            color: colorWhite,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Column(
-                                                  children: [
-                                                    Text(
-                                                      subscribeReq[index]
-                                                              .totalAppointment
-                                                              .toString() +
-                                                          getTranslated(
-                                                                  context,
-                                                                  AppString
-                                                                      .total_booking)
-                                                              .toString(),
-                                                      style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.04,
-                                                          color: cardText),
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                    ),
-                                                    SizedBox(
-                                                      height: 4,
-                                                    ),
-                                                    1 >= parseData.length
-                                                        ? Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              parseData[0][
-                                                                          'month'] !=
-                                                                      null
-                                                                  ? Row(
-                                                                      children: [
-                                                                        SharedPreferenceHelper.getString(Preferences.currency_symbol) !=
-                                                                                "N_A"
-                                                                            ? Text(
-                                                                                "${SharedPreferenceHelper.getString(Preferences.currency_symbol)} ${parseData[0]['price']} /",
-                                                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorBlack),
-                                                                              )
-                                                                            : Text(
-                                                                                "${parseData[0]['price']} /",
-                                                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorBlack),
-                                                                              ),
-                                                                        Text(
-                                                                          '${parseData[0]['month']} MONTH  ',
-                                                                          style: TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 12,
-                                                                              color: colorBlack),
-                                                                          textAlign:
-                                                                              TextAlign.start,
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                                  : Column(
-                                                                      children: [
-                                                                        Text(
-                                                                          getTranslated(context, AppString.free_validity)
-                                                                              .toString(),
-                                                                          style: TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 14,
-                                                                              color: cardText),
-                                                                          textAlign:
-                                                                              TextAlign.start,
-                                                                        ),
-                                                                        Text(
-                                                                          getTranslated(context, AppString.edit_or_delete)
-                                                                              .toString(),
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: cardText),
-                                                                          textAlign:
-                                                                              TextAlign.start,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                            ],
-                                                          )
-                                                        : Container(
-                                                            height:
-                                                                customListViewSize,
-                                                            width: width * 0.5,
-                                                            child: ListView
-                                                                .builder(
-                                                              physics:
-                                                                  NeverScrollableScrollPhysics(),
-                                                              itemCount:
-                                                                  parseData
-                                                                      .length,
-                                                              itemBuilder: (context,
-                                                                      index) =>
-                                                                  Container(
-                                                                      height:
-                                                                          40,
-                                                                      child:
-                                                                          RadioListTile(
-                                                                        value:
-                                                                            index,
-                                                                        groupValue:
-                                                                            value,
-                                                                        onChanged: (dynamic
-                                                                                ind) =>
-                                                                            setState(() =>
-                                                                                value = ind),
-                                                                        title:
-                                                                            Row(
-                                                                          children: [
-                                                                            SharedPreferenceHelper.getString(Preferences.currency_symbol) != "N_A"
-                                                                                ? Text(
-                                                                                    "${SharedPreferenceHelper.getString(Preferences.currency_symbol)} ${parseData[index]['price']} /",
-                                                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorBlack),
-                                                                                  )
-                                                                                : Text(
-                                                                                    "${parseData[index]['price']} /",
-                                                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorBlack),
-                                                                                  ),
-                                                                            Text(
-                                                                              '${parseData[index]['month']} MONTH',
-                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: colorBlack),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      )),
-                                                            ),
-                                                          ),
-                                                  ],
-                                                ),
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                      left: width * 0.02,
-                                                      right: width * 0.02),
-                                                  child: OutlinedButton(
-                                                    onPressed: () {
-                                                      subscribeReq[
-                                                                      index]
-                                                                  .name ==
-                                                              'free'
-                                                          ? Container()
-                                                          : Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (context) => PaymentGatewayScreen(
-                                                                      plan: subscribeReq[
-                                                                              index]
-                                                                          .plan,
-                                                                      value:
-                                                                          value,
-                                                                      id: subscribeReq[
-                                                                              index]
-                                                                          .id,
-                                                                      name: subscribeReq[
-                                                                              index]
-                                                                          .name)));
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(5),
-                                                      child: Text(
-                                                        getTranslated(
-                                                                context,
-                                                                AppString
-                                                                    .subscription_buy)
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          color: card,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ],
-                      ),
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: OslerTheme.heroDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              "Subscription plans",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            "Choose the plan that fits your clinic rhythm.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              height: 1.05,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Compare bookings, monthly options, and billing details in a calmer Osler-style layout.",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.78),
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlanCard(int planIndex, Data data) {
+    final List planOptions = json.decode(data.plan!);
+    final bool hasMultipleOptions = planOptions.length > 1;
+    final selectedIndex = value ?? 0;
+    final currentIndex = hasMultipleOptions
+        ? (selectedIndex >= planOptions.length ? 0 : selectedIndex)
+        : 0;
+
+    return Container(
+      decoration: OslerTheme.panelDecoration(),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: OslerTheme.forestDeep,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  data.name ?? "",
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "${data.totalAppointment}${getTranslated(context, AppString.total_booking).toString()}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: OslerTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    hasMultipleOptions ? "Flexible billing options" : "Single plan option",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: OslerTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (hasMultipleOptions)
+            ...planOptions.asMap().entries.map(
+              (entry) => _buildOptionTile(entry.key, entry.value),
+            )
+          else
+            _buildSingleOption(planOptions[0]),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                if (data.name == 'free') {
+                  return;
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentGatewayScreen(
+                      plan: data.plan,
+                      value: currentIndex,
+                      id: data.id,
+                      name: data.name,
                     ),
                   ),
                 );
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            }));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    data.name == 'free' ? OslerTheme.moss : OslerTheme.forestDeep,
+              ),
+              child: Text(
+                getTranslated(context, AppString.subscription_buy).toString(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSingleOption(dynamic option) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: OslerTheme.mutedPanelDecoration(),
+      child: option['month'] != null
+          ? Row(
+              children: [
+                Text(
+                  "${_currencyPrefix()}${option['price']} / ",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    color: OslerTheme.textPrimary,
+                  ),
+                ),
+                Text(
+                  "${option['month']} MONTH",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: OslerTheme.textSecondary,
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  getTranslated(context, AppString.free_validity).toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    color: OslerTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  getTranslated(context, AppString.edit_or_delete).toString(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: OslerTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildOptionTile(int optionIndex, dynamic option) {
+    final selected = value == optionIndex;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          value = optionIndex;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selected ? OslerTheme.limeSoft : OslerTheme.surfaceMuted,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: selected ? OslerTheme.lime : OslerTheme.border,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: selected ? OslerTheme.forestDeep : OslerTheme.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    "${_currencyPrefix()}${option['price']} / ",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: OslerTheme.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    "${option['month']} MONTH",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: OslerTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _currencyPrefix() {
+    final symbol =
+        SharedPreferenceHelper.getString(Preferences.currency_symbol);
+    return symbol != "N_A" ? "$symbol " : "";
   }
 
   Future<BaseModel<SubscriptionPlan>> subscribe() async {
@@ -401,7 +357,6 @@ class _SubSubscriptionState extends State<SubSubscription> {
         subscribeReq.addAll(response.data!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -424,11 +379,11 @@ class PaymentData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['plan'] = this.plan;
-    data['total_appointment'] = this.totalAppointment;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['plan'] = plan;
+    data['total_appointment'] = totalAppointment;
     return data;
   }
 }

@@ -16,6 +16,7 @@ import 'package:doctro/screens/auth/SignIn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:intl/intl.dart';
 
 class CancelAppointmentScreen extends StatefulWidget {
@@ -77,7 +78,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
       },
       child: RefreshIndicator(
         onRefresh: cancelAppointmentRequest,
-        child: Scaffold(
+        child: Scaffold( backgroundColor: OslerTheme.canvas,
           key: _scaffoldKey,
           drawer: const ModernDrawer(),
           appBar: PreferredSize(
@@ -107,9 +108,9 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                               AppString
                                                   .cancel_appointment_heading)
                                           .toString(),
-                                      style: TextStyle(
-                                          fontSize: width * 0.05,
-                                          color: hintColor),
+                                       style: TextStyle(
+                                           fontSize: width * 0.05,
+                                           color: OslerTheme.textPrimary),
                                     ),
                                   ),
                                 ],
@@ -136,7 +137,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                       margin: EdgeInsets.only(top: height * 0.01),
                       padding: EdgeInsets.all(10),
                       child: Card(
-                        color: colorWhite,
+                        color: OslerTheme.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -162,7 +163,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                           .toString(),
                                       hintStyle: TextStyle(
                                         fontSize: width * 0.045,
-                                        color: hintColor.withOpacity(0.3),
+                                        color: OslerTheme.textSecondary.withOpacity(0.3),
                                       ),
                                     ),
                                     onChanged: onSearchTextChanged,
@@ -203,7 +204,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                     ),
                                   )
                                 : Container(
-                                    color: divider,
+                                    color: OslerTheme.surfaceMuted,
                                     width: width * 1.0,
                                     padding: EdgeInsets.all(15),
                                     child: Row(
@@ -220,7 +221,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                         .cancel_appointment_heading)
                                                 .toString(),
                                             style: TextStyle(
-                                                fontSize: 16, color: hintColor),
+                                                fontSize: 16, color: OslerTheme.textPrimary),
                                           ),
                                         ),
                                         Text(
@@ -231,8 +232,8 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                   .toString() +
                                               " ${cancelAppointmentReq.length} ",
                                           style: TextStyle(
-                                              fontSize: 13,
-                                              color: passwordVisibility),
+                                               fontSize: 13,
+                                               color: OslerTheme.forestDeep),
                                         ),
                                       ],
                                     ),
@@ -257,15 +258,15 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                             right:
                                                                 width * 0.02),
                                                         child: Text(
-                                                          DateUtil().formattedDate(
-                                                              DateTime.parse(
-                                                                  _searchResult[
-                                                                          i]
-                                                                      .date!)),
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color:
-                                                                  passwordVisibility),
+                                                           DateUtil().formattedDate(
+                                                               DateTime.parse(
+                                                                   _searchResult[
+                                                                           i]
+                                                                       .date!)),
+                                                           style: TextStyle(
+                                                               fontSize: 14,
+                                                               color:
+                                                                   OslerTheme.forestDeep),
                                                         ),
                                                       ),
                                                       Container(
@@ -274,12 +275,12 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                             right:
                                                                 width * 0.02),
                                                         child: Text(
-                                                          _searchResult[i]
-                                                              .time!,
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              color:
-                                                                  passwordVisibility),
+                                                           _searchResult[i]
+                                                               .time!,
+                                                           style: TextStyle(
+                                                               fontSize: 14,
+                                                               color:
+                                                                   OslerTheme.forestDeep),
                                                         ),
                                                       )
                                                     ],

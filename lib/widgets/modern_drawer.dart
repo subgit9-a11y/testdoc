@@ -5,6 +5,7 @@ import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
+import 'package:doctro/theme/osler_theme.dart';
 
 class ModernDrawer extends StatelessWidget {
   const ModernDrawer({Key? key}) : super(key: key);
@@ -17,60 +18,79 @@ class ModernDrawer extends StatelessWidget {
 
     return Drawer(
       child: Container(
-        color: Colors.white,
+        color: OslerTheme.canvas,
         child: Column(
           children: [
             Container(
-              height: 230,
+              height: 260,
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [purple, const Color(0xFF9C27B0)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
+              padding: const EdgeInsets.only(top: 54, left: 22, right: 22, bottom: 22),
+              decoration: OslerTheme.heroDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 70,
-                    height: 70,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withOpacity(0.16)),
+                    ),
+                    child: const Text(
+                      "Osler Doctor Desk",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    width: 76,
+                    height: 76,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: OslerTheme.lime, width: 2),
                       image: DecorationImage(
                         image: NetworkImage(dFullImage ?? "https://via.placeholder.com/150"),
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 16),
                   Text(
                     "Dr. ${dName ?? "Doctor"}",
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Text(
                     phone ?? "",
-                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
+                    style: TextStyle(color: Colors.white.withOpacity(0.74), fontSize: 13),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15),
+                      color: OslerTheme.lime,
+                      borderRadius: BorderRadius.circular(999),
                     ),
-                    child: const Text("Verified Professional", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      "Verified Professional",
+                      style: TextStyle(
+                        color: OslerTheme.forestDeep,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
                 children: [
                   _drawerItem(context, Icons.dashboard_outlined, getTranslated(context, AppString.drawer_home).toString(), () => Navigator.popUntil(context, ModalRoute.withName('loginHome'))),
                   _drawerItem(context, Icons.calendar_month_outlined, getTranslated(context, AppString.drawer_appointments).toString(), () => Navigator.popAndPushNamed(context, 'AppointmentHistoryScreen')),
@@ -85,7 +105,10 @@ class ModernDrawer extends StatelessWidget {
                   }),
                   _drawerItem(context, Icons.schedule_outlined, getTranslated(context, AppString.drawer_schedule_timing).toString(), () => Navigator.popAndPushNamed(context, 'Schedule Timings')),
                   _drawerItem(context, Icons.settings_outlined, getTranslated(context, AppString.drawer_setting).toString(), () => Navigator.popAndPushNamed(context, 'Settings')),
-                  const Divider(indent: 20, endIndent: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    child: Divider(color: OslerTheme.border),
+                  ),
                   _drawerItem(context, Icons.logout, getTranslated(context, AppString.drawer_logout).toString(), () => _showLogoutDialog(context), isDestructive: true),
                 ],
               ),
@@ -97,11 +120,35 @@ class ModernDrawer extends StatelessWidget {
   }
 
   Widget _drawerItem(BuildContext context, IconData icon, String label, VoidCallback onTap, {bool isDestructive = false}) {
-    return ListTile(
-      leading: Icon(icon, color: isDestructive ? Colors.red : hintColor, size: 22),
-      title: Text(label, style: TextStyle(color: isDestructive ? Colors.red : hintColor, fontSize: 14)),
-      onTap: onTap,
-      dense: true,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: OslerTheme.panelDecoration(),
+      child: ListTile(
+        leading: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: isDestructive ? Colors.red.withOpacity(0.1) : OslerTheme.surfaceMuted,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, color: isDestructive ? Colors.red : hintColor, size: 20),
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isDestructive ? Colors.red : hintColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDestructive ? Colors.red.withOpacity(0.7) : OslerTheme.textSecondary,
+        ),
+        onTap: onTap,
+        dense: true,
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:doctro/services/astra_api_service.dart';
 import 'package:doctro/constant/color_constant.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/widgets/astra_fill_display.dart';
@@ -188,7 +189,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(msg),
-        backgroundColor: allHaveShopify ? Colors.green : Colors.orange,
+        backgroundColor: allHaveShopify ? OslerTheme.forestDeep : OslerTheme.warning,
         duration: Duration(seconds: 4),
       ));
       
@@ -218,8 +219,8 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Prescription for ${widget.patientName}"),
-        backgroundColor: colorWhite,
-        foregroundColor: Colors.black,
+        backgroundColor: OslerTheme.canvas,
+        foregroundColor: OslerTheme.textPrimary,
         elevation: 0,
       ),
       body: _isLoading && _patientData == null
@@ -254,12 +255,12 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
                     return Card(
                       margin: EdgeInsets.only(bottom: 10),
-                      color: noShopify ? Colors.orange.shade50 : Colors.white,
+                      color: noShopify ? OslerTheme.warning.withOpacity(0.1) : OslerTheme.surface,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: noShopify ? Colors.orange : Colors.purple,
+                            backgroundColor: noShopify ? OslerTheme.warning : OslerTheme.forestDeep,
                             child: Text("${idx + 1}", style: TextStyle(color: Colors.white))),
                           title: Row(
                             children: [
@@ -267,7 +268,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                               if (noShopify)
                                 Tooltip(
                                   message: "Not available for Auto-Cart",
-                                  child: Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                                   child: Icon(Icons.warning_amber_rounded, color: OslerTheme.warning, size: 20),
                                 ),
                             ],
                           ),
@@ -290,13 +291,13 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                   ),
                                   Spacer(),
                                   if (med['price'] != null)
-                                    Text("₹ ${med['price']}", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                                     Text("₹ ${med['price']}", style: TextStyle(color: OslerTheme.forestDeep, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ],
                           ),
                           trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(Icons.delete, color: OslerTheme.danger),
                             onPressed: () => setState(() => _medicines.removeAt(idx)),
                           ),
                         ),
@@ -372,7 +373,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                       : Text("Submit & Automate (PDF + WhatsApp)"),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 50),
-                      backgroundColor: Colors.purple,
+          backgroundColor: OslerTheme.forestDeep,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -503,7 +504,7 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
           SizedBox(height: 10),
           Expanded(
             child: _isLoading 
-              ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: OslerTheme.forestDeep))
               : ListView.builder(
                   itemCount: _results.length,
                   itemBuilder: (context, index) {

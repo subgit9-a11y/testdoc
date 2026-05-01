@@ -48,9 +48,6 @@ jobs:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Flutter Clean for next build
-        run: flutter clean
-
       - name: Build Debug APK
         run: flutter build apk --debug
 

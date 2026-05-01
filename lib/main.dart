@@ -37,6 +37,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'theme/osler_theme.dart';
 import 'VideoCall/overlay_handler.dart';
 import 'chat/pages/home_page.dart';
 import 'chat/providers/auth_provider.dart' as provider;
@@ -634,81 +635,7 @@ class _MyAppState extends State<MyApp> {
                 }
                 return supportedLocales.first;
               },
-              theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: Color(0xFF0F766E), // Herbal Teal
-                  primary: Color(0xFF0F766E),
-                  secondary: Color(0xFFD84315), // Deep Saffron
-                  surface: Color(0xFFF9FAFB),
-                  background: Color(0xFFF9FAFB),
-                ),
-                fontFamily: 'Inter', // Presuming a modern font, or falls back to system
-                scaffoldBackgroundColor: Color(0xFFF9FAFB),
-                
-                // Modern App Bar
-                appBarTheme: AppBarTheme(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Color(0xFF1E293B),
-                  elevation: 0,
-                  centerTitle: true,
-                  iconTheme: IconThemeData(color: Color(0xFF1E293B)),
-                  titleTextStyle: TextStyle(
-                    color: Color(0xFF1E293B),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                // Modern Cards
-                cardTheme: CardThemeData(
-                  color: Colors.white,
-                  surfaceTintColor: Colors.white,
-                  elevation: 2,
-                  shadowColor: Colors.black.withOpacity(0.05),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                ),
-
-                // Modern Buttons
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF0F766E),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-
-                // Modern Inputs
-                inputDecorationTheme: InputDecorationTheme(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF0F766E), width: 2),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-              ),
+              theme: OslerTheme.theme(),
               routes: {
                 // '/': (context) => SignIn(),
                 'SignIn': (context) => SignIn(),

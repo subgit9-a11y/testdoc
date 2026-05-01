@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/common_function.dart';
@@ -12,11 +11,11 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/screens/auth/SignIn.dart';
+import 'package:doctro/theme/osler_theme.dart';
+import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:doctro/widgets/modern_drawer.dart';
-import 'package:doctro/screens/auth/SignIn.dart';
-
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -24,69 +23,22 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreen extends State<PaymentScreen> {
-  //Set Height/Width Using MediaQuery
   late double width;
   late double height;
 
-  //Set DrawerOpen
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  //Set Loader
   Future? payments;
 
-  //Set Total Value
   static double sum = 0;
 
-  //get shared preferences
   String? dName;
   String? dFullImage;
   String? phone;
   int? subscription;
 
-  //get hospital data
-  String? hospitalName, hospitalAddress;
-
-  //Search view
-  TextEditingController _search = TextEditingController();
-  List<Payments> _searchResult = [];
-  List<Payments> _userPayment = [];
-
-  List<String> _drawer = [];
-  List<String> _drawerMenu = [];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    //Set Drawer Menu Item List
-    _drawer = [
-      getTranslated(context, AppString.drawer_home).toString(),
-      getTranslated(context, AppString.drawer_payments).toString(),
-      getTranslated(context, AppString.drawer_canceled_appointment).toString(),
-      getTranslated(context, AppString.drawer_appointments).toString(),
-      getTranslated(context, AppString.drawer_review).toString(),
-      getTranslated(context, AppString.drawer_notification).toString(),
-      getTranslated(context, AppString.drawer_callHistory).toString(),
-      getTranslated(context, AppString.drawer_schedule_timing).toString(),
-      getTranslated(context, AppString.drawer_setting).toString(),
-      getTranslated(context, AppString.chats).toString(),
-      getTranslated(context, AppString.drawer_logout).toString(),
-    ];
-
-    _drawerMenu = [
-      getTranslated(context, AppString.drawer_home).toString(),
-      getTranslated(context, AppString.drawer_payments).toString(),
-      getTranslated(context, AppString.drawer_canceled_appointment).toString(),
-      getTranslated(context, AppString.drawer_appointments).toString(),
-      getTranslated(context, AppString.drawer_review).toString(),
-      getTranslated(context, AppString.drawer_notification).toString(),
-      getTranslated(context, AppString.drawer_callHistory).toString(),
-      getTranslated(context, AppString.drawer_schedule_timing).toString(),
-      getTranslated(context, AppString.drawer_setting).toString(),
-      getTranslated(context, AppString.chats).toString(),
-      getTranslated(context, AppString.drawer_logout).toString(),
-    ];
-  }
+  final TextEditingController _search = TextEditingController();
+  final List<Payments> _searchResult = [];
+  final List<Payments> _userPayment = [];
 
   @override
   void initState() {
@@ -102,11 +54,8 @@ class _PaymentScreen extends State<PaymentScreen> {
     });
   }
 
-  //Set Visible Or Not length (Minimum 5)
   bool _paymentRequest = false;
-
-  //Add Payment List Data
-  List<Payments> paymentsRequest = [];
+  final List<Payments> paymentsRequest = [];
 
   @override
   Widget build(BuildContext context) {
@@ -116,401 +65,379 @@ class _PaymentScreen extends State<PaymentScreen> {
     return WillPopScope(
       onWillPop: () {
         Navigator.pushNamedAndRemoveUntil(
-            context, 'loginHome', (route) => false);
+          context,
+          'loginHome',
+          (route) => false,
+        );
         return Future<bool>.value(false);
       },
       child: RefreshIndicator(
         onRefresh: paymentsFunction,
+        color: OslerTheme.forestDeep,
         child: Scaffold(
           key: _scaffoldKey,
+          backgroundColor: OslerTheme.canvas,
           drawer: const ModernDrawer(),
-          appBar: PreferredSize(
-              preferredSize: Size(20, 160),
-              child: SafeArea(
-                  top: true,
-                  child: Column(children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: width * 0.06,
-                              right: width * 0.04,
-                              top: height * 0.01),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      getTranslated(
-                                              context, AppString.payment_title)
-                                          .toString(),
-                                      style: TextStyle(
-                                          fontSize: width * 0.05,
-                                          color: hintColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(),
-                                child: IconButton(
-                                  onPressed: () {
-                                    _scaffoldKey.currentState!.openDrawer();
-                                  },
-                                  icon: SvgPicture.asset(
-                                    "assets/icons/dMenuBar.svg",
-                                    height: 16.0,
-                                    // width: 15.0,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: height * 0.01),
-                      padding: EdgeInsets.all(10),
-                      child: Card(
-                        color: colorWhite,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Container(
-                            alignment: AlignmentDirectional.center,
-                            margin: EdgeInsets.only(
-                                left: width * 0.05, right: width * 0.05),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: height * 0.06,
-                                  width: width * 0.7,
-                                  child: TextField(
-                                    controller: _search,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: getTranslated(
-                                              context, AppString.payment_search)
-                                          .toString(),
-                                      hintStyle: TextStyle(
-                                        fontSize: width * 0.045,
-                                        color: hintColor.withOpacity(0.3),
-                                      ),
-                                    ),
-                                    onChanged: onSearchTextChanged,
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ),
-                                Container(
-                                  child: SvgPicture.asset(
-                                    'assets/icons/dSearch.svg',
-                                    height: 20,
-                                  ),
-                                ),
-                              ],
-                            )),
-                      ),
-                    ),
-                  ]))),
+          appBar: AppBar(
+            backgroundColor: OslerTheme.canvas,
+            title: Text(
+              getTranslated(context, AppString.payment_title).toString(),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: OslerTheme.textPrimary,
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  _scaffoldKey.currentState!.openDrawer();
+                },
+                icon: SvgPicture.asset(
+                  "assets/icons/dMenuBar.svg",
+                  height: 16,
+                  color: OslerTheme.forestDeep,
+                ),
+              ),
+            ],
+          ),
           body: FutureBuilder(
-              future: payments,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                    },
-                    child: SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          paymentsRequest.length == 0
-                              ? Center(
-                                  child: Container(
-                                    margin: EdgeInsets.only(top: height * 0.2),
-                                    child: Container(
-                                      child: Image.asset(
-                                          "assets/images/no-data.png"),
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  margin: EdgeInsets.only(
-                                      left: width * 0.06,
-                                      right: width * 0.06,
-                                      top: height * 0.020),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        getTranslated(context,
-                                                AppString.payment_patient_list)
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: width * 0.05,
-                                            color: hintColor),
-                                      ),
-                                      Text(
-                                        getTranslated(context,
-                                                    AppString.payment_total)
-                                                .toString() +
-                                            " ${paymentsRequest.length}",
-                                        style: TextStyle(
-                                            fontSize: width * 0.030,
-                                            color: passwordVisibility),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                          _search.text.isNotEmpty
-                              ? _searchResult.length > 0
-                                  ? ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: _searchResult.length,
-                                      itemBuilder: (context, i) {
-                                        return Column(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                  left: width * 0.06,
-                                                  top: height * 0.04,
-                                                  right: width * 0.06),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    _searchResult[i]
-                                                        .user!
-                                                        .name!,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color:
-                                                            passwordVisibility),
-                                                  ),
-                                                  Text(
-                                                    SharedPreferenceHelper
-                                                            .getString(Preferences
-                                                                .currency_symbol) +
-                                                        _searchResult[i]
-                                                            .amount
-                                                            .toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color:
-                                                            passwordVisibility),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                  left: width * 0.06,
-                                                  right: width * 0.06,
-                                                  top: height * 0.02),
-                                              child: Divider(
-                                                height: height * 0.005,
-                                                thickness: width * 0.005,
-                                                color: divider,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    )
-                                  : Center(
-                                      child: Container(
-                                      margin:
-                                          EdgeInsets.only(top: height * 0.02),
-                                      child: Text(
-                                        getTranslated(context,
-                                                AppString.result_not_found)
-                                            .toString(),
-                                      ),
-                                    ))
-                              : ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: _paymentRequest == false &&
-                                          paymentsRequest.length > 5
-                                      ? 5
-                                      : paymentsRequest.length,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: width * 0.06,
-                                              top: height * 0.04,
-                                              right: width * 0.06),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                paymentsRequest[index]
-                                                    .user!
-                                                    .name!,
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: passwordVisibility),
-                                              ),
-                                              Text(
-                                                SharedPreferenceHelper
-                                                        .getString(Preferences
-                                                            .currency_symbol) +
-                                                    paymentsRequest[index]
-                                                        .amount
-                                                        .toString(),
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: passwordVisibility),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: width * 0.06,
-                                              right: width * 0.06,
-                                              top: height * 0.02),
-                                          child: Divider(
-                                            height: height * 0.005,
-                                            thickness: width * 0.005,
-                                            color: divider,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                          paymentsRequest.length < 5
-                              ? Container()
-                              : Visibility(
-                                  visible:
-                                      _paymentRequest == true ? false : true,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _paymentRequest = true;
-                                      });
-                                    },
-                                    child: Container(
-                                      margin:
-                                          EdgeInsets.only(top: height * 0.02),
-                                      alignment:
-                                          AlignmentDirectional.centerStart,
-                                      height: height * 0.07,
-                                      width: width * 0.88,
-                                      color: divider,
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            left: width * 0.02,
-                                            right: width * 0.02),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              getTranslated(
-                                                      context,
-                                                      AppString
-                                                          .view_all_payment)
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: hintColor),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                  right: width * 0.4),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/longArrow.svg',
-                                                height: height * 0.012,
-                                              ),
-                                            ),
-                                            Text(
-                                              "${paymentsRequest.length}",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: hintColor),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                          paymentsRequest.length == 0
-                              ? Container()
-                              : Container(
-                                  height: height * 0.07,
-                                  width: width * 1.0,
-                                  margin: EdgeInsets.only(top: height * 0.04),
-                                  color: loginButton,
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        left: width * 0.06,
-                                        right: width * 0.06),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          getTranslated(context,
-                                                  AppString.payment_rs_total)
-                                              .toString(),
-                                          style: TextStyle(
-                                              fontSize: 16, color: colorWhite),
-                                        ),
-                                        Text(
-                                          SharedPreferenceHelper.getString(
-                                                  Preferences.currency_symbol) +
-                                              "$sum",
-                                          style: TextStyle(
-                                              fontSize: 16, color: colorWhite),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
+            future: payments,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: OslerTheme.forestDeep,
+                  ),
+                );
+              }
+
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: OslerTheme.screenPadding,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHero(),
+                      const SizedBox(height: 18),
+                      _buildSearchCard(),
+                      const SizedBox(height: 18),
+                      if (paymentsRequest.isEmpty)
+                        _buildEmptyState()
+                      else ...[
+                        _buildHeaderSummary(),
+                        const SizedBox(height: 12),
+                        ..._buildPaymentItems(),
+                        if (!_searching() &&
+                            !_paymentRequest &&
+                            paymentsRequest.length > 5) ...[
+                          const SizedBox(height: 10),
+                          _buildViewAllCard(),
                         ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              }),
+                        const SizedBox(height: 14),
+                        _buildTotalBar(),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: OslerTheme.heroDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              "Billing overview",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            "Track patient payments in one calm ledger.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              height: 1.05,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Search the ledger, review incoming totals, and keep the financial side of the clinic tidy.",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.78),
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchCard() {
+    return Container(
+      decoration: OslerTheme.panelDecoration(),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _search,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                filled: false,
+                hintText:
+                    getTranslated(context, AppString.payment_search).toString(),
+                hintStyle: const TextStyle(color: OslerTheme.textSecondary),
+              ),
+              onChanged: onSearchTextChanged,
+            ),
+          ),
+          SvgPicture.asset(
+            'assets/icons/dSearch.svg',
+            height: 20,
+            color: OslerTheme.forestDeep,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderSummary() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          getTranslated(context, AppString.payment_patient_list).toString(),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: OslerTheme.textPrimary,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: OslerTheme.limeSoft,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            "${getTranslated(context, AppString.payment_total).toString()} ${paymentsRequest.length}",
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: OslerTheme.forestDeep,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildPaymentItems() {
+    final List<Payments> source = _searching()
+        ? _searchResult
+        : paymentsRequest.take(_paymentRequest ? paymentsRequest.length : 5).toList();
+
+    if (_searching() && source.isEmpty) {
+      return [
+        Padding(
+          padding: const EdgeInsets.only(top: 18),
+          child: Center(
+            child: Text(
+              getTranslated(context, AppString.result_not_found).toString(),
+            ),
+          ),
+        ),
+      ];
+    }
+
+    return source.map((payment) => _buildPaymentRow(payment)).toList();
+  }
+
+  Widget _buildPaymentRow(Payments payment) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: OslerTheme.panelDecoration(),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: OslerTheme.surfaceMuted,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.payments_outlined,
+              color: OslerTheme.forestDeep,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  payment.user?.name ?? "",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: OslerTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Completed payment",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: OslerTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            "${SharedPreferenceHelper.getString(Preferences.currency_symbol)}${payment.amount}",
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: OslerTheme.forestDeep,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewAllCard() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _paymentRequest = true;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: OslerTheme.mutedPanelDecoration(),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                getTranslated(context, AppString.view_all_payment).toString(),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: OslerTheme.textPrimary,
+                ),
+              ),
+            ),
+            SvgPicture.asset(
+              'assets/icons/longArrow.svg',
+              height: 12,
+              color: OslerTheme.forestDeep,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              "${paymentsRequest.length}",
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: OslerTheme.forestDeep,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTotalBar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      decoration: BoxDecoration(
+        color: OslerTheme.forestDeep,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            getTranslated(context, AppString.payment_rs_total).toString(),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            "${SharedPreferenceHelper.getString(Preferences.currency_symbol)}$sum",
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 36),
+      decoration: OslerTheme.panelDecoration(),
+      child: Column(
+        children: [
+          Image.asset("assets/images/no-data.png", height: 88),
+          const SizedBox(height: 10),
+          Text(
+            getTranslated(context, AppString.no_user).toString(),
+            style: const TextStyle(color: OslerTheme.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _searching() => _search.text.isNotEmpty;
+
   Future<void> logoutUser() async {
     SharedPreferenceHelper.clearPref();
     Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) => SignIn()),
-        ModalRoute.withName('SignIn'));
+      context,
+      MaterialPageRoute(builder: (BuildContext context) => SignIn()),
+      ModalRoute.withName('SignIn'),
+    );
   }
 
   Future<BaseModel<Payment>> paymentsFunction() async {
@@ -528,10 +455,8 @@ class _PaymentScreen extends State<PaymentScreen> {
         for (int i = 0; i < paymentsRequest.length; i++) {
           sum += double.parse(paymentsRequest[i].amount!);
         }
-        setState(() {});
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -552,17 +477,14 @@ class _PaymentScreen extends State<PaymentScreen> {
         for (int i = 0; i < paymentsRequest.length; i++) {
           sum += double.parse(paymentsRequest[i].amount!);
         }
-        setState(() {});
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
   }
 
   showAlertDialog(BuildContext context) {
-    // set up the button
     Widget cancel = TextButton(
       child: Text(
         getTranslated(context, AppString.cancel_button).toString(),
@@ -586,13 +508,12 @@ class _PaymentScreen extends State<PaymentScreen> {
       },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       content: Text(
-          getTranslated(context, AppString.are_you_sure_logout).toString()),
+        getTranslated(context, AppString.are_you_sure_logout).toString(),
+      ),
       actions: [cancel, okButton],
     );
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -609,9 +530,9 @@ class _PaymentScreen extends State<PaymentScreen> {
     }
 
     _userPayment.forEach((payment) {
-      if ((payment.user?.name ?? "")
-          .toLowerCase()
-          .contains(text.toLowerCase())) _searchResult.add(payment);
+      if ((payment.user?.name ?? "").toLowerCase().contains(text.toLowerCase())) {
+        _searchResult.add(payment);
+      }
     });
     setState(() {});
   }

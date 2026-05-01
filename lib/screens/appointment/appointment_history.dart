@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:doctro/screens/auth/SignIn.dart';
+import 'package:doctro/theme/osler_theme.dart';
 
 
 class AppointmentHistoryScreen extends StatefulWidget {
@@ -155,6 +156,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
           builder: (context, orientation) {
             return Scaffold(
               key: _scaffoldKey,
+              backgroundColor: OslerTheme.canvas,
               drawer: const ModernDrawer(),
               appBar: PreferredSize(
                   preferredSize: Size(20, 140),
@@ -187,6 +189,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                               .toString(),
                                           style: TextStyle(
                                               fontSize: width * 0.05,
+                                              fontWeight: FontWeight.w800,
                                               color: hintColor),
                                         ),
                                       ),
@@ -201,6 +204,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                       icon: SvgPicture.asset(
                                         "assets/icons/dMenuBar.svg",
                                         height: 16.0,
+                                        color: OslerTheme.forestDeep,
                                         fit: BoxFit.fill,
                                       ),
                                     ),
@@ -213,15 +217,12 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                         Container(
                           margin: EdgeInsets.only(top: height * 0.01),
                           padding: EdgeInsets.all(10),
-                          child: Card(
-                            color: colorWhite,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
+                          child: Container(
+                            decoration: OslerTheme.panelDecoration(),
                             child: Container(
                                 alignment: AlignmentDirectional.center,
-                                margin: EdgeInsets.only(
-                                    left: width * 0.05, right: width * 0.05),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05, vertical: 6),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -234,6 +235,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                         controller: _search,
                                         decoration: InputDecoration(
                                           border: InputBorder.none,
+                                          filled: false,
                                           hintText: getTranslated(
                                                   context,
                                                   AppString
@@ -241,7 +243,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                               .toString(),
                                           hintStyle: TextStyle(
                                             fontSize: width * 0.045,
-                                            color: hintColor.withOpacity(0.3),
+                                            color: hintColor.withOpacity(0.45),
                                           ),
                                         ),
                                         onChanged: onSearchTextChanged,
@@ -252,6 +254,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                       child: SvgPicture.asset(
                                         'assets/icons/dSearch.svg',
                                         height: 20,
+                                        color: OslerTheme.forestDeep,
                                       ),
                                     ),
                                   ],
@@ -291,7 +294,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                     children: [
                                       Container(
                                         margin: EdgeInsets.only(top: 10),
-                                        color: tabBar,
+                                        decoration: BoxDecoration(
+                                          color: OslerTheme.surfaceMuted,
+                                          borderRadius: BorderRadius.circular(22),
+                                        ),
                                         padding: EdgeInsets.all(10),
                                         child: new TabBar(
                                           labelColor: loginButton,
@@ -299,6 +305,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                           indicatorSize:
                                               TabBarIndicatorSize.tab,
                                           indicatorColor: loginButton,
+                                          indicator: BoxDecoration(
+                                            color: OslerTheme.limeSoft,
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
                                           tabs: tabList,
                                           unselectedLabelColor: hintColor,
                                         ),
@@ -1091,7 +1101,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                             ),
                           );
                         } else {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: CircularProgressIndicator(color: OslerTheme.forestDeep));
                         }
                       }),
                 ),

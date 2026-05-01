@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:doctro/constant/app_string.dart';
-import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/language_model.dart';
@@ -12,6 +11,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,70 +26,40 @@ class ChangeLanguage extends StatefulWidget {
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
   Future? languageLoader;
-
-  //profile image
   String? name;
 
   var convertDegree;
   var eduCertificate;
 
-  String callDegree = '';
-  String callCollege = '';
-  String callYear = '';
-  String callCertificate = '';
-  String callCertificateYear = '';
-  String valueDegree = '';
-  String valueCollege = '';
-  String valueYear = '';
-  String certificate = '';
-  String certificateYear = '';
-
-  //Select Dob
-  DateTime? _selectedDate;
-  String newDateApiPass = "";
-  String? showFormat = '';
-  var temp;
-
-  //Doctor Profile Controller
-  TextEditingController _pDegree = TextEditingController();
-  TextEditingController _pExperience = TextEditingController();
-  TextEditingController _pStartTime = TextEditingController();
-  TextEditingController _pEndTime = TextEditingController();
-  TextEditingController _pTimeSlot = TextEditingController();
-  TextEditingController _pAppointmentFees = TextEditingController();
-  TextEditingController _pName = TextEditingController();
-  TextEditingController _pDob = TextEditingController();
-  TextEditingController _pDesc = TextEditingController();
-  TextEditingController _pCollege = TextEditingController();
-  TextEditingController _pCollegeYear = TextEditingController();
-  TextEditingController _pCertificate = TextEditingController();
-  TextEditingController _pCertificateYear = TextEditingController();
-  TextEditingController _pBasedOn = TextEditingController();
+  final TextEditingController _pDegree = TextEditingController();
+  final TextEditingController _pExperience = TextEditingController();
+  final TextEditingController _pStartTime = TextEditingController();
+  final TextEditingController _pEndTime = TextEditingController();
+  final TextEditingController _pTimeSlot = TextEditingController();
+  final TextEditingController _pAppointmentFees = TextEditingController();
+  final TextEditingController _pName = TextEditingController();
+  final TextEditingController _pDob = TextEditingController();
+  final TextEditingController _pDesc = TextEditingController();
+  final TextEditingController _pCollege = TextEditingController();
+  final TextEditingController _pCollegeYear = TextEditingController();
+  final TextEditingController _pCertificate = TextEditingController();
+  final TextEditingController _pCertificateYear = TextEditingController();
+  final TextEditingController _pBasedOn = TextEditingController();
 
   final picker = ImagePicker();
 
-  //Set DropDown Popular Field
   List<String> popular = [];
   String? _selectedPopular;
 
-  //Set DropDown For Male/Female
   List<String> gender = [];
   String? _genderSelect;
 
   int? isFilled;
-
   int? treatmentId;
-
   int? categoryId;
   int? expertiseId;
   String? hospitalId;
-
-  //Choose Images
   String? image;
-
-  //Set MediaQuery Height / Width
-  double? width;
-  double? height;
 
   @override
   void didChangeDependencies() {
@@ -118,115 +88,154 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
-
     return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: colorWhite,
-          leadingWidth: 40,
-          leading: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: colorBlack,
-                size: 30,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+      backgroundColor: OslerTheme.canvas,
+      appBar: AppBar(
+        backgroundColor: OslerTheme.canvas,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: OslerTheme.forestDeep,
+            size: 20,
           ),
-          title: Text(
-            getTranslated(context, AppString.chang_language).toString(),
-            style: TextStyle(color: hintColor, fontSize: 18),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          getTranslated(context, AppString.chang_language).toString(),
+          style: const TextStyle(
+            color: OslerTheme.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
           ),
         ),
-        body: FutureBuilder(
-            future: languageLoader,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return GestureDetector(
-                  onTap: () {
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  },
-                  child: Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                        itemCount: Language.languageList().length,
-                        itemBuilder: (context, index) {
-                          this.value = 0;
-                          this.value =
-                              Language.languageList()[index].languageCode ==
-                                      SharedPreferenceHelper.getString(
-                                          Preferences.current_language_code)
-                                  ? index
-                                  : null;
-                          if (SharedPreferenceHelper.getString(
-                                  Preferences.current_language_code) ==
-                              'N_A') {
-                            this.value = 0;
-                          }
+      ),
+      body: FutureBuilder(
+        future: languageLoader,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(color: OslerTheme.forestDeep),
+            );
+          }
 
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: grey.withOpacity(0.2),
-                                      spreadRadius: 1,
-                                      blurRadius: 7,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    ),
-                                  ],
-                                  color: colorWhite,
-                                  borderRadius: BorderRadius.circular(20)),
-                              height: height * 0.1,
-                              width: width,
-                              child: Center(
-                                  child: RadioListTile(
-                                value: index,
-                                controlAffinity:
-                                    ListTileControlAffinity.trailing,
-                                groupValue: this.value,
-                                activeColor: colorBlack,
-                                onChanged: (dynamic value) async {
-                                  Future.delayed(Duration(seconds: 1),
-                                      () async {
-                                    this.value = value;
-                                    Locale local = await setLocale(
-                                        Language.languageList()[index]
-                                            .languageCode);
-                                    setState(() {
-                                      // MyApp.setLocale(context, local);
-                                      SharedPreferenceHelper.setString(
-                                          Preferences.current_language_code,
-                                          Language.languageList()[index]
-                                              .languageCode);
-                                      SharedPreferenceHelper.setString(
-                                          Preferences.language_name,
-                                          Language.languageList()[index].name);
-                                      updateProfile();
-                                      Navigator.popAndPushNamed(
-                                          context, "loginHome");
-                                    });
-                                  });
-                                },
-                                title:
-                                    Text(Language.languageList()[index].name),
-                              )),
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: SingleChildScrollView(
+              padding: OslerTheme.screenPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHero(),
+                  const SizedBox(height: 18),
+                  ...List.generate(Language.languageList().length, (index) {
+                    value = Language.languageList()[index].languageCode ==
+                            SharedPreferenceHelper.getString(
+                                Preferences.current_language_code)
+                        ? index
+                        : null;
+                    if (SharedPreferenceHelper.getString(
+                            Preferences.current_language_code) ==
+                        'N_A') {
+                      value = 0;
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Container(
+                        decoration: OslerTheme.panelDecoration(),
+                        child: RadioListTile(
+                          value: index,
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          groupValue: value,
+                          activeColor: OslerTheme.forestDeep,
+                          onChanged: (dynamic selected) async {
+                            Future.delayed(const Duration(seconds: 1), () async {
+                              value = selected;
+                              Locale local = await setLocale(
+                                Language.languageList()[index].languageCode,
+                              );
+                              setState(() {
+                                SharedPreferenceHelper.setString(
+                                  Preferences.current_language_code,
+                                  Language.languageList()[index].languageCode,
+                                );
+                                SharedPreferenceHelper.setString(
+                                  Preferences.language_name,
+                                  Language.languageList()[index].name,
+                                );
+                                updateProfile();
+                                Navigator.popAndPushNamed(context, "loginHome");
+                              });
+                            });
+                          },
+                          title: Text(
+                            Language.languageList()[index].name,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: OslerTheme.textPrimary,
                             ),
-                          );
-                        }),
-                  ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            }));
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: OslerTheme.heroDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              "Language preferences",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            "Choose how your Osler workspace speaks to you.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              height: 1.05,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Pick the language that fits your workflow best. The app will switch as soon as the preference is saved.",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.78),
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<BaseModel<DoctorProfile>> doctorProfile() async {
@@ -245,8 +254,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         }
 
         _pName.text = response.data!.name!;
-        showFormat = response.data!.dob;
-        newDateApiPass =
+        final showFormat = response.data!.dob;
+        final newDateApiPass =
             DateUtil().formattedDate(DateTime.parse('$showFormat'));
         _pDob.text = newDateApiPass;
 
@@ -254,46 +263,29 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
         if (convertDegree != null) {
           for (int i = 0; i < convertDegree.length; i++) {
-            //Split Data Condition
-            if (_pDegree.text.length == 0) {
-              _pDegree.text = _pDegree.text + convertDegree[i]['degree'];
-            } else {
-              _pDegree.text = _pDegree.text + ',' + convertDegree[i]['degree'];
-            }
-            if (_pCollege.text.length == 0) {
-              _pCollege.text = _pCollege.text + convertDegree[i]['college'];
-            } else {
-              _pCollege.text =
-                  _pCollege.text + ',' + convertDegree[i]['college'];
-            }
-            if (_pCollegeYear.text.length == 0) {
-              _pCollegeYear.text =
-                  _pCollegeYear.text + convertDegree[i]['year'];
-            } else {
-              _pCollegeYear.text =
-                  _pCollegeYear.text + ',' + convertDegree[i]['year'];
-            }
+            _pDegree.text = _pDegree.text.length == 0
+                ? _pDegree.text + convertDegree[i]['degree']
+                : _pDegree.text + ',' + convertDegree[i]['degree'];
+            _pCollege.text = _pCollege.text.length == 0
+                ? _pCollege.text + convertDegree[i]['college']
+                : _pCollege.text + ',' + convertDegree[i]['college'];
+            _pCollegeYear.text = _pCollegeYear.text.length == 0
+                ? _pCollegeYear.text + convertDegree[i]['year']
+                : _pCollegeYear.text + ',' + convertDegree[i]['year'];
           }
         }
 
         if (eduCertificate != null) {
           for (int i = 0; i < eduCertificate.length; i++) {
-            if (_pCertificate.text.length == 0) {
-              _pCertificate.text =
-                  _pCertificate.text + eduCertificate[i]['certificate'];
-            } else {
-              _pCertificate.text =
-                  _pCertificate.text + ',' + eduCertificate[i]['certificate'];
-            }
+            _pCertificate.text = _pCertificate.text.length == 0
+                ? _pCertificate.text + eduCertificate[i]['certificate']
+                : _pCertificate.text + ',' + eduCertificate[i]['certificate'];
 
-            if (_pCertificateYear.text.length == 0) {
-              _pCertificateYear.text = _pCertificateYear.text +
-                  eduCertificate[i]['certificate_year'];
-            } else {
-              _pCertificateYear.text = _pCertificateYear.text +
-                  ',' +
-                  eduCertificate[i]['certificate_year'];
-            }
+            _pCertificateYear.text = _pCertificateYear.text.length == 0
+                ? _pCertificateYear.text + eduCertificate[i]['certificate_year']
+                : _pCertificateYear.text +
+                    ',' +
+                    eduCertificate[i]['certificate_year'];
           }
         }
 
@@ -311,87 +303,36 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         categoryId = response.data!.categoryId;
         expertiseId = response.data!.expertiseId;
         hospitalId = response.data!.hospitalId;
-
-        setState(() {});
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
   }
 
   Future<BaseModel<UpdateProfile>> updateProfile() async {
-    var eEducationList = JsonEncoder().convert(convertDegree);
-    var cCertificateList = JsonEncoder().convert(eduCertificate);
-
-    //pass date formate
-    if (_selectedDate != null) {
-      temp = '$_selectedDate';
-    } else {
-      temp = '$showFormat';
-    }
-
-    newDateApiPass = DateUtilForPass().formattedDate(DateTime.parse('$temp'));
+    UpdateProfile response;
     Map<String, dynamic> body = {
       "name": _pName.text,
-      "treatment_id": treatmentId,
-      "category_id": categoryId,
-      "expertise_id": expertiseId,
-      "hospital_id": hospitalId,
-      "dob": newDateApiPass,
+      "dob": _pDob.text,
       "gender": _genderSelect,
-      "education": eEducationList,
-      "certificate": cCertificateList,
+      "education": _pDegree.text,
       "experience": _pExperience.text,
       "appointment_fees": _pAppointmentFees.text,
-      "start_time": _pStartTime.text.toLowerCase(),
-      "end_time": _pEndTime.text.toLowerCase(),
       "timeslot": _pTimeSlot.text,
+      "start_time": _pStartTime.text,
+      "end_time": _pEndTime.text,
+      "based_on": _pBasedOn.text,
       "desc": _pDesc.text,
-      "besdon": _pBasedOn.text,
-      "is_popular": _selectedPopular ==
-              getTranslated(context, AppString.popular_yes).toString()
-          ? 1
-          : 0,
-      "language": SharedPreferenceHelper.getString(Preferences.language_name)
+      "language": SharedPreferenceHelper.getString(Preferences.language_name),
     };
-
-    UpdateProfile response;
-
     try {
       response = await RestClient(await RetroApi().dioData(context))
-          .updateProfile(body);
-      Navigator.pushNamed(context, "loginHome");
-      SharedPreferenceHelper.setInt(Preferences.is_filled, 1);
-
-      Fluttertoast.showToast(
-        msg: response.msg!,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+          .updateProfileRequest(body);
+      Fluttertoast.showToast(msg: response.msg!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
-  }
-}
-
-//Pass Date Like this format  in api
-class DateUtilForPass {
-  static const DATE_FORMAT = 'yyyy-MM-dd';
-
-  String formattedDate(DateTime dateTime) {
-    return DateFormat(DATE_FORMAT).format(dateTime);
-  }
-}
-
-//Show Date like this format in User
-class DateUtil {
-  static const DATE_FORMAT = 'dd-MM-yyyy';
-
-  String formattedDate(DateTime dateTime) {
-    return DateFormat(DATE_FORMAT).format(dateTime);
   }
 }

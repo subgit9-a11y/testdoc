@@ -21,6 +21,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -166,121 +167,161 @@ class _ProfileScreen extends State<ProfileScreen> {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: OslerTheme.canvas,
       appBar: PreferredSize(
-        preferredSize: Size(width! * 0.3, 170),
+        preferredSize: Size(width! * 0.3, 220),
         child: SafeArea(
           top: true,
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: height * 0.02),
-                color: Colors.transparent,
-                child: Container(
-                  margin: EdgeInsets.only(left: width! * 0.92),
-                  child: GestureDetector(
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      size: 28,
-                    ),
-                    onTap: () {
-                      if (_currentStep == 0) Navigator.pop(context);
-                      if (_currentStep == 1) cancel();
-                      if (_currentStep == 2) cancel();
-                    },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Container(
+              decoration: OslerTheme.heroDecoration(),
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        onTap: () {
+                          if (_currentStep == 0) Navigator.pop(context);
+                          if (_currentStep == 1) cancel();
+                          if (_currentStep == 2) cancel();
+                        },
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.14),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          "Profile workspace",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              Container(
-                margin:
-                    EdgeInsets.only(left: width! * 0.04, right: width! * 0.04),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 90,
-                      width: 90,
-                      child: Stack(
-                        children: [
-                          proImage != null
-                              ? Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: new BoxDecoration(
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 90,
+                        width: 90,
+                        child: Stack(
+                          children: [
+                            proImage != null
+                                ? Container(
+                                    width: 82,
+                                    height: 82,
+                                    decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      boxShadow: [
-                                        new BoxShadow(
-                                          color: imageBorder,
-                                          blurRadius: 1.0,
-                                        ),
-                                      ]),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Image.file(
-                                      proImage!,
-                                      fit: BoxFit.fitHeight,
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  width: 82,
-                                  height: 82,
-                                  decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        new BoxShadow(
-                                          color: imageBorder,
-                                          blurRadius: 1.5,
-                                        ),
-                                      ]),
-                                  child: CachedNetworkImage(
-                                    imageUrl: SharedPreferenceHelper.getString(
-                                        Preferences.image),
-                                    imageBuilder: (context, imageProvider) =>
-                                        CircleAvatar(
-                                      backgroundColor: colorWhite,
-                                      child: CircleAvatar(
-                                        radius: 36,
-                                        backgroundImage: imageProvider,
+                                      border: Border.all(
+                                        color: OslerTheme.lime,
+                                        width: 2,
                                       ),
                                     ),
-                                    placeholder: (context, url) =>
-                                        CircularProgressIndicator(
-                                            color: loginButton),
-                                    errorWidget: (context, url, error) =>
-                                        Image.asset("images/no_image.png"),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Image.file(
+                                        proImage!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 82,
+                                    height: 82,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: OslerTheme.lime,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: CachedNetworkImage(
+                                      imageUrl: SharedPreferenceHelper
+                                          .getString(Preferences.image),
+                                      imageBuilder: (context, imageProvider) =>
+                                          CircleAvatar(
+                                        backgroundColor: colorWhite,
+                                        child: CircleAvatar(
+                                          radius: 36,
+                                          backgroundImage: imageProvider,
+                                        ),
+                                      ),
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(
+                                        color: OslerTheme.lime,
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset("images/no_image.png"),
+                                    ),
+                                  ),
+                            Positioned(
+                              top: 56,
+                              left: 58,
+                              child: GestureDetector(
+                                onTap: () {
+                                  chooseProfileImage();
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor: OslerTheme.lime,
+                                  radius: 14,
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: OslerTheme.forestDeep,
                                   ),
                                 ),
-                          Positioned(
-                            top: 52,
-                            left: 58,
-                            child: GestureDetector(
-                              onTap: () {
-                                chooseProfileImage();
-                              },
-                              child: CircleAvatar(
-                                  backgroundColor: colorWhite,
-                                  radius: 13,
-                                  child: Icon(
-                                    Icons.add,
-                                    color: loginButton,
-                                  )),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(
-                          left: width! * 0.05, right: width! * 0.05),
-                      child: Text(
-                        "$name",
-                        style: TextStyle(
-                            fontSize: width! * 0.047, color: hintColor),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Doctor profile",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                height: 1.05,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              "$name",
+                              style: TextStyle(
+                                fontSize: width! * 0.047,
+                                color: Colors.white.withOpacity(0.88),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    )
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -288,9 +329,16 @@ class _ProfileScreen extends State<ProfileScreen> {
           future: doctorLoader,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              return Container(
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: OslerTheme.forestDeep,
+                        secondary: OslerTheme.lime,
+                      ),
+                ),
+                child: Container(
                 width: width,
-                margin: EdgeInsets.symmetric(horizontal: 5),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Column(
                   children: [
                     Expanded(
@@ -1807,13 +1855,20 @@ class _ProfileScreen extends State<ProfileScreen> {
                     ),
                   ],
                 ),
+                ),
               );
             } else {
-              return Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: OslerTheme.forestDeep,
+                ),
+              );
             }
           }),
       bottomNavigationBar: Container(
-        height: width! * 0.12,
+        color: OslerTheme.canvas,
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        height: width! * 0.18,
         child: ElevatedButton(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
