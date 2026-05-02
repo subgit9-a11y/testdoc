@@ -134,6 +134,7 @@ class _AstraFillDisplayWidgetState extends State<AstraFillDisplayWidget> {
     final List<String> symptoms = rawSymptoms is List ? List<String>.from(rawSymptoms) : (rawSymptoms != null ? [rawSymptoms.toString()] : []);
     final currentMedications = _astraFillData?['current_medications'] ?? [];
     final timestamp = _astraFillData?['created_at'] ?? _astraFillData?['timestamp'] ?? '';
+    final severityScore = _astraFillData?['severity_score'];
 
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -200,8 +200,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 
   Widget _buildHistoryCard(PurchaseDetails item) {
     final statusActive = item.status == 1;
-    final endDate = item.expireDate != null
-        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.expireDate!))
+    final endDate = item.endDate != null
+        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.endDate!))
         : "--";
     final startDate = item.startDate != null
         ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.startDate!))
@@ -343,10 +343,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       purchaseDetail.clear();
       _subscriptionHistory.clear();
       response = await RestClient(await RetroApi().dioData(context))
-          .purchaseSubscriptionRequest();
+          .purchaseSubscriptionRequest({});
       setState(() {
-        purchaseDetail.addAll(response.purchaseData!);
-        _subscriptionHistory.addAll(response.purchaseData!);
+        purchaseDetail.addAll(response.data!);
+        _subscriptionHistory.addAll(response.data!);
       });
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:doctro/constant/app_string.dart';
+import 'package:doctro/constant/date_util.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/language_model.dart';
@@ -328,8 +329,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
     };
     try {
       response = await RestClient(await RetroApi().dioData(context))
-          .updateProfileRequest(body);
-      Fluttertoast.showToast(msg: response.msg!);
+          .updateProfile(body);
+      Fluttertoast.showToast(msg: response.data!);
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));
     }

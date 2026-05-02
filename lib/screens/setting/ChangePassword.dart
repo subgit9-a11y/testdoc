@@ -271,10 +271,10 @@ class _ChangePasswordState extends State<ChangePassword> {
       response = await RestClient(await RetroApi().dioData(context))
           .changePasswordRequest(body);
       if (response.success == true) {
-        Fluttertoast.showToast(msg: response.msg!);
+        Fluttertoast.showToast(msg: response.data!);
         Navigator.pop(context);
       } else {
-        Fluttertoast.showToast(msg: response.msg!);
+        Fluttertoast.showToast(msg: response.data!);
       }
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));
