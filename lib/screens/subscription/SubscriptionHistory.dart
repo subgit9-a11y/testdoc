@@ -343,7 +343,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       purchaseDetail.clear();
       _subscriptionHistory.clear();
       response = await RestClient(await RetroApi().dioData(context))
-          .purchaseSubscriptionRequest({});
+          .purchaseDetailsRequest();
       setState(() {
         purchaseDetail.addAll(response.data!);
         _subscriptionHistory.addAll(response.data!);

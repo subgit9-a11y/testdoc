@@ -330,7 +330,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
     try {
       response = await RestClient(await RetroApi().dioData(context))
           .updateProfile(body);
-      Fluttertoast.showToast(msg: response.data!);
+      Fluttertoast.showToast(msg: response.msg!);
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));
     }
