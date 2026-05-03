@@ -4,8 +4,8 @@ class OslerTheme {
   static const Color forest = Color(0xFF536256);
   static const Color forestDeep = Color(0xFF24382C);
   static const Color moss = Color(0xFF70836F);
-  static const Color lime = Color(0xFFB5F36B);
-  static const Color limeSoft = Color(0xFFE4F8C9);
+  static const Color lime = Color(0xFF2E7D32);
+  static const Color limeSoft = Color(0xFFC8E6C9);
   static const Color canvas = Color(0xFFE9EEE4);
   static const Color surface = Color(0xFFF7F8F2);
   static const Color surfaceMuted = Color(0xFFEFF3EA);
