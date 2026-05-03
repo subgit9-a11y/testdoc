@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
@@ -92,19 +93,19 @@ class ModernDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
                 children: [
-                  _drawerItem(context, Icons.dashboard_outlined, getTranslated(context, AppString.drawer_home).toString(), () => Navigator.popUntil(context, ModalRoute.withName('loginHome'))),
-                  _drawerItem(context, Icons.calendar_month_outlined, getTranslated(context, AppString.drawer_appointments).toString(), () => Navigator.popAndPushNamed(context, 'AppointmentHistoryScreen')),
-                  _drawerItem(context, Icons.cancel_outlined, getTranslated(context, AppString.drawer_canceled_appointment).toString(), () => Navigator.popAndPushNamed(context, 'cancelAppoitmentRoutes')),
-                  _drawerItem(context, Icons.payments_outlined, getTranslated(context, AppString.drawer_payments).toString(), () => Navigator.popAndPushNamed(context, 'payment')),
-                  _drawerItem(context, Icons.star_outline, getTranslated(context, AppString.drawer_review).toString(), () => Navigator.popAndPushNamed(context, 'rateAndReviewRoutes')),
-                  _drawerItem(context, Icons.notifications_none_outlined, getTranslated(context, AppString.drawer_notification).toString(), () => Navigator.popAndPushNamed(context, 'notifications')),
-                  _drawerItem(context, Icons.chat_outlined, getTranslated(context, AppString.chats).toString(), () => Navigator.popAndPushNamed(context, 'ChatHome')),
-                  _drawerItem(context, Icons.how_to_reg_outlined, "Profile & Registration", () {
+                  _drawerItem(context, AppIcons.home, getTranslated(context, AppString.drawer_home).toString(), () => Navigator.popUntil(context, ModalRoute.withName('loginHome'))),
+                  _drawerItem(context, AppIcons.appointment, getTranslated(context, AppString.drawer_appointments).toString(), () => Navigator.popAndPushNamed(context, 'AppointmentHistoryScreen')),
+                  _drawerItem(context, AppIcons.close, getTranslated(context, AppString.drawer_canceled_appointment).toString(), () => Navigator.popAndPushNamed(context, 'cancelAppoitmentRoutes')),
+                  _drawerItem(context, AppIcons.payment, getTranslated(context, AppString.drawer_payments).toString(), () => Navigator.popAndPushNamed(context, 'payment')),
+                  _drawerItem(context, AppIcons.star, getTranslated(context, AppString.drawer_review).toString(), () => Navigator.popAndPushNamed(context, 'rateAndReviewRoutes')),
+                  _drawerItem(context, AppIcons.notifications, getTranslated(context, AppString.drawer_notification).toString(), () => Navigator.popAndPushNamed(context, 'notifications')),
+                  _drawerItem(context, AppIcons.chat, getTranslated(context, AppString.chats).toString(), () => Navigator.popAndPushNamed(context, 'ChatHome')),
+                  _drawerItem(context, AppIcons.verified, "Profile & Registration", () {
                     Navigator.pop(context);
                     Navigator.push(context, MaterialPageRoute(builder: (context) => ProfessionalRegistrationScreen()));
                   }),
-                  _drawerItem(context, Icons.schedule_outlined, getTranslated(context, AppString.drawer_schedule_timing).toString(), () => Navigator.popAndPushNamed(context, 'Schedule Timings')),
-                  _drawerItem(context, Icons.settings_outlined, getTranslated(context, AppString.drawer_setting).toString(), () => Navigator.popAndPushNamed(context, 'Settings')),
+                  _drawerItem(context, AppIcons.clock, getTranslated(context, AppString.drawer_schedule_timing).toString(), () => Navigator.popAndPushNamed(context, 'Schedule Timings')),
+                  _drawerItem(context, AppIcons.settings, getTranslated(context, AppString.drawer_setting).toString(), () => Navigator.popAndPushNamed(context, 'Settings')),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     child: Divider(color: OslerTheme.border),

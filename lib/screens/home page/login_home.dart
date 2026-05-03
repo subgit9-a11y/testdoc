@@ -6,6 +6,7 @@ import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/pages/chat_page.dart';
 import 'package:doctro/chat/providers/auth_provider.dart' as provider;
 import 'package:doctro/chat/providers/home_provider.dart';
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
@@ -352,10 +353,10 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       mainAxisSpacing: 15,
       childAspectRatio: 1.6,
       children: [
-        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), Icons.calendar_today, OslerTheme. forestDeep),
-        _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", Icons.account_balance_wallet, OslerTheme.lime),
-        _buildStatCard(getTranslated(context, AppString.dashboard_active_patients).toString(), patientCount.toString(), Icons.people, OslerTheme. lime),
-        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), Icons.star, OslerTheme. forestDeep),
+        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, OslerTheme.forestDeep),
+        _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, OslerTheme.lime),
+        _buildStatCard(getTranslated(context, AppString.dashboard_active_patients).toString(), patientCount.toString(), AppIcons.patient, OslerTheme.lime),
+        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), AppIcons.star, OslerTheme.forestDeep),
       ],
     );
   }
@@ -402,9 +403,9 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildActionButton(getTranslated(context, AppString.drawer_schedule_timing).toString(), Icons.schedule, OslerTheme. lime, () => Navigator.pushNamed(context, 'Schedule Timings')),
-            _buildActionButton(getTranslated(context, AppString.profile_personal_information).toString(), Icons.person_search, OslerTheme. forestDeep, () => Navigator.pushNamed(context, 'profile')),
-            _buildActionButton(getTranslated(context, AppString.chats).toString(), Icons.chat_bubble_outline, OslerTheme. lime, () => Navigator.pushNamed(context, 'ChatHome')),
-            _buildActionButton(getTranslated(context, AppString.drawer_setting).toString(), Icons.settings, OslerTheme. forestDeep, () => Navigator.pushNamed(context, 'Settings')),
+_buildActionButton(getTranslated(context, AppString.profile_personal_information).toString(), AppIcons.profile, OslerTheme.forestDeep, () => Navigator.pushNamed(context, 'profile')),
+        _buildActionButton(getTranslated(context, AppString.chats).toString(), AppIcons.chat, OslerTheme.lime, () => Navigator.pushNamed(context, 'ChatHome')),
+        _buildActionButton(getTranslated(context, AppString.drawer_setting).toString(), AppIcons.settings, OslerTheme.forestDeep, () => Navigator.pushNamed(context, 'Settings')),
           ],
         ),
       ],

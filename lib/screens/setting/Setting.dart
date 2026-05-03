@@ -1,3 +1,4 @@
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
@@ -120,7 +121,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ).toString(),
               items: [
                 _buildToggleItem(
-                  icon: Icons.notifications_active_outlined,
+                  icon: AppIcons.notifications,
                   title: getTranslated(
                     context,
                     AppString.settings_push_notifications,
