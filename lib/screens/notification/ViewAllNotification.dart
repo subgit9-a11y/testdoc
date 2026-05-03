@@ -178,7 +178,7 @@ class _ViewAllAppointmentState extends State<ViewAllNotification> {
                     height: 58,
                     color: OslerTheme.surfaceMuted,
                     child: const Icon(
-                      Icons.person_outline,
+                      AppIcons.profile,
                       color: OslerTheme.textSecondary,
                     ),
                   );

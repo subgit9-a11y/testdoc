@@ -277,7 +277,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               );
             },
             label: const Text("Astra AI", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-            icon: const Icon(Icons.psychology_outlined, color: Colors.white),
+            icon: const Icon(AppIcons.analytics, color: Colors.white),
             backgroundColor: OslerTheme.forestDeep,
           ),
         ),
@@ -337,7 +337,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               color: OslerTheme.lime,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.monitor_heart_outlined, color: OslerTheme.forestDeep, size: 30),
+            child: const Icon(AppIcons.medical, color: OslerTheme.forestDeep, size: 30),
           ),
         ],
       ),
@@ -402,7 +402,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildActionButton(getTranslated(context, AppString.drawer_schedule_timing).toString(), Icons.schedule, OslerTheme. lime, () => Navigator.pushNamed(context, 'Schedule Timings')),
+            _buildActionButton(getTranslated(context, AppString.drawer_schedule_timing).toString(), AppIcons.clock, OslerTheme.lime, () => Navigator.pushNamed(context, 'Schedule Timings')),
 _buildActionButton(getTranslated(context, AppString.profile_personal_information).toString(), AppIcons.profile, OslerTheme.forestDeep, () => Navigator.pushNamed(context, 'profile')),
         _buildActionButton(getTranslated(context, AppString.chats).toString(), AppIcons.chat, OslerTheme.lime, () => Navigator.pushNamed(context, 'ChatHome')),
         _buildActionButton(getTranslated(context, AppString.drawer_setting).toString(), AppIcons.settings, OslerTheme.forestDeep, () => Navigator.pushNamed(context, 'Settings')),

@@ -81,7 +81,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   .toString(),
               items: [
                 _buildToggleItem(
-                  icon: Icons.dark_mode_outlined,
+                  icon: AppIcons.settings,
                   title: getTranslated(
                     context,
                     AppString.settings_dark_mode,
@@ -100,7 +100,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   },
                 ),
                 _buildNavigationItem(
-                  icon: Icons.language_outlined,
+                  icon: AppIcons.language2,
                   title: getTranslated(
                     context,
                     AppString.drawer_change_language,
@@ -137,7 +137,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   },
                 ),
                 _buildToggleItem(
-                  icon: Icons.videocam_outlined,
+                  icon: AppIcons.videoCall,
                   title: getTranslated(context, AppString.video_call).toString(),
                   subtitle: getTranslated(
                     context,
@@ -160,7 +160,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ).toString(),
               items: [
                 _buildNavigationItem(
-                  icon: Icons.lock_outline,
+                  icon: AppIcons.password,
                   title: getTranslated(
                     context,
                     AppString.drawer_change_password,

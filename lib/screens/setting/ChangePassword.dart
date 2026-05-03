@@ -252,7 +252,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget _toggleIcon(bool hidden, VoidCallback onTap) {
     return IconButton(
       icon: Icon(
-        hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+        hidden ? AppIcons.visibility : AppIcons.visibilityOff,
         color: OslerTheme.textSecondary,
       ),
       onPressed: onTap,

@@ -217,7 +217,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     height: 58,
                     color: OslerTheme.surfaceMuted,
                     child: const Icon(
-                      Icons.person_outline,
+                      AppIcons.profile,
                       color: OslerTheme.textSecondary,
                     ),
                   );

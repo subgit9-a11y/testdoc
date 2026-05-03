@@ -2233,7 +2233,7 @@ class _ProfileScreen extends State<ProfileScreen> {
             child: new Wrap(
               children: <Widget>[
                 new ListTile(
-                    leading: new Icon(Icons.photo_library),
+                    leading: new Icon(AppIcons.photo),
                     title: new Text(
                       getTranslated(context, AppString.choose_image_gallery)
                           .toString(),
@@ -2243,7 +2243,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                       Navigator.of(context).pop();
                     }),
                 new ListTile(
-                  leading: new Icon(Icons.photo_camera),
+                  leading: new Icon(AppIcons.camera),
                   title: new Text(
                     getTranslated(context, AppString.choose_image_camera)
                         .toString(),

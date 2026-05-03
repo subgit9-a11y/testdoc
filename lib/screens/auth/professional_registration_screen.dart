@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';

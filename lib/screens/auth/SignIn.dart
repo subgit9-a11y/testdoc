@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
 import 'package:doctro/chat/providers/auth_provider.dart';
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/common_function.dart';
