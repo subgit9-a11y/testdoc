@@ -127,7 +127,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         'precise': true
       });
       
-      final suggestions = response['recommendations'] ?? [];
+      final suggestions = response['recommendations'] ?? response['medicines'] ?? [];
       
       if (!mounted) return;
       if (suggestions.isNotEmpty) {
@@ -139,10 +139,19 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
           backgroundColor: Colors.purple,
         ));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No AI suggestions found for this diagnosis")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("No AI suggestions found. Try different symptoms or add medicines manually."),
+          backgroundColor: OslerTheme.warning,
+          duration: Duration(seconds: 3),
+        ));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("AI Suggestion failed: $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("AI Suggestion failed: $e. Check your connection."),
+          backgroundColor: OslerTheme.danger,
+        ));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -418,9 +427,23 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
     setState(() => _isLoading = true);
     try {
       final results = await _astraApiService.getAvailableMedicines();
-      if (mounted) setState(() => _results = results);
+      if (mounted) {
+        setState(() => _results = results);
+        if (results.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("No medicines found. Tap 'Sync Shopify' to load products."),
+            backgroundColor: OslerTheme.warning,
+            duration: Duration(seconds: 4),
+          ));
+        }
+      }
     } catch (e) {
-      // handle error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to load medicines: $e"),
+          backgroundColor: OslerTheme.danger,
+        ));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -429,18 +452,21 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   Future<void> _syncShopify() async {
     setState(() => _isSyncing = true);
     try {
-      await _astraApiService.syncShopifyProducts();
+      final response = await _astraApiService.syncShopifyProducts();
       await _loadAvailableMedicines();
       if (mounted) {
+        final count = response['count'] ?? response['products_synced'] ?? 0;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Shopify Inventory Synced Successfully"),
-          backgroundColor: Colors.green,
+          content: Text("Shopify Sync Complete! $count products loaded."),
+          backgroundColor: count > 0 ? Colors.green : OslerTheme.warning,
         ));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Sync failed or already in progress: $e"),
+          content: Text("Sync failed: $e. Check your connection and API."),
+          backgroundColor: OslerTheme.danger,
+          duration: Duration(seconds: 4),
         ));
       }
     } finally {
@@ -463,9 +489,23 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
     setState(() => _isLoading = true);
     try {
       final results = await _astraApiService.searchMedicineProducts(query);
-      if (mounted) setState(() => _results = results);
+      if (mounted) {
+        setState(() => _results = results);
+        if (results.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("No medicines found for '$query'. Try different keywords."),
+            backgroundColor: OslerTheme.warning,
+            duration: Duration(seconds: 2),
+          ));
+        }
+      }
     } catch (e) {
-      // handle error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Search failed: $e"),
+          backgroundColor: OslerTheme.danger,
+        ));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
