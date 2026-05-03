@@ -392,6 +392,16 @@ class AstraApiService {
     }
   }
 
+  /// Check Shopify sync status
+  Future<Map<String, dynamic>> getShopifyStatus() async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/status');
+      return response.data;
+    } catch (e) {
+      return {'error': e.toString(), 'connected': false};
+    }
+  }
+
   /// AI Shop Assist - Smart medicine recommendations
   Future<Map<String, dynamic>> aiShopAssist(Map<String, dynamic> data) async {
     try {

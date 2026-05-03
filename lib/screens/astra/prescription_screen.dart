@@ -455,19 +455,23 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
       final response = await _astraApiService.syncShopifyProducts();
       await _loadAvailableMedicines();
       if (mounted) {
-        final count = response['count'] ?? response['products_synced'] ?? 0;
+        final count = response['count'] ?? response['products_synced'] ?? response['total'] ?? 0;
+        final message = response['message'] ?? response['status'] ?? '';
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Shopify Sync Complete! $count products loaded."),
+          content: Text("Shopify Sync: $count products loaded. $message"),
           backgroundColor: count > 0 ? Colors.green : OslerTheme.warning,
+          duration: Duration(seconds: 4),
         ));
+        debugPrint("Shopify Sync Response: $response");
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Sync failed: $e. Check your connection and API."),
+          content: Text("Sync failed: $e"),
           backgroundColor: OslerTheme.danger,
           duration: Duration(seconds: 4),
         ));
+        debugPrint("Shopify Sync Error: $e");
       }
     } finally {
       if (mounted) setState(() => _isSyncing = false);
@@ -521,7 +525,15 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Search Medicines", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Search Medicines", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text("${_results.length} products loaded", style: TextStyle(fontSize: 12, color: OslerTheme.textSecondary)),
+                  ],
+                ),
+              ),
               if (_isSyncing)
                 SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
               else
