@@ -442,6 +442,32 @@ class AstraApiService {
     }
   }
 
+  /// Get ALL Shopify products (for debugging)
+  Future<Map<String, dynamic>> getAllShopifyProducts() async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/products/all');
+      return {'success': true, 'products': response.data, 'count': (response.data as List?)?.length ?? 0};
+    } catch (e) {
+      // Try alternative endpoint
+      try {
+        final response = await _dio.get('/api/v1/shopify/products');
+        return {'success': true, 'products': response.data, 'count': (response.data as List?)?.length ?? 0};
+      } catch (e2) {
+        return {'success': false, 'error': e2.toString()};
+      }
+    }
+  }
+
+  /// Get Shopify store info
+  Future<Map<String, dynamic>> getShopifyStoreInfo() async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/store-info');
+      return response.data;
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
   /// Get draft order status
   Future<Map<String, dynamic>> getDraftOrderStatus(String draftOrderId) async {
     try {

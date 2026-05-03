@@ -224,6 +224,73 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     );
   }
 
+  Future<void> _showAllProducts() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text("Loading All Products..."),
+        content: Center(child: CircularProgressIndicator()),
+      ),
+    );
+    try {
+      final result = await _astraApiService.getAllShopifyProducts();
+      if (!mounted) return;
+      Navigator.pop(context);
+      
+      if (result['success'] == true) {
+        final products = result['products'] as List? ?? [];
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (ctx) => Container(
+            height: MediaQuery.of(context).size.height * 0.8,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text("All Shopify Products (${products.length})", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 10),
+                Expanded(
+                  child: products.isEmpty 
+                    ? Center(child: Text("No products found"))
+                    : ListView.builder(
+                        itemCount: products.length,
+                        itemBuilder: (ctx, i) {
+                          final p = products[i];
+                          return ListTile(
+                            title: Text(p['title'] ?? p['medicine_name'] ?? 'Unknown'),
+                            subtitle: Text("₹${p['price'] ?? '0'}"),
+                            trailing: IconButton(
+                              icon: Icon(Icons.add_circle, color: Colors.green),
+                              onPressed: () {
+                                _addMedicine(p);
+                                Navigator.pop(ctx);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: ${result['error']}"),
+          backgroundColor: OslerTheme.danger,
+        ));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed: $e"),
+        backgroundColor: OslerTheme.danger,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -540,7 +607,12 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
                 TextButton.icon(
                   onPressed: _syncShopify,
                   icon: Icon(Icons.sync, size: 16),
-                  label: Text("Sync Shopify", style: TextStyle(fontSize: 12)),
+                  label: Text("Sync", style: TextStyle(fontSize: 12)),
+                ),
+              TextButton.icon(
+                  onPressed: _showAllProducts,
+                  icon: Icon(Icons.list, size: 16),
+                  label: Text("All", style: TextStyle(fontSize: 12)),
                 ),
             ],
           ),
