@@ -465,6 +465,7 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
     try {
       // First check the connection status
       final status = await _astraApiService.getShopifyStatus();
+      debugPrint("🔗 Shopify Status: $status");
       
       if (status['connected'] != true) {
         if (mounted) {
@@ -480,6 +481,11 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
       
       // Now try sync
       final response = await _astraApiService.syncShopifyProducts();
+      debugPrint("🔄 Sync Response: $response");
+      
+      // Also test get available directly
+      final available = await _astraApiService.getAvailableMedicines();
+      debugPrint("📦 Available Products: ${available.length}");
       
       await _loadAvailableMedicines();
       if (mounted) {
