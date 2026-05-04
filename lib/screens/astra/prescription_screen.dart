@@ -452,22 +452,34 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   Future<void> _syncShopify() async {
     setState(() => _isSyncing = true);
     try {
+      // Show diagnostics
+      debugPrint("=== SHOPIFY SYNC DEBUG ===");
+      debugPrint("Shop URL: ayureze-healthcare.myshopify.com");
+      debugPrint("Testing connection to: https://astra.ayureze.in");
+      
       // First check the connection
       final status = await _astraApiService.getShopifyStatus();
-      debugPrint("Shopify Status: $status");
+      debugPrint("Shopify Status Response: $status");
+      
+      if (status['connected'] == true) {
+        debugPrint("✅ Shopify Connected!");
+      } else {
+        debugPrint("❌ Shopify Not Connected: ${status['error']}");
+      }
       
       if (status['error'] != null || status['connected'] == false) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Shopify not connected: ${status['error'] ?? 'Check credentials'}"),
+            content: Text("❌ Shopify not connected: ${status['error'] ?? 'Check backend credentials'}"),
             backgroundColor: OslerTheme.danger,
-            duration: Duration(seconds: 5),
+            duration: Duration(seconds: 6),
           ));
         }
         setState(() => _isSyncing = false);
         return;
       }
       
+      // Now try sync
       final response = await _astraApiService.syncShopifyProducts();
       debugPrint("Shopify Sync Response: $response");
       
@@ -483,28 +495,29 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
             backgroundColor: OslerTheme.danger,
             duration: Duration(seconds: 5),
           ));
+        } else if (count > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("✅ Shopify Sync: $count products loaded!"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Shopify Sync: $count products loaded. $message"),
-            backgroundColor: count > 0 ? Colors.green : OslerTheme.warning,
-            duration: Duration(seconds: 4),
+            content: Text("⚠️ Sync completed but 0 products. Check Shopify store has products."),
+            backgroundColor: OslerTheme.warning,
+            duration: Duration(seconds: 5),
           ));
         }
       }
     } catch (e) {
       if (mounted) {
-        String errorMsg = "Sync failed: $e";
+        String errorMsg = "❌ Sync failed: $e";
         debugPrint("Shopify Sync Error: $e");
-        
-        // Try to extract more info
-        if (e.toString().contains('DioException')) {
-          errorMsg = "Connection error. Check your network and API.";
-        }
         
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(errorMsg),
           backgroundColor: OslerTheme.danger,
-          duration: Duration(seconds: 5),
+          duration: Duration(seconds: 6),
         ));
       }
     } finally {
