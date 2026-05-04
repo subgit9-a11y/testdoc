@@ -157,7 +157,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             AppString.subscription_search_history,
           ).toString(),
           hintStyle: const TextStyle(color: OslerTheme.textSecondary),
-          suffixIcon: const Icon(
+          suffixIcon: Icon(
             AppIcons.search,
             color: OslerTheme.forestDeep,
           ),
