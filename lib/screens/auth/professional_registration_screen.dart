@@ -400,7 +400,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                         children: [
                           _buildTextField("Full Name", _nameController, Icons.badge_outlined),
                           _buildTextField("Email Address", _emailController, Icons.email_outlined),
-                          _buildTextField("Phone Number", _phoneController, Icons.phone_outlined, isNumber: true),
+                          _buildTextField("Phone Number", _phoneController, AppIcons.phone, isNumber: true),
                           Row(
                             children: [
                               Expanded(

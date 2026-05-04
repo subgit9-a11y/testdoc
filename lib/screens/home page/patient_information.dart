@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/providers/home_provider.dart';
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/theme/osler_theme.dart';
@@ -247,7 +248,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                         children: <Widget>[
                                           new ListTile(
                                             leading:
-                                                new Icon(Icons.phone_in_talk),
+                                                new Icon(AppIcons.call),
                                             title: new Text(
                                               getTranslated(
                                                       context, "call_text")
