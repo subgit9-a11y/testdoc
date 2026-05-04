@@ -452,26 +452,60 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
   Future<void> _syncShopify() async {
     setState(() => _isSyncing = true);
     try {
+      // First check the connection
+      final status = await _astraApiService.getShopifyStatus();
+      debugPrint("Shopify Status: $status");
+      
+      if (status['error'] != null || status['connected'] == false) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Shopify not connected: ${status['error'] ?? 'Check credentials'}"),
+            backgroundColor: OslerTheme.danger,
+            duration: Duration(seconds: 5),
+          ));
+        }
+        setState(() => _isSyncing = false);
+        return;
+      }
+      
       final response = await _astraApiService.syncShopifyProducts();
+      debugPrint("Shopify Sync Response: $response");
+      
       await _loadAvailableMedicines();
       if (mounted) {
-        final count = response['count'] ?? response['products_synced'] ?? response['total'] ?? 0;
+        final count = response['count'] ?? response['products_synced'] ?? response['total'] ?? response['synced_count'] ?? 0;
         final message = response['message'] ?? response['status'] ?? '';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Shopify Sync: $count products loaded. $message"),
-          backgroundColor: count > 0 ? Colors.green : OslerTheme.warning,
-          duration: Duration(seconds: 4),
-        ));
-        debugPrint("Shopify Sync Response: $response");
+        final error = response['error'] ?? response['errors'];
+        
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Sync Error: $error"),
+            backgroundColor: OslerTheme.danger,
+            duration: Duration(seconds: 5),
+          ));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Shopify Sync: $count products loaded. $message"),
+            backgroundColor: count > 0 ? Colors.green : OslerTheme.warning,
+            duration: Duration(seconds: 4),
+          ));
+        }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Sync failed: $e"),
-          backgroundColor: OslerTheme.danger,
-          duration: Duration(seconds: 4),
-        ));
+        String errorMsg = "Sync failed: $e";
         debugPrint("Shopify Sync Error: $e");
+        
+        // Try to extract more info
+        if (e.toString().contains('DioException')) {
+          errorMsg = "Connection error. Check your network and API.";
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(errorMsg),
+          backgroundColor: OslerTheme.danger,
+          duration: Duration(seconds: 5),
+        ));
       }
     } finally {
       if (mounted) setState(() => _isSyncing = false);
