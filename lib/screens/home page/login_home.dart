@@ -277,7 +277,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               );
             },
             label: const Text("Astra AI", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-            icon: const Icon(AppIcons.analytics, color: Colors.white),
+            icon: Icon(AppIcons.analytics, color: Colors.white),
             backgroundColor: OslerTheme.forestDeep,
           ),
         ),
@@ -337,7 +337,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               color: OslerTheme.lime,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(AppIcons.medical, color: OslerTheme.forestDeep, size: 30),
+            child: Icon(AppIcons.medical, color: OslerTheme.forestDeep, size: 30),
           ),
         ],
       ),

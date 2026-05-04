@@ -129,7 +129,7 @@ class _VideoCallState extends State<VideoCall> {
                         BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
                       ],
                     ),
-                    child: const Icon(AppIcons.callEnd, color: Colors.white, size: 28),
+                    child: Icon(AppIcons.callEnd, color: Colors.white, size: 28),
                   ),
                 ),
               ],
