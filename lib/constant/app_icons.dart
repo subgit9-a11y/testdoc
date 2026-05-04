@@ -41,6 +41,10 @@ class AppIcons {
   static IconData get call => Icons.call_outlined;
   static IconData get callEnd => Icons.call_end;
 
+  static IconData get mic => Icons.mic;
+
+  static IconData get micOff => Icons.mic_off;
+
   static IconData get videoCall => Icons.videocam_outlined;
   static IconData get videoCallOff => Icons.videocam_off_outlined;
 

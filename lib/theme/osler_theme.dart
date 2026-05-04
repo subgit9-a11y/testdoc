@@ -350,7 +350,7 @@ class OslerTheme {
         ),
         hintStyle: const TextStyle(color: darkTextSecondary),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: darkBorder)),
@@ -362,10 +362,10 @@ class OslerTheme {
         unselectedItemColor: darkTextSecondary,
       ),
       drawerTheme: const DrawerThemeData(backgroundColor: darkSurface),
-      dialogTheme: DialogTheme(backgroundColor: darkSurface, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))),
+      dialogTheme: DialogThemeData(backgroundColor: darkSurface, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: lime, foregroundColor: Colors.white),
       chipTheme: ChipThemeData(backgroundColor: darkSurfaceMuted, labelStyle: const TextStyle(color: darkTextPrimary)),
-      tabBarTheme: const TabBarTheme(labelColor: lime, unselectedLabelColor: darkTextSecondary),
+      tabBarTheme: TabBarThemeData(labelColor: lime, unselectedLabelColor: darkTextSecondary),
     );
   }
 

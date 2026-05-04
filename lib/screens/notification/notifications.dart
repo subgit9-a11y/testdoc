@@ -52,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
+          icon: Icon(
             AppIcons.back,
             color: OslerTheme.forestDeep,
             size: 20,

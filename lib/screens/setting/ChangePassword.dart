@@ -1,3 +1,4 @@
+import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -42,7 +43,7 @@ class _ChangePasswordState extends State<ChangePassword> {
       appBar: AppBar(
         backgroundColor: OslerTheme.canvas,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             AppIcons.back,
             color: OslerTheme.forestDeep,
             size: 20,
