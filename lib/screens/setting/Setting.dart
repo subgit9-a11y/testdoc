@@ -96,7 +96,6 @@ class _SettingScreenState extends State<SettingScreen> {
                     await context.read<ThemeProvider>().setDarkMode(val);
                     Fluttertoast.showToast(
                       msg: "Dark mode: ${val ? 'ON' : 'OFF'}",
-                      duration: 2,
                     );
                   },
                 ),
