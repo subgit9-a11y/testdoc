@@ -670,6 +670,8 @@ class _MyAppState extends State<MyApp> {
                 'Settings': (context) => SettingScreen(),
                 'ChatHome': (context) => HomePage(),
               },
+              );
+            },
             ),
           ),
         ),
