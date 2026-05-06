@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:doctro/retrofit/apis.dart';
 
 /// Astra AI Healthcare API Service
 /// 
@@ -18,7 +20,7 @@ class AstraApiService {
   late Dio _dio;
 
   /// Your Astra AI Backend Base URL
-  final String baseUrl = "https://astra.ayureze.in";
+  final String baseUrl = Apis.astraBaseUrl;
 
   factory AstraApiService() {
     return _instance;
@@ -66,7 +68,7 @@ class AstraApiService {
   /// Login with Firebase token
   Future<Map<String, dynamic>> login() async {
     try {
-      final response = await _dio.get('/api/v1/auth/login');
+      final response = await _dio.get(Apis.astra_login);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -76,7 +78,7 @@ class AstraApiService {
   /// Create a session for the authenticated user
   Future<Map<String, dynamic>> createSession(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/api/v1/auth/session', data: data);
+      final response = await _dio.post(Apis.astra_session, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -86,7 +88,7 @@ class AstraApiService {
   /// Get current user info
   Future<Map<String, dynamic>> getUserInfo() async {
     try {
-      final response = await _dio.get('/api/v1/auth/user');
+      final response = await _dio.get(Apis.astra_user_info);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -96,7 +98,7 @@ class AstraApiService {
   /// Logout user
   Future<void> logout() async {
     try {
-      await _dio.post('/api/v1/auth/logout');
+      await _dio.post(Apis.astra_logout);
     } catch (e) {
       throw _handleError(e);
     }
@@ -196,7 +198,8 @@ class AstraApiService {
   /// Search patients by name, phone, or ID
   Future<List<dynamic>> searchPatients(String searchTerm) async {
     try {
-      final response = await _dio.get('/api/v1/patients/search/$searchTerm');
+      final String path = Apis.astra_search_patients.replaceFirst('{search_term}', searchTerm);
+      final response = await _dio.get(path);
       return response.data ?? [];
     } catch (e) {
       return [];
@@ -206,7 +209,8 @@ class AstraApiService {
   /// Verify patient by code
   Future<Map<String, dynamic>> verifyPatientCode(String patientCode) async {
     try {
-      final response = await _dio.get('/api/v1/patients/verify/$patientCode');
+      final String path = Apis.astra_verify_patient.replaceFirst('{patient_code}', patientCode);
+      final response = await _dio.get(path);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -216,7 +220,8 @@ class AstraApiService {
   /// Get patient profile
   Future<Map<String, dynamic>> getPatientProfile(String patientId) async {
     try {
-      final response = await _dio.get('/api/v1/patients/profile/$patientId');
+      final String path = Apis.astra_patient_profile.replaceFirst('{patient_id}', patientId);
+      final response = await _dio.get(path);
       return response.data;
     } catch (e) {
       return {};
@@ -226,7 +231,7 @@ class AstraApiService {
   /// Create consultation record
   Future<Map<String, dynamic>> createConsultation(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/api/v1/patients/consultation', data: data);
+      final response = await _dio.post(Apis.astra_create_consultation, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -240,7 +245,7 @@ class AstraApiService {
   /// Create a new prescription
   Future<Map<String, dynamic>> createPrescription(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/api/v1/api/prescriptions/create', data: data);
+      final response = await _dio.post(Apis.astra_create_prescription, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -250,7 +255,8 @@ class AstraApiService {
   /// Get prescription by ID
   Future<Map<String, dynamic>> getPrescription(String prescriptionId) async {
     try {
-      final response = await _dio.get('/api/v1/api/prescriptions/$prescriptionId');
+      final String path = Apis.astra_get_prescription.replaceFirst('{prescription_id}', prescriptionId);
+      final response = await _dio.get(path);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -260,7 +266,8 @@ class AstraApiService {
   /// Update prescription
   Future<Map<String, dynamic>> updatePrescription(String prescriptionId, Map<String, dynamic> data) async {
     try {
-      final response = await _dio.put('/api/v1/api/prescriptions/$prescriptionId', data: data);
+      final String path = Apis.astra_update_prescription.replaceFirst('{prescription_id}', prescriptionId);
+      final response = await _dio.put(path, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -270,7 +277,8 @@ class AstraApiService {
   /// Get all prescriptions for a patient
   Future<List<dynamic>> getPatientPrescriptions(String patientId) async {
     try {
-      final response = await _dio.get('/api/v1/api/prescriptions/patient/$patientId');
+      final String path = Apis.astra_patient_prescriptions.replaceFirst('{patient_id}', patientId);
+      final response = await _dio.get(path);
       return response.data ?? [];
     } catch (e) {
       return [];
@@ -314,7 +322,7 @@ class AstraApiService {
   /// Generate catchy prescription from uploaded image
   Future<Map<String, dynamic>> generateCatchyFromUpload(File imageFile) async {
     try {
-      String fileName = imageFile.path.split('/').last;
+      String fileName = p.basename(imageFile.path);
       FormData formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(
           imageFile.path,
@@ -361,7 +369,7 @@ class AstraApiService {
   /// Execute unified prescription workflow (Save, PDF, WhatsApp, Cart, Reminders)
   Future<Map<String, dynamic>> executePrescriptionWorkflow(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/api/v1/prescription-workflow/execute', data: data);
+      final response = await _dio.post(Apis.astra_execute_workflow, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -371,7 +379,8 @@ class AstraApiService {
   /// Check workflow status
   Future<Map<String, dynamic>> checkWorkflowStatus(String prescriptionId) async {
     try {
-      final response = await _dio.get('/api/v1/prescription-workflow/status/$prescriptionId');
+      final String path = Apis.astra_workflow_status.replaceFirst('{prescription_id}', prescriptionId);
+      final response = await _dio.get(path);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -385,7 +394,7 @@ class AstraApiService {
   /// Sync Shopify products (Force sync from Shopify to Astra DB)
   Future<Map<String, dynamic>> syncShopifyProducts() async {
     try {
-      final response = await _dio.post('/api/v1/shopify/sync');
+      final response = await _dio.post(Apis.astra_shopify_sync);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -514,7 +523,7 @@ class AstraApiService {
         data['user_metadata']['role'] = 'doctor';
       }
       
-      final response = await _dio.post('/api/v1/brain/chat', data: data);
+      final response = await _dio.post(Apis.astra_brain_chat, data: data);
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -588,7 +597,7 @@ class AstraApiService {
   /// Process voice for prescription extraction
   Future<Map<String, dynamic>> processVoice(File audioFile, String userId, {String languageCode = "en-IN"}) async {
     try {
-      String fileName = audioFile.path.split('/').last;
+      String fileName = p.basename(audioFile.path);
       FormData formData = FormData.fromMap({
         "audio": await MultipartFile.fromFile(
           audioFile.path,
@@ -637,8 +646,8 @@ class AstraApiService {
   /// Upload a document (prescription image, lab report, etc.)
   Future<Map<String, dynamic>> uploadDocument(File file, String patientId, String documentType) async {
     try {
-      String fileName = file.path.split('/').last;
-      String ext = fileName.split('.').last.toLowerCase();
+      String fileName = p.basename(file.path);
+      String ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
       String mimeType = ext == 'pdf' ? 'application/pdf' : 'image/$ext';
       
       FormData formData = FormData.fromMap({

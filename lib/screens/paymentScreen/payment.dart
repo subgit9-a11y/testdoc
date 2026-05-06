@@ -63,14 +63,15 @@ class _PaymentScreen extends State<PaymentScreen> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         Navigator.pushNamedAndRemoveUntil(
           context,
           'loginHome',
           (route) => false,
         );
-        return Future<bool>.value(false);
       },
       child: RefreshIndicator(
         onRefresh: paymentsFunction,

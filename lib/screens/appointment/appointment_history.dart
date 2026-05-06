@@ -119,15 +119,9 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
       _tabController = new TabController(vsync: this, length: tabList.length);
       _tabController!.addListener(() {
         setState(() {
-          if (isShow == null) {
-            isShow = true;
-            _searchResult.clear();
-            _search.clear();
-          } else {
-            isShow = false;
-            _pastSearch.clear();
-            _search.clear();
-          }
+          _searchResult.clear();
+          _pastSearch.clear();
+          _search.clear();
         });
       });
 
@@ -142,7 +136,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -151,10 +145,11 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         Navigator.pushNamedAndRemoveUntil(context, 'loginHome', (route) => false);
-        return false;
       },
       child: Scaffold(
         key: _scaffoldKey,
@@ -178,7 +173,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(dFullImage ?? "https://via.placeholder.com/150"),
+                      image: (dFullImage != null && dFullImage!.isNotEmpty)
+                          ? NetworkImage(dFullImage!)
+                          : const AssetImage("assets/images/no_image.jpg")
+                              as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -1126,18 +1124,21 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
       return;
     }
 
-    isShow == null
-        ? _userDetails.forEach((upcomingAppointment) {
-            if ((upcomingAppointment.patientName ?? "")
-                .toLowerCase()
-                .contains(text.toLowerCase()))
-              _searchResult.add(upcomingAppointment);
-          })
-        : _pastData.forEach((pastAppointment) {
-            if ((pastAppointment.patientName ?? "")
-                .toLowerCase()
-                .contains(text.toLowerCase())) _pastSearch.add(pastAppointment);
-          });
+    final isUpcomingTab = _tabController?.index == 0;
+    if (isUpcomingTab) {
+      _userDetails.forEach((upcomingAppointment) {
+        if ((upcomingAppointment.patientName ?? "")
+            .toLowerCase()
+            .contains(text.toLowerCase()))
+          _searchResult.add(upcomingAppointment);
+      });
+    } else {
+      _pastData.forEach((pastAppointment) {
+        if ((pastAppointment.patientName ?? "")
+            .toLowerCase()
+            .contains(text.toLowerCase())) _pastSearch.add(pastAppointment);
+      });
+    }
 
     setState(() {});
   }

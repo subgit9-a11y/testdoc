@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:doctro/services/astra_api_service.dart';
-import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/model/astra/ai_response_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,7 +85,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           .take(10)
           .toList()
           .reversed
-          .map((m) => {
+          .map((m) => <String, String>{
                 'role': m.isMe ? 'user' : 'assistant',
                 'content': m.text,
               })
@@ -170,29 +168,38 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
     _scrollToBottom();
   }
 
-  Future<void> _toggleRecording() async {
+  Future<void> _startRecording() async {
     try {
-      if (_isRecording) {
-        final path = await _audioRecorder.stop();
+      if (_isRecording) return;
+      if (await _audioRecorder.hasPermission()) {
+        final directory = await getTemporaryDirectory();
+        _recordingPath = '${directory.path}/astra_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
+        
+        await _audioRecorder.start(const RecordConfig(), path: _recordingPath!);
         setState(() {
-          _isRecording = false;
-          _recordingPath = path;
+          _isRecording = true;
         });
-        if (path != null) {
-          _sendMessage(voicePath: path);
-        }
-      } else {
-        if (await _audioRecorder.hasPermission()) {
-          final directory = await getTemporaryDirectory();
-          _recordingPath = '${directory.path}/astra_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
-          
-          await _audioRecorder.start(const RecordConfig(), path: _recordingPath!);
-          setState(() {
-            _isRecording = true;
-          });
-        }
       }
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Recording error: $e")),
+      );
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      if (!_isRecording) return;
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+        _recordingPath = path;
+      });
+      if (path != null) {
+        _sendMessage(voicePath: path);
+      }
+    } catch (e) {
+      setState(() => _isRecording = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Recording error: $e")),
       );
@@ -346,8 +353,8 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         child: Row(
           children: [
             GestureDetector(
-              onLongPress: _toggleRecording,
-              onLongPressEnd: (_) => _toggleRecording(),
+              onLongPress: _startRecording,
+              onLongPressEnd: (_) => _stopRecording(),
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -356,7 +363,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                 ),
                 child: Icon(
                   _isRecording ? Icons.stop : Icons.mic,
-                  color: _isRecording ? Colors.white : purple,
+                  color: _isRecording ? Colors.white : AyurezeTheme.forestDeep,
                   size: 20,
                 ),
               ),
@@ -386,7 +393,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: purple,
+                  color: AyurezeTheme.forestDeep,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.send, color: Colors.white, size: 20),

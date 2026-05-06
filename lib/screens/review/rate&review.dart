@@ -172,11 +172,12 @@ class _RateAndReviewRoutesScreenState extends State<RateAndReviewRoutesScreen> {
                   ),
                 ),
               ]))),
-      body: WillPopScope(
-        onWillPop: () {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           Navigator.pushNamedAndRemoveUntil(
               context, 'loginHome', (route) => false);
-          return Future<bool>.value(false);
         },
         child: FutureBuilder(
             future: reviewDatas,

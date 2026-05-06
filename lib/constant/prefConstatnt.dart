@@ -7,7 +7,7 @@ class Preferences {
   static const String dob = "dob";
   static const String gender = "gender";
   static const String image = "image";
-  static const String phone_no = "phone no";
+  static const String phone_no = "phone_no";
   static const String email = "email";
   static const String subscription_status = "subscription_status";
   static const String auth_token = "authToken";
@@ -21,7 +21,7 @@ class Preferences {
 
   // static const String patientVCall="PatientVCall";
   static const String current_language_code = "current_language_code";
-  static const String language_name = "language name ";
+  static const String language_name = "language_name";
   static const String patient_name = "patient_name";
   static const String messageToken = "messageToken";
   static const String is_dark_mode = "isDarkMode";
@@ -72,6 +72,8 @@ class Preferences {
 
   static const String user_email = "user_email";
   static const String user_name = "user_name";
+  // ignore: unused_field
+  @Deprecated('Security risk: Never store passwords in SharedPreferences')
   static const String password = "password";
   static const String chat_profile = "profile";
   static const String registration_no = "registration_no";

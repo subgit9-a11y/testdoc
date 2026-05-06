@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
@@ -58,16 +59,20 @@ import 'screens/paymentScreen/payment.dart';
 import 'screens/profile/profile.dart';
 import 'screens/review/rate&review.dart';
 import 'screens/videoCall/video_Call.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
   
   // Initialize Supabase
   await Supabase.initialize(
-    url: 'https://ykewayjfdanhqtqpziwt.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZXdheWpmZGFuaHF0cXB6aXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5NDc2OTIsImV4cCI6MjA3MTUyMzY5Mn0.OJDr91V4He1zv0k3Dn88-ZgErOOo1eeUtee23qh6G7s',
+    url: dotenv.get('SUPABASE_URL'),
+    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
   );
   
   // Use a safer initialization sequence
@@ -91,7 +96,9 @@ Future<void> main() async {
     debugPrint("Firebase initialization failed: $e");
   }
 
-  HttpOverrides.global = new MyHttpOverrides();
+  if (kDebugMode) {
+    HttpOverrides.global = new MyHttpOverrides();
+  }
   
   if (Platform.isAndroid) {
     SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
@@ -141,7 +148,6 @@ class _MyAppState extends State<MyApp> {
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
-  get skip => null;
 
   Locale? _locale = const Locale('en', 'US');
   String messageImage = '';
@@ -649,7 +655,7 @@ class _MyAppState extends State<MyApp> {
                 'ForgotPasswordScreen': (context) => ForgotPasswordScreen(),
                 'phoneverification': (context) => PhoneVerificationScreen(),
                 'loginHome': (context) => LoginHomeScreen(chat: ""),
-                'patientInformation': (context) => patientDetailsScreen(),
+                'patientInformation': (context) => PatientDetailsScreen(),
                 'cancelAppoitmentRoutes': (context) =>
                     CancelAppointmentScreen(),
                 'AppointmentHistoryScreen': (context) =>

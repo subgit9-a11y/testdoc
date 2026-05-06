@@ -59,6 +59,17 @@ class _CreateAccountState extends State<CreateAccount> {
     });
   }
 
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _dob.dispose();
+    _phone.dispose();
+    _password.dispose();
+    _phoneCode.dispose();
+    super.dispose();
+  }
+
   //Select Dob
   DateTime? _selectedDate;
   String newDateApiPass = "";

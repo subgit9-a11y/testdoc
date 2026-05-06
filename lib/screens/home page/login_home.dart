@@ -134,6 +134,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+      if (!mounted) return;
       if (message != null) {
         Map<String, dynamic> dataValue = message.data;
         messageImage = dataValue['userImage'].toString();
@@ -165,6 +166,8 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
   @override
   void dispose() {
     _pulseController.dispose();
+    _search.dispose();
+    timer?.cancel();
     super.dispose();
   }
 
@@ -172,7 +175,8 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
   DateTime? currentBackPressTime;
 
   //Set Double Tap exit //
-  Future<bool> onWillPop() {
+  void _handlePopInvoked(bool didPop, dynamic result) {
+    if (didPop) return;
     DateTime now = DateTime.now();
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -181,9 +185,9 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
           gravity: ToastGravity.BOTTOM,
           msg: getTranslated(context, AppString.tap_again_to_exit_app)
               .toString());
-      return Future.value(false);
+    } else {
+      Navigator.of(context).pop();
     }
-    return Future.value(true);
   }
 
   // Add List Data //
@@ -207,8 +211,9 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _handlePopInvoked,
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: AyurezeTheme.canvas,
@@ -231,7 +236,10 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(dFullImage ?? "https://via.placeholder.com/150"),
+                      image: (dFullImage != null && dFullImage!.isNotEmpty)
+                          ? NetworkImage(dFullImage!)
+                          : const AssetImage("assets/images/no_image.jpg")
+                              as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -527,7 +535,7 @@ _buildActionButton(getTranslated(context, AppString.profile_personal_information
 
   Widget _buildAppointmentCard(dynamic app) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => patientDetailsScreen(id: app.id))),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PatientDetailsScreen(id: app.id))),
       child: Container(
         margin: EdgeInsets.only(bottom: 12),
         padding: EdgeInsets.all(16),
@@ -683,7 +691,7 @@ _buildActionButton(getTranslated(context, AppString.profile_personal_information
               )),
               GestureDetector(
                 onTap: () {
-                  SubSubscription();
+                  Navigator.pushReplacementNamed(context, "subscription");
                 },
                 child: Container(
                     margin: EdgeInsets.only(top: height * 0.02),

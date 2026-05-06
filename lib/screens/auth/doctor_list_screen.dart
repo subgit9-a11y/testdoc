@@ -115,7 +115,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
           radius: 30,
-          backgroundImage: NetworkImage(doc.image ?? 'https://via.placeholder.com/150'),
+          backgroundImage: (doc.image != null && doc.image!.isNotEmpty)
+              ? NetworkImage(doc.image!)
+              : const AssetImage("assets/images/no_image.jpg") as ImageProvider,
         ),
         title: Text(
           doc.name ?? "Unknown",

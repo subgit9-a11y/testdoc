@@ -34,15 +34,15 @@ import '../../chat/pages/chat_page.dart';
 import '../videoCall/video_Call.dart';
 import 'package:doctro/screens/astra/prescription_screen.dart';
 import 'package:doctro/widgets/astra_fill_display.dart';
-import 'package:doctro/services/astra_service.dart';
+import 'package:doctro/services/astra_api_service.dart';
 
-class patientDetailsScreen extends StatefulWidget {
+class PatientDetailsScreen extends StatefulWidget {
   final int? id;
 
-  patientDetailsScreen({this.id});
+  PatientDetailsScreen({this.id});
 
   @override
-  _patientDetailsScreenState createState() => _patientDetailsScreenState();
+  _PatientDetailsScreenState createState() => _PatientDetailsScreenState();
 }
 
 //Pass Medicine list in pdf
@@ -52,13 +52,13 @@ List<Map<String, dynamic>> listOfMedicine = [];
 //Add Medicine List
 List<String> medicineReq = [];
 
-class _patientDetailsScreenState extends State<patientDetailsScreen>
+class _PatientDetailsScreenState extends State<PatientDetailsScreen>
     with TickerProviderStateMixin {
   //Set Loader
   Future? appointmentDetail;
   
   // Astra Fill Data (Health intake from patient's app)
-  final AstraService _astraService = AstraService();
+  final AstraApiService _astraService = AstraApiService();
   Map<String, dynamic>? _astraFillData;
   bool _isLoadingAstraFill = false;
 
@@ -187,7 +187,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -235,7 +235,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white.withOpacity(0.3), width: 3),
                                 image: DecorationImage(
-                                  image: NetworkImage(fullImage ?? "https://via.placeholder.com/150"),
+                                  image: (fullImage != null && fullImage!.isNotEmpty)
+                                      ? NetworkImage(fullImage!)
+                                      : const AssetImage("assets/images/no_image.jpg") as ImageProvider,
                                   fit: BoxFit.cover,
                                 ),
                               ),

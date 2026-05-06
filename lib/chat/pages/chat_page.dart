@@ -536,7 +536,8 @@ class ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<bool> onWillPop() {
+  void _handlePop(bool didPop, dynamic result) {
+    if (didPop) return;
     if (widget.isNavigate == 'chatHome') {
       Navigator.pop(context);
     } else {
@@ -547,7 +548,6 @@ class ChatPageState extends State<ChatPage> {
                     chat: "chat",
                   )));
     }
-    return Future.value(true);
   }
 
   @override
@@ -577,8 +577,9 @@ class ChatPageState extends State<ChatPage> {
               color: ColorConstants.black,
             )),
       ),
-      body: WillPopScope(
-        onWillPop: onWillPop,
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: _handlePop,
         child: Stack(
           children: <Widget>[
             Column(

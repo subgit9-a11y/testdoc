@@ -49,7 +49,17 @@ class RetroApi {
               final refreshToken =
                   SharedPreferenceHelper.getString(Preferences.refresh_token);
 
-              final newToken = await refreshFirebaseToken(refreshToken!);
+              if (refreshToken == 'N_A' || refreshToken.isEmpty) {
+                SharedPreferenceHelper.clearPref();
+                final navigator = Navigator.of(context);
+                final current = ModalRoute.of(context)?.settings.name;
+                if (navigator.canPop() && current != 'SignIn') {
+                  navigator.pushNamedAndRemoveUntil('SignIn', (route) => false);
+                }
+                return handler.reject(e);
+              }
+
+              final newToken = await refreshFirebaseToken(refreshToken);
 
               if (newToken != null) {
                 // Retry request with new token
@@ -85,7 +95,7 @@ class RetroApi {
               if (navigator.canPop() && current != 'SignIn') {
                 navigator.pushNamedAndRemoveUntil('SignIn', (route) => false);
               }
-              return handler.reject(err as DioException);
+              return handler.reject(e);
             }
           }
 
@@ -98,8 +108,9 @@ class RetroApi {
 
   Future<String?> refreshFirebaseToken(String refreshToken) async {
     try {
+      final String apiKey = dotenv.get('FIREBASE_API_KEY');
       final response = await Dio().post(
-        'https://securetoken.googleapis.com/v1/token?key=AIzaSyDlpw8laR5rfPfx3oQeTrIENXBfXV7CZyo',
+        'https://securetoken.googleapis.com/v1/token?key=$apiKey',
         data: {
           'grant_type': 'refresh_token',
           'refresh_token': refreshToken,

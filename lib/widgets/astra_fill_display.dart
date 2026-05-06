@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:doctro/constant/color_constant.dart';
-import 'package:doctro/services/astra_service.dart';
+import 'package:doctro/services/astra_api_service.dart';
 
 /// Widget to display Astra Fill health intake records submitted by patient
 /// This shows symptoms, vitals, medical history that patient filled in their app
@@ -19,7 +19,7 @@ class AstraFillDisplayWidget extends StatefulWidget {
 }
 
 class _AstraFillDisplayWidgetState extends State<AstraFillDisplayWidget> {
-  final AstraService _astraService = AstraService();
+  final AstraApiService _astraService = AstraApiService();
   Map<String, dynamic>? _astraFillData;
   bool _isLoading = true;
   bool _isExpanded = true;

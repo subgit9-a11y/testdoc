@@ -2,16 +2,17 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:minio/minio.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class WasabiService {
   static final WasabiService _instance = WasabiService._internal();
   
-  // Credentials from USER
-  final String _accessKey = "NFFPC7HWJXCNXQ3VL16K";
-  final String _secretKey = "UmienYXZwtzRffe5yhbuP5uLRquGd6g6a22AgUWC";
-  final String _region = "ap-southeast-1";
-  final String _bucket = "astraehr";
-  final String _endpoint = "s3.ap-southeast-1.wasabisys.com";
+  // Credentials from Environment
+  final String _accessKey = dotenv.get('WASABI_ACCESS_KEY');
+  final String _secretKey = dotenv.get('WASABI_SECRET_KEY');
+  final String _region = dotenv.get('WASABI_REGION');
+  final String _bucket = dotenv.get('WASABI_BUCKET');
+  final String _endpoint = dotenv.get('WASABI_ENDPOINT');
 
   late Minio _minio;
 

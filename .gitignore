@@ -35,3 +35,6 @@
 # Local scripts with secrets
 supabase_to_mysql_sync.py
 test_supabase.py
+
+# Environment variables (secrets)
+.env

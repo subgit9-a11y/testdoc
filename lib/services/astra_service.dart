@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:dio/dio.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:doctro/retrofit/apis.dart';
 import 'package:doctro/model/astra/astra_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http_parser/http_parser.dart';
@@ -14,7 +16,7 @@ class AstraService {
   late Dio _dio;
   
   /// Use the actual backend URL here.
-  final String baseUrl = "https://astra.ayureze.in"; 
+  final String baseUrl = Apis.astraBaseUrl; 
 
   factory AstraService() {
     return _instance;
@@ -59,7 +61,7 @@ class AstraService {
     try {
       return await _dio.post('/api/v1/api/doctors/register', data: data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -68,7 +70,7 @@ class AstraService {
     try {
       return await _dio.get('/api/v1/api/doctors/$doctorId');
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -77,7 +79,7 @@ class AstraService {
     try {
       return await _dio.put('/api/v1/api/doctors/$doctorId', data: data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -188,7 +190,7 @@ class AstraService {
     try {
       return await _dio.post('/api/v1/patients/register', data: data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -237,24 +239,12 @@ class AstraService {
     }
   }
 
-  /// Submit prescription with automation (PDF, WhatsApp, Cart, Reminders)
-  Future<Response> submitPrescription(Map<String, dynamic> payload) async {
-    try {
-      return await _dio.post(
-        '/api/v1/api/prescriptions/create',
-        data: payload,
-      );
-    } catch (e) {
-      throw e;
-    }
-  }
-
   /// Create prescription
   Future<Response> createPrescription(Map<String, dynamic> data) async {
     try {
       return await _dio.post('/api/v1/api/prescriptions/create', data: data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -323,7 +313,7 @@ class AstraService {
   /// Process voice for prescription extraction
   Future<Map<String, dynamic>> processVoice(File audioFile, String userId, {String languageCode = "en-IN"}) async {
     try {
-      String fileName = audioFile.path.split('/').last;
+      String fileName = p.basename(audioFile.path);
       FormData formData = FormData.fromMap({
         "audio": await MultipartFile.fromFile(
           audioFile.path, 
@@ -341,7 +331,7 @@ class AstraService {
       );
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -351,7 +341,7 @@ class AstraService {
       final response = await _dio.post('/api/v1/astra-fill/process-text', data: data);
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -361,7 +351,7 @@ class AstraService {
       final response = await _dio.post('/api/v1/astra-fill/confirm', data: data);
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -374,7 +364,7 @@ class AstraService {
     try {
       return await _dio.post('/api/v1/patients/consultation', data: data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -385,8 +375,8 @@ class AstraService {
   /// Upload document
   Future<Map<String, dynamic>> uploadDocument(File file, String patientId, String documentType) async {
     try {
-      String fileName = file.path.split('/').last;
-      String ext = fileName.split('.').last.toLowerCase();
+      String fileName = p.basename(file.path);
+      String ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
       String mimeType = ext == 'pdf' ? 'application/pdf' : 'image/$ext';
       
       FormData formData = FormData.fromMap({
@@ -406,7 +396,7 @@ class AstraService {
       );
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -426,7 +416,7 @@ class AstraService {
       final response = await _dio.post('/api/v1/documents/share-whatsapp/$documentId');
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -440,7 +430,7 @@ class AstraService {
       final response = await _dio.post('/api/v1/prescriptions/catchy-from-data', data: data);
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -450,7 +440,7 @@ class AstraService {
       final response = await _dio.post('/api/v1/prescriptions/auto-generate-catchy', data: data);
       return response.data;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

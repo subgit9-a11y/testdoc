@@ -80,14 +80,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ],
       ),
-      body: WillPopScope(
-        onWillPop: () {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           Navigator.pushNamedAndRemoveUntil(
             context,
             'loginHome',
             (route) => false,
           );
-          return Future<bool>.value(false);
         },
         child: RefreshIndicator(
           onRefresh: bookNotifications,

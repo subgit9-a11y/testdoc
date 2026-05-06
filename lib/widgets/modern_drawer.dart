@@ -55,7 +55,10 @@ class ModernDrawer extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: AyurezeTheme.lime, width: 2),
                       image: DecorationImage(
-                        image: NetworkImage(dFullImage ?? "https://via.placeholder.com/150"),
+                        image: (dFullImage != null && dFullImage!.isNotEmpty)
+                            ? NetworkImage(dFullImage!)
+                            : const AssetImage("assets/images/no_image.jpg")
+                                as ImageProvider,
                         fit: BoxFit.cover,
                       ),
                     ),

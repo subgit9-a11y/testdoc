@@ -5,6 +5,7 @@ class Apis {
   /// to generate the api_services.g.dart file
   /// Every time you change the base url, you need to run the above command
   static const String baseUrl = 'https://ayureze.org/public/api/';
+  static const String astraBaseUrl = 'https://astra.ayureze.in';
 
   static const String login = "doctor_login";
   static const String register = "doctor_register";

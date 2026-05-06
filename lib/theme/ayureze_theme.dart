@@ -400,10 +400,4 @@ class AyurezeTheme {
     );
   }
 
-  static const Color darkCanvas = Color(0xFF1A1A1A);
-  static const Color darkSurface = Color(0xFF2D2D2D);
-  static const Color darkSurfaceMuted = Color(0xFF3D3D3D);
-  static const Color darkBorder = Color(0xFF4D4D4D);
-  static const Color darkTextPrimary = Color(0xFFE0E0E0);
-  static const Color darkTextSecondary = Color(0xFFA0A0A0);
 }

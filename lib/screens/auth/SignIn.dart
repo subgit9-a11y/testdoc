@@ -65,6 +65,13 @@ class _SignInState extends State<SignIn> {
     getToken();
   }
 
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
   Future<void> getToken() async {
     try {
       String? token = await FirebaseMessaging.instance.getToken();
@@ -88,7 +95,7 @@ class _SignInState extends State<SignIn> {
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
+          FocusScope.of(context).unfocus();
         },
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
@@ -208,7 +215,7 @@ class _SignInState extends State<SignIn> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () => Navigator.pushNamed(context, 'forgotpassword'),
+                            onPressed: () => Navigator.pushNamed(context, 'ForgotPasswordScreen'),
                             child: Text(
                               getTranslated(context, AppString.login_forgot_password).toString(),
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AyurezeTheme.forestDeep),
@@ -370,16 +377,16 @@ class _SignInState extends State<SignIn> {
   }
 
   void _saveUserData(LoginResponse response) {
-    SharedPreferenceHelper.setString(Preferences.name, response.data!.name!);
+    SharedPreferenceHelper.setString(Preferences.name, response.data!.name ?? '');
     SharedPreferenceHelper.setString(
       Preferences.phone_no,
-      response.data!.phone!,
+      response.data!.phone ?? '',
     );
-    SharedPreferenceHelper.setString(Preferences.email, response.data!.email!);
-    SharedPreferenceHelper.setString(Preferences.image, response.data!.image!);
+    SharedPreferenceHelper.setString(Preferences.email, response.data!.email ?? '');
+    SharedPreferenceHelper.setString(Preferences.image, response.data!.image ?? '');
     SharedPreferenceHelper.setInt(
       Preferences.is_filled,
-      response.data!.isFilled!,
+      response.data!.isFilled ?? 0,
     );
 
     if (response.token != null) {
@@ -414,11 +421,11 @@ class _SignInState extends State<SignIn> {
     }
     SharedPreferenceHelper.setString(
       Preferences.chat_profile,
-      response.data!.fullImage!,
+      response.data!.fullImage ?? '',
     );
     SharedPreferenceHelper.setString(
       Preferences.user_name,
-      response.data!.name!,
+      response.data!.name ?? '',
     );
     SharedPreferenceHelper.setString(
       Preferences.doctorId,
@@ -436,7 +443,6 @@ class _SignInState extends State<SignIn> {
     };
 
     SharedPreferenceHelper.setString(Preferences.user_email, email.text);
-    SharedPreferenceHelper.setString(Preferences.password, password.text);
 
     LoginResponse response;
 

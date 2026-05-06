@@ -79,10 +79,10 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future<bool> onBackPress() {
+  void onBackPress(bool didPop, dynamic result) {
+    if (didPop) return;
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (context) => LoginHomeScreen(chat: "")));
-    return Future.value(false);
   }
 
   Future<void> handleSignOut() async {
@@ -113,8 +113,9 @@ class HomePageState extends State<HomePage> {
       ),
       body: Container(
         color: back,
-        child: WillPopScope(
-          onWillPop: onBackPress,
+        child: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: onBackPress,
           child: Stack(
             children: <Widget>[
               Column(
