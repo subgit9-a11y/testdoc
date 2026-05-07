@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:doctro/screens/auth/profile_complete_screen.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
 import 'package:doctro/services/supabase_service.dart';
+import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/model/register.dart';

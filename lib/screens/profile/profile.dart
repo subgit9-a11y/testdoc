@@ -537,44 +537,44 @@ class _ProfileScreen extends State<ProfileScreen> {
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        const SizedBox(height: 24),
-                                        Container(
-                                          alignment: Alignment.topLeft,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                getTranslated(context, AppString.profile_description).toString(),
-                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              TextFormField(
-                                                controller: _pDesc,
-                                                keyboardType: TextInputType.multiline,
-                                                maxLines: 3,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter.allow(RegExp("[a-zA-Z &.,]")),
-                                                ],
-                                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
-                                                decoration: AyurezeTheme.textFieldDecoration(
-                                                  hintText: getTranslated(context, AppString.profile_description_hint).toString(),
+                                          const SizedBox(height: 24),
+                                          Container(
+                                            alignment: Alignment.topLeft,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  getTranslated(context, AppString.profile_description).toString(),
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
                                                 ),
-                                                validator: (String? value) {
-                                                  if (value!.isEmpty) {
-                                                    return getTranslated(context, AppString.please_enter_description).toString();
-                                                  } else if (value.trim().length < 1) {
-                                                    return getTranslated(context, AppString.please_enter_valid_description).toString();
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                        ),
+                                                const SizedBox(height: 8),
+                                                TextFormField(
+                                                  controller: _pDesc,
+                                                  keyboardType: TextInputType.multiline,
+                                                  maxLines: 3,
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter.allow(RegExp("[a-zA-Z &.,]")),
+                                                  ],
+                                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                                  decoration: AyurezeTheme.textFieldDecoration(
+                                                    hintText: getTranslated(context, AppString.profile_description_hint).toString(),
+                                                  ),
+                                                  validator: (String? value) {
+                                                    if (value!.isEmpty) {
+                                                      return getTranslated(context, AppString.please_enter_description).toString();
+                                                    } else if (value.trim().length < 1) {
+                                                      return getTranslated(context, AppString.please_enter_valid_description).toString();
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
                             isActive: _currentStep >= 0,
                             state: _currentStep >= 0 ? StepState.complete : StepState.disabled,
                           ),

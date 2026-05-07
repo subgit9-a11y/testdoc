@@ -13,6 +13,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
@@ -437,8 +438,6 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                                                                                       );
                                                                           },
                                                                         )
-                                                            },
-                                                          )
                                                         : Center(
                                                             child: Container(
                                                             child: Text(getTranslated(
@@ -638,9 +637,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                         ),
                                                                                                                                                   );
                                                                           },
-                                                                        )
-                                                        },
-                                                      ),
+                                                                        ),
                                             pastAppointmentReq.length == 0
                                                 ? Container(
                                                     height: height / 2,
@@ -824,8 +821,6 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                                                                                       );
                                                                           },
                                                                         )
-                                                            },
-                                                          )
                                                         : Center(
                                                             child: Container(
                                                             child: Text(getTranslated(
@@ -1028,9 +1023,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                         ),
                                                                                                                                                   );
                                                                           },
-                                                                        )
-                                                        },
-                                                      ),
+                                                                        ),
                                           ],
                                         ),
                                       ),
