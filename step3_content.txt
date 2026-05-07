@@ -1,0 +1,327 @@
+                            ),
+                            content: Form(
+                              key: _formkey,
+                              child: SingleChildScrollView(
+                                child: Container(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              getTranslated(context, AppString.profile_experience).toString(),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _pExperience,
+                                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_experience_hint).toString(),
+                                              ),
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_experience).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Video call fee",
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _vAppointmentFees,
+                                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_appointment_fees_hint).toString(),
+                                              ),
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_appointment_fees).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Audio call fee",
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _aAppointmentFees,
+                                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_appointment_fees_hint).toString(),
+                                              ),
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_appointment_fees).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        margin:
+                                            EdgeInsets.only(top: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.topLeft,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                            Text(
+                                              getTranslated(context, AppString.profile_time_slot).toString(),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _pTimeSlot,
+                                              keyboardType: TextInputType.number,
+                                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_time_slot_hint).toString(),
+                                              ),
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_time_slot).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Revenue model",
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            DropdownButtonFormField<String>(
+                                              value: ["Commission", "Subscription"].contains(_pBasedOn.text) ? _pBasedOn.text : null,
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.revenue_model_hint).toString(),
+                                              ),
+                                              icon: Icon(Icons.keyboard_arrow_down_rounded, color: AyurezeTheme.forestDeep),
+                                              items: ["Commission", "Subscription"].map((String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary)),
+                                                );
+                                              }).toList(),
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  _pBasedOn.text = newValue!;
+                                                });
+                                              },
+                                              validator: (value) {
+                                                if (_pBasedOn.text.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_based_on).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              getTranslated(context, AppString.profile_start_time).toString(),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _pStartTime,
+                                              readOnly: true,
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_start_time_hint).toString(),
+                                              ).copyWith(suffixIcon: Icon(Icons.access_time_rounded, size: 20, color: AyurezeTheme.forestDeep)),
+                                              onTap: () async {
+                                                final TimeOfDay? result = await showTimePicker(
+                                                    context: context,
+                                                    initialTime: TimeOfDay.now(),
+                                                    builder: (context, child) {
+                                                      return Theme(
+                                                        data: Theme.of(context).copyWith(
+                                                          colorScheme: const ColorScheme.light(
+                                                            primary: AyurezeTheme.forestDeep,
+                                                            onPrimary: Colors.white,
+                                                            onSurface: AyurezeTheme.forestDeep,
+                                                          ),
+                                                        ),
+                                                        child: MediaQuery(
+                                                            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+                                                            child: child!),
+                                                      );
+                                                    });
+                                                if (result != null) {
+                                                  setState(() {
+                                                    String data = result.format(context).toLowerCase();
+                                                    var parts = data.split(":");
+                                                    String startPart = parts[0].trim();
+                                                    int checkData = int.parse(startPart);
+                                                    if (checkData > 9) {
+                                                      _pStartTime.text = data;
+                                                    } else {
+                                                      _pStartTime.text = "0$data";
+                                                    }
+                                                  });
+                                                }
+                                              },
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_start_time).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              getTranslated(context, AppString.profile_end_time).toString(),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            TextFormField(
+                                              controller: _pEndTime,
+                                              readOnly: true,
+                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary),
+                                              decoration: AyurezeTheme.textFieldDecoration(
+                                                hintText: getTranslated(context, AppString.profile_end_time_hint).toString(),
+                                              ).copyWith(suffixIcon: Icon(Icons.access_time_rounded, size: 20, color: AyurezeTheme.forestDeep)),
+                                              onTap: () async {
+                                                final TimeOfDay? result = await showTimePicker(
+                                                    context: context,
+                                                    initialTime: TimeOfDay.now(),
+                                                    builder: (context, child) {
+                                                      return Theme(
+                                                        data: Theme.of(context).copyWith(
+                                                          colorScheme: const ColorScheme.light(
+                                                            primary: AyurezeTheme.forestDeep,
+                                                            onPrimary: Colors.white,
+                                                            onSurface: AyurezeTheme.forestDeep,
+                                                          ),
+                                                        ),
+                                                        child: MediaQuery(
+                                                            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+                                                            child: child!),
+                                                      );
+                                                    });
+                                                if (result != null) {
+                                                  setState(() {
+                                                    String data = result.format(context).toLowerCase();
+                                                    var parts = data.split(":");
+                                                    String startPart = parts[0].trim();
+                                                    int checkData = int.parse(startPart);
+                                                    if (checkData > 9) {
+                                                      _pEndTime.text = data;
+                                                    } else {
+                                                      _pEndTime.text = "0$data";
+                                                    }
+                                                  });
+                                                }
+                                              },
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return getTranslated(context, AppString.please_enter_end_time).toString();
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              getTranslated(context, AppString.profile_popular).toString(),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            DropdownButtonFormField<String>(
+                                              hint: Text(getTranslated(context, AppString.profile_popular).toString()),
+                                              value: _selectedPopular == '0'
+                                                  ? getTranslated(context, AppString.popular_no).toString()
+                                                  : getTranslated(context, AppString.popular_yes).toString(),
+                                              decoration: AyurezeTheme.textFieldDecoration(),
+                                              icon: Icon(Icons.keyboard_arrow_down_rounded, color: AyurezeTheme.forestDeep),
+                                              items: popular.map((pop) {
+                                                return DropdownMenuItem<String>(
+                                                  value: pop,
+                                                  child: Text(pop, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary)),
+                                                );
+                                              }).toList(),
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  _selectedPopular = newValue!;
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            isActive: _currentStep >= 2,
+                            state: _currentStep >= 2 ? StepState.complete : StepState.disabled,
+                          ),

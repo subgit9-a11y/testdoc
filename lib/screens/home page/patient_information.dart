@@ -144,20 +144,6 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen>
     );
   }
 
-  void _addVideoOverlay(BuildContext context) {
-    if (id != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoCall(
-            id: id,
-            flag: "InComming",
-            callEnd: false,
-          ),
-        ),
-      );
-    }
-  }
 
   void initState() {
     super.initState();

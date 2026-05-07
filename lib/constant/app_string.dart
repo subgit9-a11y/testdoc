@@ -8,6 +8,9 @@ class AppString{
   static const String login_forgot_password = "login_forgot_password";
   static const String login_dont_have_account = "login_dont_have_account";
   static const String login_sign_up = "login_sign_up";
+  static const String login_email_validator = "login_email_validator";
+  static const String login_email_validator2 = "login_email_validator2";
+  static const String login_password_validator = "login_password_validator";
   static const String doctor = "doctor";
 
   static const String chats = "chats";

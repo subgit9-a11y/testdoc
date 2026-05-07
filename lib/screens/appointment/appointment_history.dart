@@ -435,6 +435,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                 ],
                                                                               ),
                                                                             ),
+                                                                                                                                                        ],
+                                                                                                                                                      ), 
+                                                                                                                                                      ), 
+                                                                                                                                                      ), 
                                                                                                                                                       );
                                                                           },
                                                                         )
@@ -635,6 +639,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                             ],
                                                                           ),
                                                                         ),
+                                                                                                                                                    ],
+                                                                                                                                                  ), 
+                                                                                                                                                  ), 
+                                                                                                                                                  ), 
                                                                                                                                                   );
                                                                           },
                                                                         ),
@@ -818,6 +826,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                 ],
                                                                               ),
                                                                             ),
+                                                                                                                                                        ],
+                                                                                                                                                      ), 
+                                                                                                                                                      ), 
+                                                                                                                                                      ), 
                                                                                                                                                       );
                                                                           },
                                                                         )
@@ -1021,6 +1033,10 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                             ],
                                                                           ),
                                                                         ),
+                                                                                                                                                    ],
+                                                                                                                                                  ), 
+                                                                                                                                                  ), 
+                                                                                                                                                  ), 
                                                                                                                                                   );
                                                                           },
                                                                         ),
@@ -1028,12 +1044,20 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                         ),
                                       ),
                                     ],
+                                    ],
+                                  ), 
+                                  ), 
+                                  ), 
                                   );
                         } else {
                           return Center(
                             child: CircularProgressIndicator(
                               color: AyurezeTheme.forestDeep,
                             ),
+                            ],
+                          ), 
+                          ), 
+                          ), 
                           );
                         }
                       }),

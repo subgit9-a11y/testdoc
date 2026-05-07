@@ -574,12 +574,6 @@ class _ProfileScreen extends State<ProfileScreen> {
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                                  ),
-                                ),
-                              ),
                             isActive: _currentStep >= 0,
                             state: _currentStep >= 0 ? StepState.complete : StepState.disabled,
                           ),
@@ -1026,7 +1020,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                       Container(
                                         alignment: Alignment.topLeft,
                                         margin:
-                                            EdgeInsets.only(top: width! * 0.02),
+                                            EdgeInsets.only(top: 10),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -1254,16 +1248,9 @@ class _ProfileScreen extends State<ProfileScreen> {
                                   ),
                                 ],
                               ),
-                            ),
+                            isActive: _currentStep >= 2,
+                            state: _currentStep >= 2 ? StepState.complete : StepState.disabled,
                           ),
-                        ),
-                      ),
-                      isActive: _currentStep >= 2,
-                      state: _currentStep >= 2
-                          ? StepState.complete
-                          : StepState.disabled,
-                    ),
-                        ],
                         controlsBuilder:
                             (BuildContext context, ControlsDetails controls) {
                           return Row(
@@ -1580,14 +1567,12 @@ class _ProfileScreen extends State<ProfileScreen> {
           hospitalReq.add(response.data![i]);
         }
         doctorProfile();
-      });
-    } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
-      return BaseModel()..setException(ServerError.withError(error: error));
-    }
-    return BaseModel()..data = response;
-  }
-
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            isActive: _currentStep >= 2,
   Future<BaseModel<ImageUpload>> uploadImage() async {
     Map<String, dynamic> body = {
       "image": image,
@@ -1810,6 +1795,15 @@ class DateUtilForPass {
 }
 
 //Show Date like this format in User
+class DateUtil {
+  static const DATE_FORMAT = 'dd-MM-yyyy';
+
+  String formattedDate(DateTime dateTime) {
+    return DateFormat(DATE_FORMAT).format(dateTime);
+  }
+}
+
+ format in User
 class DateUtil {
   static const DATE_FORMAT = 'dd-MM-yyyy';
 
