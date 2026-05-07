@@ -109,8 +109,8 @@ class ModernDrawer extends StatelessWidget {
                   }),
                   _drawerItem(context, AppIcons.clock, getTranslated(context, AppString.drawer_schedule_timing).toString(), () => Navigator.popAndPushNamed(context, 'Schedule Timings')),
                   _drawerItem(context, AppIcons.settings, getTranslated(context, AppString.drawer_setting).toString(), () => Navigator.popAndPushNamed(context, 'Settings')),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     child: Divider(color: AyurezeTheme.border),
                   ),
                   _drawerItem(context, Icons.logout, getTranslated(context, AppString.drawer_logout).toString(), () => _showLogoutDialog(context), isDestructive: true),

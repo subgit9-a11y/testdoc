@@ -113,6 +113,52 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen>
   String policyInsurerName = "";
   String policyNumber = "";
 
+  Widget _buildQuickActionButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
+    );
+  }
+
+  Widget _buildCompactInfo(String label, String? value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value ?? "N/A",
+          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+        ),
+      ],
+    );
+  }
+
+  void _addVideoOverlay(BuildContext context) {
+    if (id != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoCall(
+            id: id,
+            flag: "InComming",
+            callEnd: false,
+          ),
+        ),
+      );
+    }
+  }
+
   void initState() {
     super.initState();
     homeProvider = Provider.of(context, listen: false);
