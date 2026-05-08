@@ -535,7 +535,7 @@ _buildActionButton(getTranslated(context, AppString.profile_personal_information
 
   Widget _buildAppointmentCard(dynamic app) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PatientDetailsScreen(id: app.id))),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => patientDetailsScreen(id: app.id))),
       child: Container(
         margin: EdgeInsets.only(bottom: 12),
         padding: EdgeInsets.all(16),

@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:doctro/screens/auth/SignIn.dart';
-import 'package:doctro/theme/osler_theme.dart';
+import 'package:doctro/theme/ayureze_theme.dart';
 
 
 class AppointmentHistoryScreen extends StatefulWidget {
@@ -157,7 +157,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
           builder: (context, orientation) {
             return Scaffold(
               key: _scaffoldKey,
-              backgroundColor: OslerTheme.canvas,
+              backgroundColor: AyurezeTheme.canvas,
               drawer: const ModernDrawer(),
               appBar: PreferredSize(
                   preferredSize: Size(20, 140),
@@ -205,7 +205,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                       icon: SvgPicture.asset(
                                         "assets/icons/dMenuBar.svg",
                                         height: 16.0,
-                                        color: OslerTheme.forestDeep,
+                                        color: AyurezeTheme.forestDeep,
                                         fit: BoxFit.fill,
                                       ),
                                     ),
@@ -219,7 +219,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                           margin: EdgeInsets.only(top: height * 0.01),
                           padding: EdgeInsets.all(10),
                           child: Container(
-                            decoration: OslerTheme.panelDecoration(),
+                            decoration: AyurezeTheme.panelDecoration(),
                             child: Container(
                                 alignment: AlignmentDirectional.center,
                                 padding: EdgeInsets.symmetric(
@@ -255,7 +255,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                       child: SvgPicture.asset(
                                         'assets/icons/dSearch.svg',
                                         height: 20,
-                                        color: OslerTheme.forestDeep,
+                                        color: AyurezeTheme.forestDeep,
                                       ),
                                     ),
                                   ],
@@ -296,7 +296,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                       Container(
                                         margin: EdgeInsets.only(top: 10),
                                         decoration: BoxDecoration(
-                                          color: OslerTheme.surfaceMuted,
+                                          color: AyurezeTheme.surfaceMuted,
                                           borderRadius: BorderRadius.circular(22),
                                         ),
                                         padding: EdgeInsets.all(10),
@@ -307,7 +307,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                               TabBarIndicatorSize.tab,
                                           indicatorColor: loginButton,
                                           indicator: BoxDecoration(
-                                            color: OslerTheme.limeSoft,
+                                            color: AyurezeTheme.limeSoft,
                                             borderRadius: BorderRadius.circular(16),
                                           ),
                                           tabs: tabList,
@@ -1102,7 +1102,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                             ),
                           );
                         } else {
-                          return Center(child: CircularProgressIndicator(color: OslerTheme.forestDeep));
+                          return Center(child: CircularProgressIndicator(color: AyurezeTheme.forestDeep));
                         }
                       }),
                 ),

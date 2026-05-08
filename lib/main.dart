@@ -655,7 +655,7 @@ class _MyAppState extends State<MyApp> {
                 'ForgotPasswordScreen': (context) => ForgotPasswordScreen(),
                 'phoneverification': (context) => PhoneVerificationScreen(),
                 'loginHome': (context) => LoginHomeScreen(chat: ""),
-                'patientInformation': (context) => PatientDetailsScreen(),
+                'patientInformation': (context) => patientDetailsScreen(),
                 'cancelAppoitmentRoutes': (context) =>
                     CancelAppointmentScreen(),
                 'AppointmentHistoryScreen': (context) =>
