@@ -411,8 +411,7 @@ class AyurezeTheme {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
         borderSide: BorderSide(color: border),
-      ),
-      focusedBorder: OutlineInputBorder(
+      ),      focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
         borderSide: BorderSide(color: forestDeep, width: 2),
       ),
