@@ -13,7 +13,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:doctro/screens/auth/profile_complete_screen.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
 import 'package:doctro/services/supabase_service.dart';
-import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/model/register.dart';
@@ -93,23 +92,6 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     if (SharedPreferenceHelper.getBoolean(Preferences.is_logged_in)) {
       _fetchProfileDetails();
     }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _dobController.dispose();
-    _licenseController.dispose();
-    _educationController.dispose();
-    _experienceController.dispose();
-    _feesController.dispose();
-    _videoFeesController.dispose();
-    _descController.dispose();
-    _languageController.dispose();
-    _revenueModelController.dispose();
-    super.dispose();
   }
 
   Future<void> _fetchProfileDetails() async {
@@ -393,133 +375,99 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AyurezeTheme.canvas,
+      backgroundColor: const Color(0xFFFBFBFE),
       appBar: AppBar(
-        title: Text("Clinical Profile", style: TextStyle(color: AyurezeTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 20)),
-        backgroundColor: AyurezeTheme.canvas,
-        elevation: 0,
+        title: Text("Clinical Profile", style: TextStyle(color: purple, fontWeight: FontWeight.w800, fontSize: 22)),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
         centerTitle: true,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new_rounded, color: AyurezeTheme.forestDeep, size: 20), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: purple, size: 20), onPressed: () => Navigator.pop(context)),
       ),
       body: _isLoading 
-        ? Center(child: CircularProgressIndicator(color: AyurezeTheme.forestDeep))
+        ? Center(child: CircularProgressIndicator(color: purple))
         : SingleChildScrollView(
-            padding: AyurezeTheme.screenPadding,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionHeader("Personal Information", Icons.person_outline_rounded),
+                  _buildSectionHeader("Personal Information", Icons.person_outline),
                   const SizedBox(height: 15),
                   widget.personalData != null 
                     ? _buildPersonalSummaryCard()
-                    : Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: AyurezeTheme.panelDecoration(),
-                        child: Column(
-                          children: [
-                            _buildTextField("Full Name", _nameController, Icons.badge_rounded),
-                            _buildTextField("Email Address", _emailController, Icons.email_rounded),
-                            _buildTextField("Phone Number", _phoneController, Icons.phone_android_rounded, isNumber: true),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildLabel("Gender"),
-                                      _buildGenericDropdown(_genders, (val) => setState(() => _genderSelect = val), _genderSelect),
-                                    ],
-                                  ),
+                    : Column(
+                        children: [
+                          _buildTextField("Full Name", _nameController, Icons.badge_outlined),
+                          _buildTextField("Email Address", _emailController, Icons.email_outlined),
+                          _buildTextField("Phone Number", _phoneController, AppIcons.phone, isNumber: true),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildLabel("Gender"),
+                                    _buildGenericDropdown(_genders, (val) => setState(() => _genderSelect = val), _genderSelect),
+                                  ],
                                 ),
-                                const SizedBox(width: 15),
-                                Expanded(child: _buildTextField("Date of Birth", _dobController, Icons.cake_outlined, isReadOnly: true, onTap: () => _selectDate(context))),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                              const SizedBox(width: 15),
+                              Expanded(child: _buildTextField("Date of Birth", _dobController, Icons.cake_outlined, isReadOnly: true, onTap: () => _selectDate(context))),
+                            ],
+                          ),
+                        ],
                       ),
 
+                  const SizedBox(height: 10),
+                  
                   const SizedBox(height: 35),
                   _buildSectionHeader("Professional Credentials", Icons.badge_outlined),
                   const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: AyurezeTheme.panelDecoration(),
-                    child: Column(
-                      children: [
-                        _buildTextField("Medical License Number", _licenseController, Icons.verified_user_rounded),
-                        _buildTextField("Medical Education (e.g. BAMS, MD)", _educationController, Icons.school_rounded),
-                        _buildTextField("Years of Experience", _experienceController, Icons.history_rounded, isNumber: true),
-                      ],
-                    ),
-                  ),
+                  _buildTextField("Medical Registration / License Number", _licenseController, Icons.verified_user_outlined),
+                  _buildTextField("Medical Education (e.g. BAMS, MD)", _educationController, Icons.school_outlined),
+                  _buildTextField("Years of Experience", _experienceController, Icons.history, isNumber: true),
                   
                   const SizedBox(height: 35),
                   _buildSectionHeader("Consultation Rates", Icons.account_balance_wallet_outlined),
                   const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: AyurezeTheme.panelDecoration(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(child: _buildTextField("Audio call fee (₹)", _feesController, Icons.phone_android_rounded, isNumber: true)),
-                            const SizedBox(width: 15),
-                            Expanded(child: _buildTextField("Video call fee (₹)", _videoFeesController, Icons.videocam_rounded, isNumber: true)),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        _buildLabel("Revenue Model"),
-                        _buildGenericDropdown(_revenueModels, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
+                        Expanded(child: _buildTextField("Audio call fee (₹)", _feesController, Icons.phone_android_outlined, isNumber: true)),
+                        const SizedBox(width: 15),
+                        Expanded(child: _buildTextField("Video call fee (₹)", _videoFeesController, Icons.videocam_outlined, isNumber: true)),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    _buildLabel("Revenue Model"),
+                    _buildGenericDropdown(_revenueModels, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
 
                   const SizedBox(height: 35),
                   _buildSectionHeader("Practice Details", Icons.description_outlined),
                   const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: AyurezeTheme.panelDecoration(),
-                    child: Column(
-                      children: [
-                        _buildTextField("Languages Spoken", _languageController, Icons.translate_rounded),
-                        _buildTextField("Professional Bio", _descController, Icons.article_rounded, maxLines: 3),
-                      ],
-                    ),
-                  ),
+                  _buildTextField("Languages Spoken (e.g. English, Hindi)", _languageController, Icons.translate),
+                  _buildTextField("Professional Bio / Description", _descController, Icons.article_outlined, maxLines: 3),
                   
                   const SizedBox(height: 35),
-                  _buildSectionHeader("Verification Documents", Icons.cloud_upload_rounded),
+                  _buildSectionHeader("Verification Documents", Icons.cloud_upload_outlined),
                   const SizedBox(height: 15),
                   
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: AyurezeTheme.panelDecoration(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabel("Medical Degree / Certificate"),
-                        _buildUploadBox(
-                          onTap: () => _pickImage(true),
-                          file: _certificateImage,
-                          url: _existingCertificateUrl,
-                          placeholder: "Upload Medical Certificate",
-                        ),
-                        const SizedBox(height: 25),
-                        _buildLabel("Identification Proof"),
-                        _buildUploadBox(
-                          onTap: () => _pickImage(false),
-                          file: _idProofImage,
-                          url: _existingIdProofUrl,
-                          placeholder: "Upload ID Proof",
-                        ),
-                      ],
-                    ),
+                  _buildLabel("Medical Degree / Certificate"),
+                  _buildUploadBox(
+                    onTap: () => _pickImage(true),
+                    file: _certificateImage,
+                    url: _existingCertificateUrl,
+                    placeholder: "Upload Medical Certificate",
+                  ),
+                  
+                  const SizedBox(height: 25),
+                  
+                  _buildLabel("Identification Proof (Aadhar / PAN / DL)"),
+                  _buildUploadBox(
+                    onTap: () => _pickImage(false),
+                    file: _idProofImage,
+                    url: _existingIdProofUrl,
+                    placeholder: "Upload ID Proof",
                   ),
                   
                   const SizedBox(height: 45),
@@ -529,16 +477,15 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                     child: ElevatedButton(
                       onPressed: _submitData,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AyurezeTheme.forestDeep,
-                        foregroundColor: Colors.white,
+                        backgroundColor: purple,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                         elevation: 0,
                       ),
                       child: Text(widget.personalData != null ? "Complete Registration" : "Save Profile Details", 
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
@@ -550,12 +497,13 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 140,
+        height: 160,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AyurezeTheme.surfaceMuted,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AyurezeTheme.border, width: 2),
+          border: Border.all(color: purple.withOpacity(0.1), width: 2),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, spreadRadius: 0)],
         ),
         child: file != null
           ? ClipRRect(
@@ -570,11 +518,11 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo_rounded, size: 32, color: AyurezeTheme.forestDeep),
+                  Icon(Icons.add_a_photo_outlined, size: 40, color: purple.withOpacity(0.4)),
                   const SizedBox(height: 10),
-                  Text(placeholder, style: TextStyle(color: AyurezeTheme.forestDeep, fontWeight: FontWeight.w700, fontSize: 13)),
+                  Text(placeholder, style: TextStyle(color: purple, fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 4),
-                  Text("Tap to select image", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 11)),
+                  const Text("Tap to select image/PDF", style: TextStyle(color: Colors.grey, fontSize: 10)),
                 ],
               ),
       ),
@@ -584,9 +532,9 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: AyurezeTheme.forestDeep, size: 20),
+        Icon(icon, color: purple, size: 22),
         const SizedBox(width: 10),
-        Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AyurezeTheme.textPrimary)),
+        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87.withOpacity(0.8))),
       ],
     );
   }
@@ -594,30 +542,58 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   Widget _buildLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w700, color: AyurezeTheme.textSecondary, fontSize: 12)),
+      child: Text(label, style: TextStyle(fontWeight: FontWeight.w700, color: Colors.black54, fontSize: 13)),
     );
   }
 
-  Widget _buildGenericDropdown(List<String> items, Function(String?) onChanged, String? value) {
+  Widget _buildDropdown(List<dynamic> items, Function(String?) onChanged, String? value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: AyurezeTheme.surfaceMuted,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AyurezeTheme.border),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 5, spreadRadius: 0)],
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          dropdownColor: AyurezeTheme.canvas,
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AyurezeTheme.forestDeep),
-          hint: Text("Select", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
+          icon: Icon(Icons.keyboard_arrow_down, color: purple),
+          hint: const Text("Select option", style: TextStyle(fontSize: 14, color: Colors.grey)),
+          items: items.map((item) {
+            return DropdownMenuItem<String>(
+              value: item.id.toString(),
+              child: Text(item.name ?? "", style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenericDropdown(List<String> items, Function(String?) onChanged, String? value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 5, spreadRadius: 0)],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          icon: Icon(Icons.keyboard_arrow_down, color: purple),
+          hint: const Text("Select", style: TextStyle(fontSize: 14, color: Colors.grey)),
           items: items.map((item) {
             return DropdownMenuItem<String>(
               value: item,
-              child: Text(item, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AyurezeTheme.textPrimary)),
+              child: Text(item, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             );
           }).toList(),
           onChanged: onChanged,
@@ -639,12 +615,16 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             readOnly: isReadOnly,
             onTap: onTap,
             keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AyurezeTheme.textPrimary),
-            decoration: AyurezeTheme.textFieldDecoration(
-              labelText: "",
-            ).copyWith(
-              prefixIcon: Icon(icon, color: AyurezeTheme.forestDeep.withOpacity(0.7), size: 20),
-              hintText: "Enter $label",
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            decoration: InputDecoration(
+              prefixIcon: Icon(icon, color: purple.withOpacity(0.7), size: 20),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.withOpacity(0.2))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: purple, width: 1.5)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Colors.redAccent)),
             ),
             validator: (value) => value == null || value.isEmpty ? "Required" : null,
           ),
@@ -664,12 +644,16 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: AyurezeTheme.forestDeep,
-            colorScheme: const ColorScheme.light(
-              primary: AyurezeTheme.forestDeep,
+            primaryColor: purple,
+            colorScheme: ColorScheme.light(
+              primary: purple,
               onPrimary: Colors.white,
               surface: Colors.white,
-              onSurface: AyurezeTheme.forestDeep,
+              onSurface: purple,
+            ),
+            dialogBackgroundColor: Colors.white,
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: purple),
             ),
           ),
           child: child!,
@@ -685,17 +669,21 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
 
   Widget _buildPersonalSummaryCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: AyurezeTheme.panelDecoration(),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: purple.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: purple.withOpacity(0.1)),
+      ),
       child: Column(
         children: [
-          _buildSummaryRow(Icons.person_rounded, "Name", _nameController.text),
-          Divider(height: 24, color: AyurezeTheme.border),
-          _buildSummaryRow(Icons.email_rounded, "Email", _emailController.text),
-          Divider(height: 24, color: AyurezeTheme.border),
-          _buildSummaryRow(Icons.cake_rounded, "DOB", _dobController.text),
-          Divider(height: 24, color: AyurezeTheme.border),
-          _buildSummaryRow(Icons.wc_rounded, "Gender", _genderSelect ?? "Not selected"),
+          _buildSummaryRow(Icons.person, "Name", _nameController.text),
+          const Divider(height: 20),
+          _buildSummaryRow(Icons.email, "Email", _emailController.text),
+          const Divider(height: 20),
+          _buildSummaryRow(Icons.cake, "DOB", _dobController.text),
+          const Divider(height: 20),
+          _buildSummaryRow(Icons.wc, "Gender", _genderSelect ?? "Not selected"),
         ],
       ),
     );
@@ -704,14 +692,13 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   Widget _buildSummaryRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AyurezeTheme.forestDeep),
+        Icon(icon, size: 18, color: purple),
         const SizedBox(width: 12),
-        Text("$label: ", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w600)),
-        Text(value, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AyurezeTheme.textPrimary)),
+        Text("$label: ", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       ],
     );
   }
-}
 
   void _showSuccessDialog(BuildContext context, {required String name, required String email, required String uniqueId}) {
     showDialog(
@@ -823,4 +810,3 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     );
   }
 }
-

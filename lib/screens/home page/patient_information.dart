@@ -7,7 +7,7 @@ import 'package:doctro/chat/providers/home_provider.dart';
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
-import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/theme/osler_theme.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -34,15 +34,15 @@ import '../../chat/pages/chat_page.dart';
 import '../videoCall/video_Call.dart';
 import 'package:doctro/screens/astra/prescription_screen.dart';
 import 'package:doctro/widgets/astra_fill_display.dart';
-import 'package:doctro/services/astra_api_service.dart';
+import 'package:doctro/services/astra_service.dart';
 
-class PatientDetailsScreen extends StatefulWidget {
+class patientDetailsScreen extends StatefulWidget {
   final int? id;
 
-  PatientDetailsScreen({this.id});
+  patientDetailsScreen({this.id});
 
   @override
-  _PatientDetailsScreenState createState() => _PatientDetailsScreenState();
+  _patientDetailsScreenState createState() => _patientDetailsScreenState();
 }
 
 //Pass Medicine list in pdf
@@ -52,13 +52,13 @@ List<Map<String, dynamic>> listOfMedicine = [];
 //Add Medicine List
 List<String> medicineReq = [];
 
-class _PatientDetailsScreenState extends State<PatientDetailsScreen>
+class _patientDetailsScreenState extends State<patientDetailsScreen>
     with TickerProviderStateMixin {
   //Set Loader
   Future? appointmentDetail;
   
   // Astra Fill Data (Health intake from patient's app)
-  final AstraApiService _astraService = AstraApiService();
+  final AstraService _astraService = AstraService();
   Map<String, dynamic>? _astraFillData;
   bool _isLoadingAstraFill = false;
 
@@ -112,38 +112,6 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen>
   int isInsured = 0;
   String policyInsurerName = "";
   String policyNumber = "";
-
-  Widget _buildQuickActionButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: Colors.white, size: 22),
-      ),
-    );
-  }
-
-  Widget _buildCompactInfo(String label, String? value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value ?? "N/A",
-          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
-        ),
-      ],
-    );
-  }
-
 
   void initState() {
     super.initState();
@@ -219,7 +187,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen>
 
   @override
   void dispose() {
-    _tabController?.dispose();
+    _tabController!.dispose();
     super.dispose();
   }
 
@@ -229,121 +197,299 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen>
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: AyurezeTheme.canvas,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AyurezeTheme.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
+    return Scaffold( backgroundColor: OslerTheme.canvas,
+      appBar: PreferredSize(
+        preferredSize: Size(width! * 0.3, height * 0.2),
+        child: SafeArea(
+          top: true,
+          child: Container(
+              margin: EdgeInsets.only(top: height * 0.02),
+              color: OslerTheme.canvas,
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: Container(
+                    margin: EdgeInsets.only(
+                        left: width! * 0.9, right: width! * 0.02),
+                    child: InkWell(
+                      child: Icon(Icons.arrow_back_ios, color: OslerTheme.forestDeep),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    )),
+              )),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert_rounded, color: AyurezeTheme.textPrimary),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: FutureBuilder(
-        future: appointmentDetail,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: AyurezeTheme.heroDecoration(),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white.withOpacity(0.3), width: 3),
-                                image: DecorationImage(
-                                  image: (fullImage != null && fullImage!.isNotEmpty)
-                                      ? NetworkImage(fullImage!)
-                                      : const AssetImage("assets/images/no_image.jpg") as ImageProvider,
-                                  fit: BoxFit.cover,
+          future: appointmentDetail,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return SingleChildScrollView(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(
+                                left: width! * 0.16, right: width! * 0.03),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext bc) {
+                                  return SafeArea(
+                                    child: Container(
+                                      child: new Wrap(
+                                        children: <Widget>[
+                                          new ListTile(
+                                            leading:
+                                                new Icon(AppIcons.call),
+                                            title: new Text(
+                                              getTranslated(
+                                                      context, "call_text")
+                                                  .toString(),
+                                            ),
+                                            onTap: () {
+                                              if (SharedPreferenceHelper
+                                                      .getBoolean(Preferences
+                                                          .is_logged_in) ==
+                                                  true) {
+                                                Navigator.of(context).pop();
+                                                launchUrl(
+                                                    Uri.parse("tel:$phoneNo"));
+                                              } else {
+                                                Navigator.of(context).pop();
+                                              }
+                                            },
+                                          ),
+                                          if (appointmentType == 'video')
+                                            new ListTile(
+                                              leading: new Icon(Icons.videocam),
+                                              title: new Text(
+                                                getTranslated(
+                                                        context, "video_call")
+                                                    .toString(),
+                                              ),
+                                              onTap: () {
+                                                setState(
+                                                  () {
+                                                    if (SharedPreferenceHelper
+                                                            .getBoolean(Preferences
+                                                                .is_logged_in) ==
+                                                        true) {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      _addVideoOverlay(context);
+                                                    } else {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    }
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              child: SvgPicture.asset(
+                                'assets/icons/call_dialler.svg',
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(
+                              left: width! * 0.04,
+                              right: width! * 0.03,
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  height: 120,
+                                  child: CachedNetworkImage(
+                                    alignment: Alignment.center,
+                                    imageUrl: '$fullImage',
+                                    imageBuilder: (context, imageProvider) =>
+                                        CircleAvatar(
+                                      radius: 50,
+                                      backgroundColor: loginButton,
+                                      child: CircleAvatar(
+                                        radius: 52,
+                                        backgroundImage: imageProvider,
+                                      ),
+                                    ),
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
+                                            "assets/images/no_image.jpg"),
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                    margin:
+                                        EdgeInsets.only(top: height * 0.015),
+                                    child: Text(
+                                      '${name ?? ''}',
+                                      style: TextStyle(
+                                          fontSize: 20, color: loginButton),
+                                    )),
+                                Text(
+                                  getTranslated(context,
+                                              AppString.information_booking_id)
+                                          .toString() +
+                                      '$appointmentId',
+                                  style: TextStyle(
+                                      fontSize: 14, color: loginButton),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name ?? "Patient",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "ID: $appointmentId",
-                                    style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.8), fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      _buildQuickActionButton(Icons.call_rounded, () => launchUrl(Uri.parse("tel:$phoneNo"))),
-                                      const SizedBox(width: 12),
-                                      _buildQuickActionButton(Icons.chat_bubble_rounded, () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(
-                                          peerId: body['peerId'].toString(),
-                                          peerAvatar: body['peerAvatar'].toString(),
-                                          peerNickname: body['nickName'].toString(),
-                                          token: body['token'].toString(),
-                                          isNavigate: 'chatHome',
-                                        )));
-                                      }),
-                                      if (appointmentType == 'video') ...[
-                                        const SizedBox(width: 12),
-                                        _buildQuickActionButton(Icons.videocam_rounded, () => _addVideoOverlay(context)),
-                                      ],
-                                    ],
-                                  ),
-                                ],
-                              ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(
+                                right: width! * 0.01, top: height * 0.2),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatPage(
+                                            peerId: body['peerId'].toString(),
+                                            peerAvatar:
+                                                body['peerAvatar'].toString(),
+                                            peerNickname:
+                                                body['nickName'].toString(),
+                                            token: body['token'].toString(),
+                                            isNavigate: 'chatHome',
+                                          )));
+                              // launchUrl(Uri.parse("sms:$phoneNo"));
+                            },
+                            child: SvgPicture.asset(
+                              'assets/icons/message_dialler.svg',
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: homeProvider.getStreamFireStoreSpecificUser(
+                                FirestoreConstants.pathUserCollection,
+                                1,
+                                userId.toString()),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                if ((snapshot.data?.docs.length ?? 0) > 0) {
+                                  UserChat userChat = UserChat.fromDocument(
+                                      snapshot.data!.docs[0]);
+                                  body = {
+                                    "peerId": userChat.id,
+                                    "nickName": userChat.nickname,
+                                    "peerAvatar": userChat.photoUrl,
+                                    "token": userChat.token
+                                  };
+                                  return SizedBox();
+                                } else {
+                                  return SizedBox();
+                                }
+                              } else {
+                                return SizedBox();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            _buildCompactInfo("Amount", "₹$amount"),
-                            _buildCompactInfo("Date", date),
-                            _buildCompactInfo("Slot", time ?? ""),
+                            Column(
+                              children: [
+                                Text(
+                                  getTranslated(
+                                          context, AppString.information_amount)
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: hintColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  SharedPreferenceHelper.getString(
+                                          Preferences.currency_symbol) +
+                                      '$amount',
+                                  style:
+                                      TextStyle(fontSize: 16, color: hintColor),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  getTranslated(
+                                          context, AppString.information_date)
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: hintColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '$date',
+                                  style:
+                                      TextStyle(fontSize: 16, color: hintColor),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  getTranslated(context,
+                                          AppString.information_appointment)
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: hintColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "${appointmentType ?? '-'} ${appointmentType != null ? ' appointment' : ''}\n$appointment",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: hintColor,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                              ],
+                            )
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    decoration: AyurezeTheme.panelDecoration(),
-                    padding: const EdgeInsets.all(10),
-                    child: TabBar(
-                      controller: _tabController,
-                      indicator: BoxDecoration(color: AyurezeTheme.limeSoft, borderRadius: BorderRadius.circular(16)),
-                      labelColor: AyurezeTheme.forestDeep,
-                      unselectedLabelColor: AyurezeTheme.textSecondary,
-                      labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                      tabs: tabList,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: height * 0.6,
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
+                      ),
+                      new Container(
+                        margin: EdgeInsets.only(top: 20),
+                        color: divider,
+                        padding: EdgeInsets.all(15),
+                        child: new TabBar(
+                          labelColor: loginButton,
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          tabs: tabList,
+                          unselectedLabelColor: hintColor,
+                        ),
+                      ),
+                      new Container(
+                        height: height * 0.54,
+                        child: new TabBarView(
+                          controller: _tabController,
+                          children: [
                             ///tab 1
                             SingleChildScrollView(
                               scrollDirection: Axis.vertical,
