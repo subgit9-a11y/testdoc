@@ -109,7 +109,11 @@ class RetroApi {
 
   Future<String?> refreshFirebaseToken(String refreshToken) async {
     try {
-      final String apiKey = dotenv.get('FIREBASE_API_KEY');
+      final String apiKey =
+          dotenv.maybeGet('FIREBASE_API_KEY') ?? const String.fromEnvironment('FIREBASE_API_KEY');
+      if (apiKey.isEmpty) {
+        return null;
+      }
       final response = await Dio().post(
         'https://securetoken.googleapis.com/v1/token?key=$apiKey',
         data: {

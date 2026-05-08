@@ -8,11 +8,16 @@ class WasabiService {
   static final WasabiService _instance = WasabiService._internal();
   
   // Credentials from Environment
-  final String _accessKey = dotenv.get('WASABI_ACCESS_KEY');
-  final String _secretKey = dotenv.get('WASABI_SECRET_KEY');
-  final String _region = dotenv.get('WASABI_REGION');
-  final String _bucket = dotenv.get('WASABI_BUCKET');
-  final String _endpoint = dotenv.get('WASABI_ENDPOINT');
+  final String _accessKey =
+      dotenv.maybeGet('WASABI_ACCESS_KEY') ?? const String.fromEnvironment('WASABI_ACCESS_KEY');
+  final String _secretKey =
+      dotenv.maybeGet('WASABI_SECRET_KEY') ?? const String.fromEnvironment('WASABI_SECRET_KEY');
+  final String _region =
+      dotenv.maybeGet('WASABI_REGION') ?? const String.fromEnvironment('WASABI_REGION');
+  final String _bucket =
+      dotenv.maybeGet('WASABI_BUCKET') ?? const String.fromEnvironment('WASABI_BUCKET');
+  final String _endpoint =
+      dotenv.maybeGet('WASABI_ENDPOINT') ?? const String.fromEnvironment('WASABI_ENDPOINT');
 
   late Minio _minio;
 

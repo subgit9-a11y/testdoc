@@ -66,14 +66,25 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
-  
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: dotenv.get('SUPABASE_URL'),
-    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
-  );
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint(".env not found, using compile-time environment values.");
+  }
+
+  final String supabaseUrl =
+      dotenv.maybeGet('SUPABASE_URL') ?? const String.fromEnvironment('SUPABASE_URL');
+  final String supabaseAnonKey =
+      dotenv.maybeGet('SUPABASE_ANON_KEY') ?? const String.fromEnvironment('SUPABASE_ANON_KEY');
+
+  if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+  } else {
+    debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
+  }
   
   // Use a safer initialization sequence
   SharedPreferences? _prefs;
