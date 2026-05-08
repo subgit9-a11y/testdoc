@@ -109,8 +109,13 @@ class RetroApi {
 
   Future<String?> refreshFirebaseToken(String refreshToken) async {
     try {
-      final String apiKey =
-          dotenv.maybeGet('FIREBASE_API_KEY') ?? const String.fromEnvironment('FIREBASE_API_KEY');
+      String? apiKey;
+      try {
+        apiKey = dotenv.maybeGet('FIREBASE_API_KEY');
+      } catch (_) {
+        apiKey = null;
+      }
+      apiKey ??= const String.fromEnvironment('FIREBASE_API_KEY');
       if (apiKey.isEmpty) {
         return null;
       }

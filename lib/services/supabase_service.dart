@@ -4,7 +4,13 @@ import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
 
 class SupabaseService {
-  final SupabaseClient _client = Supabase.instance.client;
+  SupabaseClient get _client {
+    try {
+      return Supabase.instance.client;
+    } catch (e) {
+      throw Exception("Supabase is not initialized. Configure SUPABASE_URL and SUPABASE_ANON_KEY.");
+    }
+  }
 
   /// Generate a unique Doctor ID
   String generateDoctorID() {

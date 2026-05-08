@@ -6,32 +6,43 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class WasabiService {
   static final WasabiService _instance = WasabiService._internal();
+
+  String _env(String key) {
+    try {
+      return dotenv.maybeGet(key) ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
   
   // Credentials from Environment
-  final String _accessKey =
-      dotenv.maybeGet('WASABI_ACCESS_KEY') ?? const String.fromEnvironment('WASABI_ACCESS_KEY');
-  final String _secretKey =
-      dotenv.maybeGet('WASABI_SECRET_KEY') ?? const String.fromEnvironment('WASABI_SECRET_KEY');
-  final String _region =
-      dotenv.maybeGet('WASABI_REGION') ?? const String.fromEnvironment('WASABI_REGION');
-  final String _bucket =
-      dotenv.maybeGet('WASABI_BUCKET') ?? const String.fromEnvironment('WASABI_BUCKET');
-  final String _endpoint =
-      dotenv.maybeGet('WASABI_ENDPOINT') ?? const String.fromEnvironment('WASABI_ENDPOINT');
+  late final String _accessKey;
+  late final String _secretKey;
+  late final String _region;
+  late final String _bucket;
+  late final String _endpoint;
 
-  late Minio _minio;
+  Minio? _minio;
 
   factory WasabiService() {
     return _instance;
   }
 
   WasabiService._internal() {
-    _minio = Minio(
-      endPoint: _endpoint,
-      accessKey: _accessKey,
-      secretKey: _secretKey,
-      region: _region,
-    );
+    _accessKey = _env('WASABI_ACCESS_KEY');
+    _secretKey = _env('WASABI_SECRET_KEY');
+    _region = _env('WASABI_REGION');
+    _bucket = _env('WASABI_BUCKET');
+    _endpoint = _env('WASABI_ENDPOINT');
+
+    if (_endpoint.isNotEmpty && _accessKey.isNotEmpty && _secretKey.isNotEmpty) {
+      _minio = Minio(
+        endPoint: _endpoint,
+        accessKey: _accessKey,
+        secretKey: _secretKey,
+        region: _region,
+      );
+    }
   }
 
   /// Uploads a file to Wasabi Storage
@@ -45,8 +56,12 @@ class WasabiService {
       final String fileName = "${doctorId}/${category}_${DateTime.now().millisecondsSinceEpoch}${path.extension(file.path)}";
       final String folderPath = "doctors/verification/$fileName";
 
+      if (_minio == null || _bucket.isEmpty || _endpoint.isEmpty) {
+        throw Exception("Wasabi not configured");
+      }
+
       // Uploading to Wasabi
-      await _minio.putObject(
+      await _minio!.putObject(
         _bucket,
         folderPath,
         file.openRead().map((chunk) => Uint8List.fromList(chunk)),
@@ -70,7 +85,11 @@ class WasabiService {
     try {
       final String folderPath = "doctors/verification/$doctorId/$fileName";
       
-      await _minio.putObject(
+      if (_minio == null || _bucket.isEmpty || _endpoint.isEmpty) {
+        throw Exception("Wasabi not configured");
+      }
+
+      await _minio!.putObject(
         _bucket,
         folderPath,
         Stream.value(bytes),

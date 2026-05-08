@@ -72,10 +72,18 @@ Future<void> main() async {
     debugPrint(".env not found, using compile-time environment values.");
   }
 
+  String? getEnvSafe(String key) {
+    try {
+      return dotenv.maybeGet(key);
+    } catch (_) {
+      return null;
+    }
+  }
+
   final String supabaseUrl =
-      dotenv.maybeGet('SUPABASE_URL') ?? const String.fromEnvironment('SUPABASE_URL');
+      getEnvSafe('SUPABASE_URL') ?? const String.fromEnvironment('SUPABASE_URL');
   final String supabaseAnonKey =
-      dotenv.maybeGet('SUPABASE_ANON_KEY') ?? const String.fromEnvironment('SUPABASE_ANON_KEY');
+      getEnvSafe('SUPABASE_ANON_KEY') ?? const String.fromEnvironment('SUPABASE_ANON_KEY');
 
   if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
     await Supabase.initialize(
