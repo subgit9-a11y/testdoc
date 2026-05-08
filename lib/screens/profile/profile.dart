@@ -22,7 +22,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
-import 'package:doctro/theme/osler_theme.dart';
+import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -168,7 +168,7 @@ class _ProfileScreen extends State<ProfileScreen> {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: OslerTheme.canvas,
+      backgroundColor: AyurezeTheme.canvas,
       appBar: PreferredSize(
         preferredSize: Size(width! * 0.3, 220),
         child: SafeArea(
@@ -176,7 +176,7 @@ class _ProfileScreen extends State<ProfileScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Container(
-              decoration: OslerTheme.heroDecoration(),
+              decoration: AyurezeTheme.heroDecoration(),
               padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +231,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                        color: OslerTheme.lime,
+                                        color: AyurezeTheme.lime,
                                         width: 2,
                                       ),
                                     ),
@@ -249,7 +249,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                        color: OslerTheme.lime,
+                                        color: AyurezeTheme.lime,
                                         width: 2,
                                       ),
                                     ),
@@ -266,7 +266,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                       ),
                                       placeholder: (context, url) =>
                                           const CircularProgressIndicator(
-                                        color: OslerTheme.lime,
+                                        color: AyurezeTheme.lime,
                                       ),
                                       errorWidget: (context, url, error) =>
                                           Image.asset("images/no_image.png"),
@@ -280,11 +280,11 @@ class _ProfileScreen extends State<ProfileScreen> {
                                   chooseProfileImage();
                                 },
                                 child: CircleAvatar(
-                                  backgroundColor: OslerTheme.lime,
+                                  backgroundColor: AyurezeTheme.lime,
                                   radius: 14,
                                   child: const Icon(
                                     Icons.add,
-                                    color: OslerTheme.forestDeep,
+                                    color: AyurezeTheme.forestDeep,
                                   ),
                                 ),
                               ),
@@ -333,8 +333,8 @@ class _ProfileScreen extends State<ProfileScreen> {
               return Theme(
                 data: Theme.of(context).copyWith(
                   colorScheme: Theme.of(context).colorScheme.copyWith(
-                        primary: OslerTheme.forestDeep,
-                        secondary: OslerTheme.lime,
+                        primary: AyurezeTheme.forestDeep,
+                        secondary: AyurezeTheme.lime,
                       ),
                 ),
                 child: Container(
@@ -1861,13 +1861,13 @@ class _ProfileScreen extends State<ProfileScreen> {
             } else {
               return const Center(
                 child: CircularProgressIndicator(
-                  color: OslerTheme.forestDeep,
+                  color: AyurezeTheme.forestDeep,
                 ),
               );
             }
           }),
       bottomNavigationBar: Container(
-        color: OslerTheme.canvas,
+        color: AyurezeTheme.canvas,
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         height: width! * 0.18,
         child: ElevatedButton(
