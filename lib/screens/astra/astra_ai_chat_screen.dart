@@ -7,6 +7,8 @@ import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/model/astra/ai_response_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:doctro/constant/prefConstatnt.dart';
+import 'package:doctro/constant/preferences.dart';
 
 class AstraAIChatScreen extends StatefulWidget {
   const AstraAIChatScreen({Key? key}) : super(key: key);
@@ -74,7 +76,12 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
 
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) throw Exception("User not authenticated");
+      final String fallbackUserId =
+          SharedPreferenceHelper.getString(Preferences.uniqueId) != 'N_A'
+              ? SharedPreferenceHelper.getString(Preferences.uniqueId)
+              : SharedPreferenceHelper.getString(Preferences.doctorId);
+      final String effectiveUserId =
+          user?.uid ?? (fallbackUserId == 'N_A' ? 'doctor_app_user' : fallbackUserId);
 
       // Prepare history for memory (last 10 messages)
       List<Map<String, String>> history = _messages
@@ -106,12 +113,12 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           });
         }
         
-        final voiceResponse = await _apiService.processVoice(File(voicePath), user.uid);
+        final voiceResponse = await _apiService.processVoice(File(voicePath), effectiveUserId);
         String extractedText = voiceResponse['text'] ?? "Voice processed successfully.";
         
         response = await _apiService.brainChat({
           'q': extractedText,
-          'user_id': user.uid,
+          'user_id': effectiveUserId,
           'session_id': _sessionId,
           'history': history,
           'user_metadata': {
@@ -124,7 +131,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         // Regular text chat
         response = await _apiService.brainChat({
           'q': message,
-          'user_id': user.uid,
+          'user_id': effectiveUserId,
           'session_id': _sessionId,
           'history': history,
           'user_metadata': {
@@ -233,7 +240,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                  color: AyurezeTheme.forestDeep.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.psychology, color: AyurezeTheme.forestDeep, size: 20),
+              child: Icon(Icons.psychology, color: AyurezeTheme.textPrimary, size: 20),
             ),
             const SizedBox(width: 12),
             Column(
@@ -253,7 +260,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           ],
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AyurezeTheme.forestDeep, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: AyurezeTheme.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -282,7 +289,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                 children: [
                    SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2, color: AyurezeTheme.forestDeep)),
                    const SizedBox(width: 10),
-                   const Text("Astra is thinking...", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text("Astra is thinking...", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 12)),
                 ],
               ),
             ),
@@ -322,7 +329,9 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               style: TextStyle(
                 color: message.isError 
                     ? Colors.red 
-                    : (message.isSystem ? Colors.blue[800] : (message.isMe ? Colors.white : const Color(0xFF333333))),
+                    : (message.isSystem
+                        ? AyurezeTheme.forestDeep
+                        : (message.isMe ? Colors.white : AyurezeTheme.textPrimary)),
                 fontSize: 14,
               ),
             ),
@@ -330,7 +339,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
             Text(
               DateFormat('hh:mm a').format(message.time),
               style: TextStyle(
-                color: message.isMe ? Colors.white70 : Colors.grey,
+                color: message.isMe ? Colors.white70 : AyurezeTheme.textSecondary,
                 fontSize: 10,
               ),
             ),
@@ -344,7 +353,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AyurezeTheme.surface,
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5)),
         ],
@@ -358,7 +367,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _isRecording ? Colors.red : const Color(0xFFF0F0F0),
+                  color: _isRecording ? Colors.red : AyurezeTheme.surfaceMuted,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -373,16 +382,17 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F0F0),
+                  color: AyurezeTheme.surfaceMuted,
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: TextField(
                   controller: _messageController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Type or hold mic to dictate...",
                     border: InputBorder.none,
-                    hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                    hintStyle: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary),
                   ),
+                  style: TextStyle(color: AyurezeTheme.textPrimary),
                   onSubmitted: (_) => _sendMessage(),
                 ),
               ),

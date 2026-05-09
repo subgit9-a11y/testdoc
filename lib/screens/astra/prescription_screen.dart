@@ -91,11 +91,23 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   }
 
   void _addMedicine(Map<String, dynamic> medicine) {
+    final List variants = (medicine['variants'] is List) ? medicine['variants'] : [];
+    final Map<String, dynamic>? firstVariant = variants.isNotEmpty && variants.first is Map<String, dynamic>
+        ? variants.first as Map<String, dynamic>
+        : null;
+
+    final dynamic variantId = medicine['shopify_variant_id'] ??
+        medicine['variant_id'] ??
+        medicine['id'] ??
+        firstVariant?['id'];
+
+    final dynamic variantPrice = medicine['price'] ?? firstVariant?['price'];
+
     setState(() {
       _medicines.add({
         "medicine_name": medicine['medicine_name'] ?? medicine['title'],
-        "shopify_variant_id": medicine['shopify_variant_id'] ?? (medicine['variants'] != null && (medicine['variants'] as List).isNotEmpty ? medicine['variants'][0]['id'] : null),
-        "price": medicine['price'] ?? (medicine['variants'] != null && (medicine['variants'] as List).isNotEmpty ? medicine['variants'][0]['price'] : null),
+        "shopify_variant_id": variantId,
+        "price": variantPrice,
         "dosage": "1 tablet",
         "frequency": "twice_daily",
         "timing": "After Food",
@@ -112,6 +124,75 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     });
   }
 
+  Future<void> _editMedicineDetails(int index) async {
+    final med = _medicines[index];
+    final TextEditingController dosageController =
+        TextEditingController(text: (med['dosage'] ?? '1 tablet').toString());
+    final TextEditingController durationController =
+        TextEditingController(text: (med['duration_days'] ?? 5).toString());
+    String frequency = (med['frequency'] ?? 'twice_daily').toString();
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Edit Dosage"),
+          content: StatefulBuilder(
+            builder: (context, setLocalState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: dosageController,
+                    decoration: const InputDecoration(labelText: "Dosage (e.g. 1 tablet)"),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: frequency,
+                    items: const [
+                      DropdownMenuItem(value: 'once_daily', child: Text('Once daily')),
+                      DropdownMenuItem(value: 'twice_daily', child: Text('Twice daily')),
+                      DropdownMenuItem(value: 'thrice_daily', child: Text('Thrice daily')),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setLocalState(() => frequency = v);
+                      }
+                    },
+                    decoration: const InputDecoration(labelText: "Frequency"),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: durationController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: "Duration (days)"),
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+            TextButton(
+              onPressed: () {
+                final int parsedDays = int.tryParse(durationController.text.trim()) ?? 5;
+                setState(() {
+                  _medicines[index]['dosage'] = dosageController.text.trim().isEmpty
+                      ? '1 tablet'
+                      : dosageController.text.trim();
+                  _medicines[index]['frequency'] = frequency;
+                  _medicines[index]['duration_days'] = parsedDays < 1 ? 1 : parsedDays;
+                });
+                Navigator.pop(context);
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   Future<void> _submitPrescription() async {
     if (_medicines.isEmpty) {
@@ -126,10 +207,17 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
     setState(() => _isLoading = true);
     try {
-      bool allHaveShopify = _medicines.every((m) => m['shopify_variant_id'] != null);
+      final String doctorId = (widget.doctorId != null && widget.doctorId!.isNotEmpty)
+          ? widget.doctorId!
+          : SharedPreferenceHelper.getString(Preferences.doctorId);
+      if (doctorId.isEmpty || doctorId == 'N_A') {
+        throw Exception("Doctor ID missing. Please re-login once.");
+      }
+
+      bool allHaveShopify = _medicines.every((m) => m['shopify_variant_id'] != null && m['shopify_variant_id'].toString().isNotEmpty);
       
       final payload = {
-        "doctor_id": widget.doctorId ?? SharedPreferenceHelper.getString(Preferences.doctorId),
+        "doctor_id": doctorId,
         "patient_id": widget.patientId,
         "patient_name": widget.patientName,
         "patient_phone": widget.patientPhone,
@@ -243,6 +331,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                               Text("${med['dosage']} | ${med['frequency']} | ${med['duration_days']} days"),
                               Row(
                                 children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, size: 18, color: AyurezeTheme.forestDeep),
+                                    tooltip: "Edit dosage",
+                                    onPressed: () => _editMedicineDetails(idx),
+                                  ),
                                   Text("Qty: ", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                   DropdownButton<int>(
                                     value: med['quantity'],

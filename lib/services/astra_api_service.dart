@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:doctro/retrofit/apis.dart';
+import 'package:doctro/constant/prefConstatnt.dart';
+import 'package:doctro/constant/preferences.dart';
 
 /// Astra AI Healthcare API Service
 /// 
@@ -35,12 +37,20 @@ class AstraApiService {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // Add Firebase Auth Token
+        // Prefer Firebase token when available
         User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           String? token = await user.getIdToken();
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
+          }
+        }
+
+        // Fallback to app auth token (doctor login token)
+        if (options.headers['Authorization'] == null) {
+          final String appToken = SharedPreferenceHelper.getString(Preferences.auth_token);
+          if (appToken.isNotEmpty && appToken != 'N_A') {
+            options.headers['Authorization'] = 'Bearer $appToken';
           }
         }
         // Set default content type for JSON requests

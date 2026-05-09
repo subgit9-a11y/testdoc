@@ -135,12 +135,12 @@ class ModernDrawer extends StatelessWidget {
             color: isDestructive ? Colors.red.withOpacity(0.1) : AyurezeTheme.surfaceMuted,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(icon, color: isDestructive ? Colors.red : hintColor, size: 20),
+          child: Icon(icon, color: isDestructive ? Colors.red : AyurezeTheme.textPrimary, size: 20),
         ),
         title: Text(
           label,
           style: TextStyle(
-            color: isDestructive ? Colors.red : hintColor,
+            color: isDestructive ? Colors.red : AyurezeTheme.textPrimary,
             fontSize: 14,
             fontWeight: FontWeight.w700,
           ),
