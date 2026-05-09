@@ -207,6 +207,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
     setState(() => _isLoading = true);
     try {
+      final bool astraOnline = await _astraApiService.checkHealth();
+      if (!astraOnline) {
+        throw Exception("Astra service is unreachable. Check internet and try again.");
+      }
+
       final String doctorId = (widget.doctorId != null && widget.doctorId!.isNotEmpty)
           ? widget.doctorId!
           : SharedPreferenceHelper.getString(Preferences.doctorId);
@@ -248,7 +253,18 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
       
       Navigator.pop(context);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Submission Failed: $e")));
+      String message = "Submission failed. Please try again.";
+      final String err = e.toString();
+      if (err.contains("Doctor ID missing")) {
+        message = "Doctor session missing. Please login again.";
+      } else if (err.contains("unreachable") || err.contains("Network error") || err.contains("connection") || err.contains("timeout")) {
+        message = "Astra server unreachable. Check internet/VPN and retry.";
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

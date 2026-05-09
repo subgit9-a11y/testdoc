@@ -75,6 +75,11 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
     _scrollToBottom();
 
     try {
+      final bool astraOnline = await _apiService.checkHealth();
+      if (!astraOnline) {
+        throw Exception("Astra service is temporarily unreachable. Please check internet and try again.");
+      }
+
       final user = FirebaseAuth.instance.currentUser;
       final String fallbackUserId =
           SharedPreferenceHelper.getString(Preferences.uniqueId) != 'N_A'
@@ -159,10 +164,22 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         });
       }
     } catch (e) {
+      final String errorText = e.toString();
+      String friendlyMessage = "Unable to contact Astra right now. Please try again.";
+
+      if (errorText.contains('Unauthorized') || errorText.contains('401')) {
+        friendlyMessage = "Session expired. Please login again.";
+      } else if (errorText.contains('Astra service is temporarily unreachable') ||
+          errorText.contains('Network error') ||
+          errorText.contains('connection') ||
+          errorText.contains('timeout')) {
+        friendlyMessage = "Astra server unreachable. Check network/VPN and try again.";
+      }
+
       if (mounted) {
         setState(() {
           _messages.add(ChatMessage(
-            text: "Error: ${e.toString()}",
+            text: friendlyMessage,
             isMe: false,
             time: DateTime.now(),
             isError: true,
