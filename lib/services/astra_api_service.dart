@@ -30,8 +30,14 @@ class AstraApiService {
   }
 
   AstraApiService._internal() {
+    // Ensure baseUrl always ends with a slash to prevent construction errors
+    String sanitizedBaseUrl = baseUrl;
+    if (!sanitizedBaseUrl.endsWith('/')) {
+      sanitizedBaseUrl += '/';
+    }
+
     _dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl: sanitizedBaseUrl,
       connectTimeout: const Duration(seconds: 45),
       receiveTimeout: const Duration(seconds: 90),
     ));
@@ -43,11 +49,13 @@ class AstraApiService {
         final client = HttpClient();
         client.connectionTimeout = const Duration(seconds: 45);
         client.badCertificateCallback = (cert, host, port) {
-          return host.contains('astra.ayureze.in');
+          // Trust all certificates for Astra domain to bypass SSL/TLS handshake issues
+          return host.contains('astra.ayureze.in') || host.contains('82.25.105.156');
         };
         return client;
       };
     }
+
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
