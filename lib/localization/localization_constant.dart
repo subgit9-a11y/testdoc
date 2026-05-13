@@ -8,7 +8,11 @@ String? getTranslated(BuildContext context, String key) {
 }
 
 const String ENGLISH = "en";
-const String ARABIC = "ar";
+const String TAMIL = "ta";
+const String HINDI = "hi";
+const String MALAYALAM = "ml";
+const String TELUGU = "te";
+const String KANNADA = "kn";
 
 Future<Locale> setLocale(String languageCode) async {
   SharedPreferenceHelper.setString(Preferences.current_language_code, languageCode);
@@ -21,8 +25,20 @@ Locale _locale(String languageCode) {
     case ENGLISH:
       _temp = Locale(languageCode, 'US');
       break;
-    case ARABIC:
-      _temp = Locale(languageCode, 'AE');
+    case TAMIL:
+      _temp = Locale(languageCode, 'IN');
+      break;
+    case HINDI:
+      _temp = Locale(languageCode, 'IN');
+      break;
+    case MALAYALAM:
+      _temp = Locale(languageCode, 'IN');
+      break;
+    case TELUGU:
+      _temp = Locale(languageCode, 'IN');
+      break;
+    case KANNADA:
+      _temp = Locale(languageCode, 'IN');
       break;
     default:
       _temp = Locale(ENGLISH, 'US');

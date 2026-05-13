@@ -34,7 +34,7 @@ class _LanguageLocalizationDelegate extends LocalizationsDelegate<LanguageLocali
 
   @override
   bool isSupported(Locale locale) {
-    return [ENGLISH, ARABIC].contains(locale.languageCode);
+    return [ENGLISH, TAMIL, HINDI, MALAYALAM, TELUGU, KANNADA].contains(locale.languageCode);
   }
 
   @override
