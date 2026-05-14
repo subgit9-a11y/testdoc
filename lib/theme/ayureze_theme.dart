@@ -55,6 +55,21 @@ class AyurezeTheme {
   static Color get textPrimary => _isDark ? darkTextPrimary : lightTextPrimary;
   static Color get textSecondary => _isDark ? darkTextSecondary : lightTextSecondary;
   
+  // Aliases for backwards compatibility
+  static const Color forestDeep = healingGreen100;
+  static const Color forest = healingGreen50;
+  static const Color moss = oslerGray50;
+  static const Color lime = healingGreen50;
+  static const Color limeSoft = healingGreen10;
+  static const Color danger = remoteRed50;
+  static const Color warning = sunshineYellow50;
+  static const Color purple = caringViolet50;
+  
+  // Additional semantic getters
+  static Color get surfaceDark => darkSurface;
+  static Color get textMuted => darkTextSecondary;
+  static Color get borderMuted => border;
+  
   // Dynamic Icon/SVG Colors - ensures visibility in both modes
   static Color get iconPrimary => _isDark ? Colors.white : healingGreen100;
   static Color get iconSecondary => _isDark ? darkTextSecondary : oslerGray50;
@@ -208,15 +223,15 @@ class AyurezeTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: forestDeep, width: 1.4),
+          borderSide: const BorderSide(color: healingGreen100, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: danger),
+          borderSide: const BorderSide(color: remoteRed50),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: danger, width: 1.4),
+          borderSide: const BorderSide(color: remoteRed50, width: 1.4),
         ),
       ),
       chipTheme: ChipThemeData(
@@ -444,7 +459,7 @@ class AyurezeTheme {
         borderSide: BorderSide(color: border),
       ),      focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: forestDeep, width: 2),
+        borderSide: BorderSide(color: healingGreen100, width: 2),
       ),
       filled: true,
       fillColor: surface,

@@ -3,7 +3,9 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doctro/widgets/osler_button.dart';
+import 'package:doctro/constant/app_icons.dart';
+import 'package:doctro/constant/app_string.dart';
+import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -21,6 +23,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/widgets/osler_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';

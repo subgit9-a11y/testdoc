@@ -222,7 +222,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
         appBar: AppBar(
           backgroundColor: AyurezeTheme.canvas,
           elevation: 0,
-leading: IconButton(
+          leading: IconButton(
             icon: SvgPicture.asset("assets/icons/dMenuBar.svg", height: 18, color: AyurezeTheme.iconPrimary),
             onPressed: () => _scaffoldKey.currentState!.openDrawer()),
           ),
@@ -251,7 +251,7 @@ leading: IconButton(
         ),
         body: RefreshIndicator(
           onRefresh: todayAppointmentsFunction,
-          color: AyurezeTheme.healingGreen100Deep,
+          color: AyurezeTheme.healingGreen100,
           child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
             padding: AyurezeTheme.screenPadding,
@@ -287,7 +287,7 @@ leading: IconButton(
             },
             label: const Text("Astra AI", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             icon: Icon(AppIcons.analytics, color: Colors.white),
-            backgroundColor: AyurezeTheme.healingGreen100Deep,
+            backgroundColor: AyurezeTheme.healingGreen100,
           ),
         ),
       ),
@@ -346,7 +346,7 @@ leading: IconButton(
               color: AyurezeTheme.healingGreen50,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Icon(AppIcons.medical, color: AyurezeTheme.healingGreen100Deep, size: 30),
+            child: Icon(AppIcons.medical, color: AyurezeTheme.healingGreen100, size: 30),
           ),
         ],
       ),
@@ -362,10 +362,10 @@ leading: IconButton(
       mainAxisSpacing: 15,
       childAspectRatio: 1.6,
       children: [
-        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100Deep),
+        _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100),
         _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, AyurezeTheme.healingGreen50),
         _buildStatCard(getTranslated(context, AppString.dashboard_active_patients).toString(), patientCount.toString(), AppIcons.patient, AyurezeTheme.healingGreen50),
-        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), AppIcons.star, AyurezeTheme.healingGreen100Deep),
+        _buildStatCard(getTranslated(context, AppString.dashboard_feedbacks).toString(), reviewCount.toString(), AppIcons.star, AyurezeTheme.healingGreen100),
       ],
     );
   }

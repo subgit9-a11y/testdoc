@@ -209,7 +209,8 @@ class _SubSubscriptionState extends State<SubSubscription> {
           SizedBox(
             width: double.infinity,
             child: OslerButton(
-              text: "Subscribe Now",
+              text: getTranslated(context, AppString.subscription_buy).toString(),
+              customColor: data.name == 'free' ? AyurezeTheme.oslerGray50 : AyurezeTheme.healingGreen100,
               onPressed: () {
                 if (data.name == 'free') {
                   return;
@@ -226,13 +227,6 @@ class _SubSubscriptionState extends State<SubSubscription> {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    data.name == 'free' ? AyurezeTheme.oslerGray50 : AyurezeTheme.healingGreen100,
-              ),
-              child: Text(
-                getTranslated(context, AppString.subscription_buy).toString(),
-              ),
             ),
           ),
         ],
