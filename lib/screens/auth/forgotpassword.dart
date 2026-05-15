@@ -9,7 +9,7 @@ import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -119,17 +119,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       setState(() {
         if (response.success == true) {
           Navigator.pushReplacementNamed(context, "SignIn");
-          Fluttertoast.showToast(
-            msg: response.msg!,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-          );
+          OslerToast.success(context, response.msg!);
         } else {
-          Fluttertoast.showToast(
-            msg: response.msg!,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-          );
+          OslerToast.error(context, response.msg!);
         }
       });
     } catch (error, stacktrace) {

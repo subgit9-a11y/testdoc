@@ -449,12 +449,7 @@ class _SignInState extends State<SignIn> {
 
       if (response.success == true) {
         _saveUserData(response);
-
-        Fluttertoast.showToast(
-          msg: response.msg!,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        OslerToast.success(context, response.msg!);
 
         if (response.data!.verify == 0) {
           final data = OtpData(otp: response.data!.otp, id: response.data!.id);
@@ -478,11 +473,7 @@ class _SignInState extends State<SignIn> {
             ),
           );
         } else {
-          Fluttertoast.showToast(
-            msg: response.msg!,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-          );
+          OslerToast.error(context, response.msg!);
         }
       }
     } catch (error, stacktrace) {

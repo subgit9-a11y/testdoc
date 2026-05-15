@@ -2,13 +2,13 @@ import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/localization/localization_constant.dart';
-import 'package:doctro/model/ChangePassword.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_button.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -270,10 +270,10 @@ class _ChangePasswordState extends State<ChangePassword> {
       response = await RestClient(await RetroApi().dioData(context))
           .changePasswordRequest(body);
       if (response.success == true) {
-        Fluttertoast.showToast(msg: response.data!);
+        OslerToast.success(context, response.data!);
         Navigator.pop(context);
       } else {
-        Fluttertoast.showToast(msg: response.data!);
+        OslerToast.error(context, response.data!);
       }
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));

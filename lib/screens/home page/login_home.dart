@@ -34,6 +34,7 @@ import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_card.dart';
 import 'package:doctro/widgets/osler_status_badge.dart';
 import 'package:doctro/widgets/osler_alert.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -185,10 +186,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(
-          gravity: ToastGravity.BOTTOM,
-          msg: getTranslated(context, AppString.tap_again_to_exit_app)
-              .toString());
+      OslerToast.info(context, getTranslated(context, AppString.tap_again_to_exit_app).toString());
     } else {
       Navigator.of(context).pop();
     }

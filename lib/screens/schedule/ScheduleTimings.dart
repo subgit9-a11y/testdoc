@@ -4,8 +4,7 @@ import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/localization/localization_constant.dart';
-import 'package:doctro/model/UpdateTiming.dart';
-import 'package:doctro/model/working_hours.dart';
+import 'package:doctro/model/schedule_timings.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
@@ -13,6 +12,7 @@ import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_loader.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -423,9 +423,7 @@ actions: <Widget>[
                                                           Navigator.pop(context);
                                                         });
                                                       } else {
-                                                        Fluttertoast.showToast(
-                                                          msg: getTranslated(context, AppString.please_enter_start_end_time).toString(),
-                                                        );
+                                                        OslerToast.warning(context, getTranslated(context, AppString.please_enter_start_end_time).toString());
                                                       }
                                                     },
                                                   ),
@@ -490,11 +488,7 @@ actions: <Widget>[
       response = await RestClient(await RetroApi().dioData(context))
           .updateTimingRequest(body);
       doctorWorkingHoursFunction();
-      Fluttertoast.showToast(
-        msg: response.msg!,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+      OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));

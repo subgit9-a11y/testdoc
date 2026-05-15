@@ -11,6 +11,7 @@ import 'package:doctro/widgets/osler_modal.dart';
 import 'package:doctro/widgets/osler_alert.dart';
 import 'package:doctro/widgets/osler_card.dart';
 import 'package:doctro/widgets/osler_tooltip.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -98,9 +99,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     setState(() => isDarkMode = val);
                     // Use ThemeProvider for instant theme change
                     await context.read<ThemeProvider>().setDarkMode(val);
-                    Fluttertoast.showToast(
-                      msg: "Dark mode: ${val ? 'ON' : 'OFF'}",
-                    );
+                    OslerToast.success(context, "Dark mode: ${val ? 'ON' : 'OFF'}");
                   },
                 ),
                 _buildNavigationItem(
@@ -214,9 +213,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   title: "Contact Support",
                   color: const Color(0xFF7AA6D8),
                   onTap: () {
-                    Fluttertoast.showToast(
-                      msg: "Support ticket system coming soon",
-                    );
+                    OslerToast.info(context, "Support ticket system coming soon");
                   },
                 ),
                 _buildNavigationItem(
@@ -427,7 +424,7 @@ class _SettingScreenState extends State<SettingScreen> {
       primaryAction: () => Navigator.pop(context),
       secondaryAction: () {
         Navigator.pop(context);
-        Fluttertoast.showToast(msg: "Request submitted to admin");
+        OslerToast.success(context, "Request submitted to admin");
       },
       isDanger: true,
     );
@@ -454,7 +451,7 @@ class _SettingScreenState extends State<SettingScreen> {
       response = await RestClient(await RetroApi().dioData(context))
           .updatePatientVcallRequest(body);
       if (response.success == true) {
-        Fluttertoast.showToast(msg: response.msg!);
+        OslerToast.success(context, response.msg!);
       }
     } catch (error) {
       return BaseModel()..setException(ServerError.withError(error: error));

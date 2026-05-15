@@ -9,7 +9,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:doctro/chat/providers/auth_provider.dart';
@@ -218,18 +218,10 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           // Complete profile: Go to Dashboard
           Navigator.pushReplacementNamed(context, "loginHome");
         }
-        
-        Fluttertoast.showToast(
-          msg: response.msg!,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+
+        OslerToast.success(context, response.msg!);
       } else {
-        Fluttertoast.showToast(
-          msg: response.msg!,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        OslerToast.error(context, response.msg!);
       }
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");

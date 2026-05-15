@@ -6,6 +6,7 @@ import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/widgets/osler_button.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
@@ -170,16 +171,16 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   }
 
   Future<void> _submitData() async {
-    if (!_formKey.currentState!.validate() || 
-        _licenseController.text.isEmpty || 
+    if (!_formKey.currentState!.validate() ||
+        _licenseController.text.isEmpty ||
         _videoFeesController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Please fill all required fields");
+      OslerToast.warning(context, "Please fill all required fields");
       return;
     }
-    
-    if ((_certificateImage == null && _existingCertificateUrl == null) || 
+
+    if ((_certificateImage == null && _existingCertificateUrl == null) ||
         (_idProofImage == null && _existingIdProofUrl == null)) {
-      Fluttertoast.showToast(msg: "Both Medical Certificate and ID Proof are required");
+      OslerToast.warning(context, "Both Medical Certificate and ID Proof are required");
       return;
     }
 
@@ -283,23 +284,23 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         );
       }
       } else {
-        Fluttertoast.showToast(msg: response.msg ?? "Registration failed");
+        OslerToast.error(context, response.msg ?? "Registration failed");
       }
     } catch (e, stack) {
       if (e is DioException) {
         debugPrint("Registration Request Data: ${e.requestOptions.data}");
         debugPrint("Registration Error Status: ${e.response?.statusCode}");
         debugPrint("Registration Error Response: ${e.response?.data}");
-        
+
         String errorMsg = "Registration failed";
         if (e.response?.data is Map) {
           errorMsg = e.response?.data['msg'] ?? e.response?.data['message'] ?? errorMsg;
         }
-        Fluttertoast.showToast(msg: errorMsg);
+        OslerToast.error(context, errorMsg);
       } else {
         debugPrint("Non-Dio Error during registration: $e");
         debugPrint("Stacktrace: $stack");
-        Fluttertoast.showToast(msg: "An unexpected error occurred: $e");
+        OslerToast.error(context, "An unexpected error occurred: $e");
       }
     } finally {
       setState(() => _isLoading = false);
@@ -349,26 +350,26 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       final response = await RestClient(await RetroApi().dioData(context)).updateProfile(body);
 
       if (response.success == true) {
-        Fluttertoast.showToast(msg: "Clinical Profile Updated");
+        OslerToast.success(context, "Clinical Profile Updated");
         Navigator.pop(context);
       } else {
-        Fluttertoast.showToast(msg: response.msg ?? "Update failed");
+        OslerToast.error(context, response.msg ?? "Update failed");
       }
     } catch (e, stack) {
       if (e is DioException) {
         debugPrint("Update Request Data: ${e.requestOptions.data}");
         debugPrint("Update Error Status: ${e.response?.statusCode}");
         debugPrint("Update Error Response: ${e.response?.data}");
-        
+
         String errorMsg = "Profile update failed";
         if (e.response?.data is Map) {
           errorMsg = e.response?.data['msg'] ?? e.response?.data['message'] ?? errorMsg;
         }
-        Fluttertoast.showToast(msg: errorMsg);
+        OslerToast.error(context, errorMsg);
       } else {
         debugPrint("Non-Dio Error during update: $e");
         debugPrint("Stacktrace: $stack");
-        Fluttertoast.showToast(msg: "An error occurred: $e");
+        OslerToast.error(context, "An error occurred: $e");
       }
     } finally {
       setState(() => _isLoading = false);

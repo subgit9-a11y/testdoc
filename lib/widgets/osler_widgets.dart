@@ -10,3 +10,4 @@ export 'osler_checkbox.dart';
 export 'osler_tooltip.dart';
 export 'osler_chat_bubble.dart';
 export 'osler_status_badge.dart';
+export 'osler_toast.dart';

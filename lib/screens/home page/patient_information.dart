@@ -7,20 +7,18 @@ import 'package:doctro/chat/providers/home_provider.dart';
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
-import 'package:doctro/theme/ayureze_theme.dart';
-import 'package:doctro/widgets/osler_button.dart';
-import 'package:doctro/widgets/osler_loader.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
-import 'package:doctro/model/AllMedicines.dart';
-import 'package:doctro/model/DoctorStatusChange.dart';
-import 'package:doctro/model/appointment_details.dart';
-import 'package:doctro/pdf_creation/report_pdf.dart';
+import 'package:doctro/model/today_appointment.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
+import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/widgets/osler_button.dart';
+import 'package:doctro/widgets/osler_loader.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -1125,11 +1123,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         hideButton = false;
         setState(() {});
 
-        Fluttertoast.showToast(
-          msg: response.msg!,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        OslerToast.success(context, response.msg!);
       });
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");

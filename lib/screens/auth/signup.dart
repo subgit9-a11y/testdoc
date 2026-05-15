@@ -22,6 +22,7 @@ import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_input.dart';
 import 'package:doctro/widgets/osler_dropdown.dart';
 import 'package:doctro/widgets/osler_alert.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -304,7 +305,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
   Future<BaseModel<Register>> callApiForRegister() async {
     if (_selectedDate == null) {
-      Fluttertoast.showToast(msg: "Please select your birth date");
+      OslerToast.warning(context, "Please select your birth date");
       return BaseModel()..setException(ServerError.withError(error: "Date not selected"));
     }
 

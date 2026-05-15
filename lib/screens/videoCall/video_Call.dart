@@ -19,6 +19,7 @@ import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/screens/home page/login_home.dart';
 import 'package:doctro/screens/videoCall/model/doctorAgoraTokenGenerateModel.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -240,8 +241,7 @@ class _VideoCallState extends State<VideoCall> {
             setState(() {
               _remoteUid = null;
               _engine.leaveChannel();
-              Fluttertoast.showToast(
-                  msg: "Call Ended", toastLength: Toast.LENGTH_SHORT);
+              OslerToast.info(context, "Call Ended");
             });
           },
           onLeaveChannel: (RtcConnection connection, RtcStats details) {
@@ -432,11 +432,11 @@ class _VideoCallState extends State<VideoCall> {
         await initAgora();
         setState(() {});
       } else {
-        Fluttertoast.showToast(msg: "Failed to call the patient! Unable to connect!");
+        OslerToast.error(context, "Failed to call the patient! Unable to connect!");
         Navigator.pop(context);
       }
     } catch (error, stacktrace) {
-      Fluttertoast.showToast(msg: "Failed to call the patient! Unable to connect!");
+      OslerToast.error(context, "Failed to call the patient! Unable to connect!");
       Navigator.pop(context);
     }
   }
