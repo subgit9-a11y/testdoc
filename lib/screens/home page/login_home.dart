@@ -690,48 +690,69 @@ Widget _buildAppointmentCard(dynamic app) {
               ),
               SizedBox(
                 height: 10,
-              ),
+),
                Container(
-                   child: Text(
-                 getTranslated(context, AppString.home_subscription_deActive)
-                     .toString(),
-                 style: TextStyle(
-                     fontSize: 20,
-                     color: AyurezeTheme. textPrimary,
-                     decoration: TextDecoration.none),
-                 textAlign: TextAlign.center,
+                 padding: const EdgeInsets.symmetric(horizontal: 10),
+                 child: Text(
+                  getTranslated(context, AppString.home_subscription_deActive)
+                      .toString(),
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: AyurezeTheme.textPrimary,
+                      decoration: TextDecoration.none),
+                  textAlign: TextAlign.center,
+                ),
                ),
                GestureDetector(
-                 onTap: () {
-                   Navigator.pushReplacementNamed(context, "subscription");
-                 },
-                 child: Container(
-                     margin: EdgeInsets.only(top: height * 0.02),
-                     child: Text(
-                       getTranslated(context, AppString.home_please_active_plan)
-                           .toString(),
-                       style: TextStyle(
-                           fontSize: 14,
-                           color: darkGrey,
-                           decoration: TextDecoration.none),
-                       textAlign: TextAlign.center,
-                     ),
-                   ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, "subscription");
+                  },
+                  child: Container(
+                      margin: EdgeInsets.only(top: height * 0.02),
+                      child: Text(
+                        getTranslated(context, AppString.home_please_active_plan)
+                            .toString(),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: darkGrey,
+                            decoration: TextDecoration.none),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, "subscription");
+                  },
+                  child: Container(
+                      margin: EdgeInsets.only(top: height * 0.02),
+                      child: Text(
+                        getTranslated(context, AppString.home_please_active_plan)
+                            .toString(),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: darkGrey,
+                            decoration: TextDecoration.none),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                ),
-               SizedBox(
-                 height: 10,
-               ),
-               Container(
-                   margin: EdgeInsets.only(left: 12, right: 12),
-                   child: OslerButton(
-                       text: getTranslated(context, AppString.home_activate_subscription).toString(),
-                       onPressed: () => Navigator.pushReplacementNamed(context, "subscription")
-                   ),
-               ),
-         ),
-       ),
-     );
-   }
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                  margin: EdgeInsets.only(left: 12, right: 12),
+                  child: OslerButton(
+                      text: getTranslated(context, AppString.home_activate_subscription).toString(),
+                      onPressed: () => Navigator.pushReplacementNamed(context, "subscription")
+                  ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   // Future<void> getOneSingleToken() async {
   //   try {

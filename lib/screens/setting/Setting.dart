@@ -326,6 +326,22 @@ class _SettingScreenState extends State<SettingScreen> {
         Container(
           decoration: AyurezeTheme.panelDecoration(),
           child: Column(
+            children: List.generate(items.length, (index) {
+              return Column(
+                children: [
+                  items[index],
+                  if (index != items.length - 1)
+                    Divider(
+                      height: 1,
+                      indent: 68,
+                      endIndent: 18,
+                      color: AyurezeTheme.border,
+                    ),
+                ],
+              );
+            }),
+          ),
+        ),
       ],
     );
   }

@@ -2,14 +2,16 @@ import 'dart:core';
 import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
-import 'package:doctro/chat/providers/auth_provider.dart';
+import 'package:doctro/chat/providers/auth_provider.dart' as chat;
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
+import 'package:doctro/constant/common_function.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/model/login.dart';
+import 'package:doctro/model/otp_verify.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
@@ -18,16 +20,18 @@ import 'package:doctro/screens/auth/signup.dart';
 import 'package:doctro/screens/auth/forgotpassword.dart';
 import 'package:doctro/screens/auth/phoneverification.dart';
 import 'package:doctro/screens/home%20page/login_home.dart';
+import 'package:doctro/model/setting.dart';
 import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_input.dart';
 import 'package:doctro/widgets/osler_alert.dart';
 import 'package:doctro/widgets/osler_tooltip.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class SignIn extends StatefulWidget {
@@ -48,7 +52,7 @@ class _SignInState extends State<SignIn> {
 
   String? deviceToken;
 
-  late AuthProvider authProvider;
+  late chat.AuthProvider authProvider;
 
   int? verify;
 
@@ -88,7 +92,7 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    authProvider = Provider.of<AuthProvider>(context);
+    authProvider = Provider.of<chat.AuthProvider>(context);
 
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
@@ -300,7 +304,7 @@ class _SignInState extends State<SignIn> {
   }
 
   Future<void> _handleGoogleSignIn() async {
-    firebase.User? user = await authProvider.signInWithGoogle();
+    User? user = await authProvider.signInWithGoogle();
     if (user != null) {
       try {
         CommonFunction.onLoading(context);
