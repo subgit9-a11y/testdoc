@@ -13,11 +13,8 @@ import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_paystack/flutter_paystack.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:doctro/widgets/osler_toast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-
-// import 'package:flutterwave_standard/flutterwave.dart';
 
 import '../../model/purchaseSubscription.dart';
 import 'paypal/paypal_payment.dart';
@@ -751,9 +748,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       setState(() {
         SharedPreferenceHelper.setInt(Preferences.subscription_status, 1);
         Navigator.pushNamed(context, "loginHome");
-        Fluttertoast.showToast(
-            gravity: ToastGravity.BOTTOM,
-            msg: getTranslated(context, AppString.payment_success).toString());
+        OslerToast.success(context, getTranslated(context, AppString.payment_success).toString());
       });
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");
@@ -846,19 +841,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     // print(response.paymentId);
     aPaymentToken != ""
         ? purchaseSubscriptions()
-        : Fluttertoast.showToast(
-            msg: getTranslated(context, AppString.payment_not_complete)
-                .toString(),
-            toastLength: Toast.LENGTH_SHORT);
+        : OslerToast.error(context, getTranslated(context, AppString.payment_not_complete).toString());
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {}
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    Fluttertoast.showToast(
-        gravity: ToastGravity.BOTTOM,
-        msg: "EXTERNAL_WALLET: " + response.walletName!,
-        toastLength: Toast.LENGTH_SHORT);
+    OslerToast.warning(context, "EXTERNAL_WALLET: " + response.walletName!);
   }
 }
 
