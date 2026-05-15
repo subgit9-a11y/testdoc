@@ -237,11 +237,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           .resentOtpRequest(id);
 
       Navigator.pushNamed(context, 'SignIn');
-      Fluttertoast.showToast(
-        msg: response.msg!,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+      OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));

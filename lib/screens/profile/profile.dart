@@ -1864,10 +1864,7 @@ class _ProfileScreen extends State<ProfileScreen> {
               if (selectedHospitals.isNotEmpty) {
                 continued();
               } else {
-                Fluttertoast.showToast(
-                    msg:
-                        getTranslated(context, AppString.please_select_hospital)
-                            .toString());
+                OslerToast.warning(context, getTranslated(context, AppString.please_select_hospital).toString());
               }
             } else if (_currentStep == 1 && _step2.currentState!.validate()) {
               List<String> degree = [];
@@ -1974,11 +1971,7 @@ class _ProfileScreen extends State<ProfileScreen> {
           .updateProfile(body);
       Navigator.pushNamed(context, "loginHome");
       SharedPreferenceHelper.setInt(Preferences.is_filled, 1);
-      Fluttertoast.showToast(
-        msg: response.msg!,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+      OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
       // print("Exception occur: $error stackTrace: $stacktrace");
       return BaseModel()..setException(ServerError.withError(error: error));
