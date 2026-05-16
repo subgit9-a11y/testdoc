@@ -10,7 +10,6 @@ import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:doctro/screens/auth/profile_complete_screen.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
 import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/constant/preferences.dart';
@@ -667,28 +666,6 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         const SizedBox(width: 12),
         Text("$label: ", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 13)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, {bool isBold = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 13)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14,
-              color: isBold ? AyurezeTheme.healingGreen100 : AyurezeTheme.textPrimary,
-            ),
-            textAlign: TextAlign.right,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
       ],
     );
   }
