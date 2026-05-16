@@ -41,9 +41,8 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   final TextEditingController _feesController = TextEditingController();
   final TextEditingController _videoFeesController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
-  final TextEditingController _languageController = TextEditingController();
-  final TextEditingController _revenueModelController = TextEditingController();
-  
+   final TextEditingController _languageController = TextEditingController();
+   
   String? _genderSelect;
   String? _selectedRevenueModel;
   List<String> _revenueModels = ["Commission", "Subscription"];
@@ -546,34 +545,6 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     );
   }
 
-  Widget _buildDropdown(List<dynamic> items, Function(String?) onChanged, String? value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: AyurezeTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AyurezeTheme.border.withOpacity(0.6)),
-        boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.06), blurRadius: 5, spreadRadius: 0)],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: AyurezeTheme.textSecondary),
-          hint: Text("Select option", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
-          items: items.map((item) {
-            return DropdownMenuItem<String>(
-              value: item.id.toString(),
-              child: Text(item.name ?? "", style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
   Widget _buildGenericDropdown(List<String> items, Function(String?) onChanged, String? value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
@@ -697,90 +668,6 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         Text("$label: ", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 13)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       ],
-    );
-  }
-
-  void _showSuccessDialog(BuildContext context, {required String name, required String email, required String uniqueId}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AyurezeTheme.surface,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.18), blurRadius: 10.0, offset: const Offset(0.0, 10.0)),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 50),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  "Registration Successful!",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Your professional profile has been created. Please keep your credentials safe.",
-                  style: TextStyle(color: AyurezeTheme.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AyurezeTheme.surfaceMuted,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AyurezeTheme.borderMuted),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildDetailRow("Doctor ID", uniqueId, isBold: true),
-                      const Divider(height: 24),
-                      _buildDetailRow("Name", name),
-                      const SizedBox(height: 8),
-                      _buildDetailRow("Email", email),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: OslerButton(
-                    text: "Continue",
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                         context,
-                         MaterialPageRoute(builder: (context) => ProfileCompleteScreen()),
-                         (route) => false,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
