@@ -188,6 +188,9 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     
     final int safeTreatmentId = int.tryParse(_selectedTreatmentId ?? "") ?? 1;
     final int safeCategoryId = int.tryParse(_selectedCategoryId ?? "") ?? 1;
+    final String safeLanguage = _languageController.text.trim().isEmpty
+        ? "English"
+        : _languageController.text.trim();
 
     combinedData.addAll({
       "name": _nameController.text,
@@ -208,7 +211,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       "hospital_id": _licenseController.text,
       "license_number": _licenseController.text, // User recommended field
       "based_on": _selectedRevenueModel ?? "",
-      "language": _languageController.text,
+      "language": safeLanguage,
       "desc": _descController.text,
       "certificate": _existingCertificateUrl ?? "",
       "id_proof": _existingIdProofUrl ?? "",
