@@ -84,9 +84,9 @@ class _VideoCallState extends State<VideoCall> {
             margin: const EdgeInsets.only(bottom: 30),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.4),
+              color: AyurezeTheme.surfaceDark.withOpacity(0.72),
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+              border: Border.all(color: AyurezeTheme.border.withOpacity(0.35), width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -95,8 +95,8 @@ class _VideoCallState extends State<VideoCall> {
                 _buildControlButton(
                   onPressed: _onToggleMute,
                   icon: muted ? AppIcons.micOff : AppIcons.mic,
-                  color: muted ? Colors.red : Colors.white,
-                  bgColor: muted ? Colors.white : Colors.white.withOpacity(0.2),
+                  color: muted ? AyurezeTheme.remoteRed100 : AyurezeTheme.textPrimary,
+                  bgColor: muted ? AyurezeTheme.surface : AyurezeTheme.surface.withOpacity(0.2),
                 ),
                 const SizedBox(width: 15),
                 
@@ -104,8 +104,8 @@ class _VideoCallState extends State<VideoCall> {
                 _buildControlButton(
                   onPressed: _onToggleVideo,
                   icon: mutedVideo ? AppIcons.videoCallOff : AppIcons.videoCall,
-                  color: mutedVideo ? Colors.red : Colors.white,
-                  bgColor: mutedVideo ? Colors.white : Colors.white.withOpacity(0.2),
+                  color: mutedVideo ? AyurezeTheme.remoteRed100 : AyurezeTheme.textPrimary,
+                  bgColor: mutedVideo ? AyurezeTheme.surface : AyurezeTheme.surface.withOpacity(0.2),
                 ),
                 const SizedBox(width: 15),
 
@@ -113,8 +113,8 @@ class _VideoCallState extends State<VideoCall> {
                 _buildControlButton(
                   onPressed: _onSwitchCamera,
                   icon: Icons.flip_camera_ios_outlined,
-                  color: Colors.white,
-                  bgColor: Colors.white.withOpacity(0.2),
+                  color: AyurezeTheme.textPrimary,
+                  bgColor: AyurezeTheme.surface.withOpacity(0.2),
                 ),
                 const SizedBox(width: 25),
 

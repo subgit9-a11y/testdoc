@@ -2289,16 +2289,16 @@ class _ProfileScreen extends State<ProfileScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: purple,
+            primaryColor: AyurezeTheme.healingGreen100,
             colorScheme: ColorScheme.light(
-              primary: purple,
+              primary: AyurezeTheme.healingGreen100,
               onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: purple,
+              surface: AyurezeTheme.surface,
+              onSurface: AyurezeTheme.textPrimary,
             ),
-            dialogBackgroundColor: Colors.white,
+            dialogBackgroundColor: AyurezeTheme.surface,
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: purple),
+              style: TextButton.styleFrom(foregroundColor: AyurezeTheme.healingGreen100),
             ),
           ),
           child: child!,
