@@ -385,16 +385,16 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBFE),
+      backgroundColor: AyurezeTheme.canvas,
       appBar: AppBar(
-        title: Text("Clinical Profile", style: TextStyle(color: purple, fontWeight: FontWeight.w800, fontSize: 22)),
-        backgroundColor: Colors.white,
+        title: Text("Clinical Profile", style: TextStyle(color: AyurezeTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 22)),
+        backgroundColor: AyurezeTheme.surface,
         elevation: 0.5,
         centerTitle: true,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: purple, size: 20), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: AyurezeTheme.textPrimary, size: 20), onPressed: () => Navigator.pop(context)),
       ),
       body: _isLoading 
-        ? Center(child: CircularProgressIndicator(color: purple))
+        ? Center(child: CircularProgressIndicator(color: AyurezeTheme.healingGreen100))
         : SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
             child: Form(
@@ -504,10 +504,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         height: 160,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AyurezeTheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: purple.withOpacity(0.1), width: 2),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, spreadRadius: 0)],
+          boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.08), blurRadius: 10, spreadRadius: 0)],
         ),
         child: file != null
           ? ClipRRect(
@@ -524,9 +524,9 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                 children: [
                   Icon(Icons.add_a_photo_outlined, size: 40, color: purple.withOpacity(0.4)),
                   const SizedBox(height: 10),
-                  Text(placeholder, style: TextStyle(color: purple, fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(placeholder, style: TextStyle(color: AyurezeTheme.textPrimary, fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 4),
-                  const Text("Tap to select image/PDF", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                  Text("Tap to select image/PDF", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 10)),
                 ],
               ),
       ),
@@ -536,7 +536,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: purple, size: 22),
+        Icon(icon, color: AyurezeTheme.healingGreen100, size: 22),
         const SizedBox(width: 10),
         Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AyurezeTheme.textPrimary)),
       ],
@@ -555,17 +555,17 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AyurezeTheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 5, spreadRadius: 0)],
+        border: Border.all(color: AyurezeTheme.border.withOpacity(0.6)),
+        boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.06), blurRadius: 5, spreadRadius: 0)],
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: purple),
-          hint: const Text("Select option", style: TextStyle(fontSize: 14, color: Colors.grey)),
+          icon: Icon(Icons.keyboard_arrow_down, color: AyurezeTheme.textSecondary),
+          hint: Text("Select option", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
           items: items.map((item) {
             return DropdownMenuItem<String>(
               value: item.id.toString(),
@@ -583,17 +583,17 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AyurezeTheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 5, spreadRadius: 0)],
+        border: Border.all(color: AyurezeTheme.border.withOpacity(0.6)),
+        boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.06), blurRadius: 5, spreadRadius: 0)],
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: purple),
-          hint: const Text("Select", style: TextStyle(fontSize: 14, color: Colors.grey)),
+          icon: Icon(Icons.keyboard_arrow_down, color: AyurezeTheme.textSecondary),
+          hint: Text("Select", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
           items: items.map((item) {
             return DropdownMenuItem<String>(
               value: item,
@@ -619,14 +619,14 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             readOnly: isReadOnly,
             onTap: onTap,
             keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AyurezeTheme.textPrimary),
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: purple.withOpacity(0.7), size: 20),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AyurezeTheme.surface,
               contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.withOpacity(0.2))),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: purple, width: 1.5)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: AyurezeTheme.border.withOpacity(0.6))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: AyurezeTheme.healingGreen100, width: 1.5)),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Colors.redAccent)),
             ),
@@ -650,12 +650,12 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           data: ThemeData.light().copyWith(
             primaryColor: purple,
             colorScheme: ColorScheme.light(
-              primary: purple,
+              primary: AyurezeTheme.healingGreen100,
               onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: purple,
+              surface: AyurezeTheme.surface,
+              onSurface: AyurezeTheme.textPrimary,
             ),
-            dialogBackgroundColor: Colors.white,
+            dialogBackgroundColor: AyurezeTheme.surface,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: purple),
             ),

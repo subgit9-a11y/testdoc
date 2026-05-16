@@ -670,7 +670,7 @@ Widget _buildAppointmentCard(dynamic app) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: width * 0.1),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(1.0),
+        color: AyurezeTheme.surface,
         borderRadius: BorderRadius.circular(40),
       ),
       width: width * 0.8,
@@ -712,10 +712,10 @@ Widget _buildAppointmentCard(dynamic app) {
                       child: Text(
                         getTranslated(context, AppString.home_please_active_plan)
                             .toString(),
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: darkGrey,
-                            decoration: TextDecoration.none),
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: AyurezeTheme.textSecondary,
+                          decoration: TextDecoration.none),
                         textAlign: TextAlign.center,
                       ),
                     ),
