@@ -186,16 +186,19 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
 
     Map<String, dynamic> combinedData = widget.personalData != null ? Map.from(widget.personalData!) : {};
     
+    final int safeTreatmentId = int.tryParse(_selectedTreatmentId ?? "") ?? 1;
+    final int safeCategoryId = int.tryParse(_selectedCategoryId ?? "") ?? 1;
+
     combinedData.addAll({
       "name": _nameController.text,
       "email": _emailController.text,
       "phone": _phoneController.text,
       "dob": _dobController.text.isNotEmpty ? DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(_dobController.text)) : "",
       "gender": _genderSelect,
-      "treatment_id": int.tryParse(_selectedTreatmentId ?? ""),
-      "category_id": int.tryParse(_selectedCategoryId ?? ""),
-      "treatment": _selectedTreatmentId, // User recommended field
-      "category": _selectedCategoryId, // User recommended field
+      "treatment_id": safeTreatmentId,
+      "category_id": safeCategoryId,
+      "treatment": safeTreatmentId.toString(),
+      "category": safeCategoryId.toString(),
       "education": _educationController.text,
       "experience": _experienceController.text,
       "appointment_fees": _feesController.text,
