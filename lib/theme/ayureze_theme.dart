@@ -69,6 +69,7 @@ class AyurezeTheme {
   static Color get surfaceDark => darkSurface;
   static Color get textMuted => darkTextSecondary;
   static Color get borderMuted => border;
+  static Color get shadow => _isDark ? const Color(0x66000000) : const Color(0x26000000);
   
   // Dynamic Icon/SVG Colors - ensures visibility in both modes
   static Color get iconPrimary => _isDark ? Colors.white : healingGreen100;

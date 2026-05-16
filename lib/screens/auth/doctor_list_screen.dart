@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:doctro/constant/color_constant.dart';
-import 'package:doctro/retrofit/network_api.dart';
-import 'package:doctro/retrofit/api_header.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DoctorListScreen extends StatefulWidget {
+  const DoctorListScreen({super.key});
+
   @override
   _DoctorListScreenState createState() => _DoctorListScreenState();
 }
@@ -14,7 +12,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   List<dynamic> _doctors = [];
   List<dynamic> _filteredDoctors = [];
   bool _isLoading = true;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -23,21 +21,12 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   }
 
   Future<void> _fetchDoctors() async {
-    try {
-      // Re-using existing treatment logic to fetch doctors if available or create a specific endpoint
-      // Assuming a generic endpoint or fetching from existing model
-      final response = await RestClient(await RetroApi().dioData(context)).apiAllDoctors(); 
-      if (response.success == true) {
-        setState(() {
-          _doctors = response.data!;
-          _filteredDoctors = _doctors;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() => _isLoading = false);
-      print("Error: $e");
-    }
+    // Placeholder until dedicated API endpoint is finalized.
+    setState(() {
+      _doctors = [];
+      _filteredDoctors = [];
+      _isLoading = false;
+    });
   }
 
   void _filterDoctors(String query) {
@@ -88,7 +77,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: SpinKitPulse(color: Colors.cyanAccent, size: 50.0))
+                ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
                 : ListView.builder(
                     itemCount: _filteredDoctors.length,
                     padding: const EdgeInsets.symmetric(horizontal: 16),

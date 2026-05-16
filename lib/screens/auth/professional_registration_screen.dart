@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import 'package:doctro/constant/app_icons.dart';
-import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_toast.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/retrofit/api_header.dart';
-import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
-import 'package:doctro/retrofit/server_error.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:doctro/screens/auth/profile_complete_screen.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
@@ -719,8 +715,8 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
               color: AyurezeTheme.surface,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(24),
-              boxShadow: const [
-                BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.18), blurRadius: 10.0, offset: Offset(0.0, 10.0)),
+              boxShadow: [
+                BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.18), blurRadius: 10.0, offset: const Offset(0.0, 10.0)),
               ],
             ),
             child: Column(
