@@ -640,6 +640,7 @@ class _MyAppState extends State<MyApp> {
             child: Consumer<ThemeProvider>(
                 builder: (context, themeProvider, child) {
                   return MaterialApp(
+                    themeMode: ThemeMode.light,
                     navigatorKey: navigatorKey,
                     title: "Ayureze",
                     debugShowCheckedModeBanner: false,

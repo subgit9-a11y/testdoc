@@ -7,9 +7,9 @@ class AyurezeTheme {
   static const Color oslerGray50 = Color(0xFF849087);
   static const Color oslerGray10 = Color(0xFFF5F5F5);
 
-  static const Color healingGreen100 = Color(0xFF1A2E05); // Primary Dark
-  static const Color healingGreen50 = Color(0xFF84CC16);  // Primary Brand Color
-  static const Color healingGreen10 = Color(0xFFECFCCB);  // Primary Light
+  static const Color healingGreen100 = Color(0xFF0F2916); // Deep Botanical Forest Green
+  static const Color healingGreen50 = Color(0xFF10B981);  // Premium Healing Emerald Green
+  static const Color healingGreen10 = Color(0xFFE6F7F0);  // Soft Sage Mint Accent
 
   static const Color remoteRed100 = Color(0xFF4C050B);
   static const Color remoteRed50 = Color(0xFFF43F5E);
