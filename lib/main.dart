@@ -65,6 +65,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  bool firebaseInitialized = false;
 
   try {
     await dotenv.load(fileName: ".env");
@@ -106,6 +107,7 @@ Future<void> main() async {
   // Initialize Firebase but don't let it hang the whole app
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    firebaseInitialized = true;
     
     // Subscribe to topic in background, don't await it
     FirebaseMessaging.instance.subscribeToTopic("all").catchError((e) {
@@ -129,7 +131,7 @@ Future<void> main() async {
     _prefs = await SharedPreferences.getInstance(); 
   }
 
-  runApp(MyApp(prefs: _prefs!));
+  runApp(MyApp(prefs: _prefs!, firebaseInitialized: firebaseInitialized));
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -153,7 +155,8 @@ class MyHttpOverrides extends HttpOverrides {
 
 class MyApp extends StatefulWidget {
   final SharedPreferences prefs;
-  const MyApp({Key? key, required this.prefs}) : super(key: key);
+  final bool firebaseInitialized;
+  const MyApp({Key? key, required this.prefs, required this.firebaseInitialized}) : super(key: key);
 
   _MyAppState createState() => _MyAppState();
 
@@ -164,10 +167,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-
-
   Locale? _locale = const Locale('en', 'US');
   String messageImage = '';
   String messageName = '';
@@ -176,7 +175,9 @@ class _MyAppState extends State<MyApp> {
 
   void initState() {
     super.initState();
-    initApp();
+    if (widget.firebaseInitialized) {
+      initApp();
+    }
     // settingRequest();
   }
 
@@ -603,6 +604,18 @@ class _MyAppState extends State<MyApp> {
         ),
       );
     } else {
+      if (!widget.firebaseInitialized) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: SharedPreferenceHelper.getBoolean(Preferences.is_logged_in)
+              ? LoginHomeScreen(chat: "")
+              : SignIn(),
+        );
+      }
+
+      final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+      final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -618,19 +631,19 @@ class _MyAppState extends State<MyApp> {
                 create: (_) => provider.AuthProvider(
                   firebaseAuth: FirebaseAuth.instance,
                   prefs: widget.prefs,
-                  firebaseFirestore: this.firebaseFirestore,
+                  firebaseFirestore: firebaseFirestore,
                 ),
               ),
               Provider<HomeProvider>(
                 create: (_) => HomeProvider(
-                  firebaseFirestore: this.firebaseFirestore,
+                  firebaseFirestore: firebaseFirestore,
                 ),
               ),
               Provider<ChatProvider>(
                 create: (_) => ChatProvider(
                   prefs: widget.prefs,
-                  firebaseFirestore: this.firebaseFirestore,
-                  firebaseStorage: this.firebaseStorage,
+                  firebaseFirestore: firebaseFirestore,
+                  firebaseStorage: firebaseStorage,
                 ),
               ),
               ChangeNotifierProvider<ThemeProvider>(
