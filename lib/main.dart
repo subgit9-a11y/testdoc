@@ -607,9 +607,7 @@ class _MyAppState extends State<MyApp> {
       if (!widget.firebaseInitialized) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: SharedPreferenceHelper.getBoolean(Preferences.is_logged_in)
-              ? LoginHomeScreen(chat: "")
-              : SignIn(),
+          home: const FirebaseUnavailableScreen(),
         );
       }
 
@@ -716,6 +714,39 @@ class _MyAppState extends State<MyApp> {
         ),
       );
     }
+  }
+}
+
+class FirebaseUnavailableScreen extends StatelessWidget {
+  const FirebaseUnavailableScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.cloud_off, size: 52, color: Colors.redAccent),
+                SizedBox(height: 12),
+                Text(
+                  'Service setup error',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'The app could not connect to required services. Please check Firebase configuration and restart the app.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
