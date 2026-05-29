@@ -87,10 +87,14 @@ Future<void> main() async {
       getEnvSafe('SUPABASE_ANON_KEY') ?? const String.fromEnvironment('SUPABASE_ANON_KEY');
 
   if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-    );
+    try {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+    } catch (e) {
+      debugPrint("Supabase initialization failed: $e");
+    }
   } else {
     debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
   }
@@ -121,8 +125,12 @@ Future<void> main() async {
     HttpOverrides.global = new MyHttpOverrides();
   }
   
-  if (Platform.isAndroid) {
-    SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
+  if (Platform.isAndroid && _prefs != null) {
+    try {
+      await SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
+    } catch (e) {
+      debugPrint("Failed to store device platform: $e");
+    }
   }
 
   if (_prefs == null) {
