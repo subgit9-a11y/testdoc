@@ -61,6 +61,27 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
 
   final SupabaseService _supabaseService = SupabaseService();
 
+  DateTime? _parseDobFlexible(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return null;
+    final formats = [
+      DateFormat('yyyy-MM-dd'),
+      DateFormat('dd-MM-yyyy'),
+      DateFormat('yyyy-MM-dd HH:mm:ss'),
+      DateFormat('yyyy-MM-ddTHH:mm:ss'),
+    ];
+    for (final format in formats) {
+      try {
+        return format.parseStrict(value);
+      } catch (_) {}
+    }
+    try {
+      return DateTime.parse(value);
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,17 +90,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     if (widget.personalData != null) {
       String rawDob = widget.personalData!['dob'] ?? "";
       if (rawDob.isNotEmpty) {
-        try {
-          // If signup passes yyyy-MM-dd reformat it
-          if (rawDob.contains("-") && rawDob.indexOf("-") == 4) {
-             DateTime d = DateFormat('yyyy-MM-dd').parse(rawDob);
-             _dobController.text = DateFormat('dd-MM-yyyy').format(d);
-          } else {
-             _dobController.text = rawDob;
-          }
-        } catch (e) {
-          _dobController.text = rawDob;
-        }
+        final parsedDob = _parseDobFlexible(rawDob);
+        _dobController.text = parsedDob != null
+            ? DateFormat('dd-MM-yyyy').format(parsedDob)
+            : rawDob;
       }
       _nameController.text = widget.personalData!['name'] ?? "";
       _emailController.text = widget.personalData!['email'] ?? "";
@@ -103,19 +117,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           _emailController.text = data.email ?? "";
           _phoneController.text = data.phone ?? "";
           
-          if (data.dob != null && data.dob!.contains("-")) {
-            try {
-              if (data.dob!.indexOf("-") == 4) {
-                 _dobController.text = DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(data.dob!));
-              } else {
-                 _dobController.text = data.dob!;
-              }
-            } catch (e) {
-              _dobController.text = data.dob!;
-            }
-          } else {
-            _dobController.text = data.dob ?? "";
-          }
+          final parsedDob = _parseDobFlexible(data.dob ?? "");
+          _dobController.text = parsedDob != null
+              ? DateFormat('dd-MM-yyyy').format(parsedDob)
+              : (data.dob ?? "");
           _genderSelect = data.gender;
           
           _licenseController.text = data.hospitalId ?? "";
@@ -186,11 +191,17 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         ? "English"
         : _languageController.text.trim();
 
+    final parsedDob = _parseDobFlexible(_dobController.text);
+    if (_dobController.text.isNotEmpty && parsedDob == null) {
+      OslerToast.warning(context, "DOB must be in dd-MM-yyyy or yyyy-MM-dd format");
+      return;
+    }
+
     combinedData.addAll({
       "name": _nameController.text,
       "email": _emailController.text,
       "phone": _phoneController.text,
-      "dob": _dobController.text.isNotEmpty ? DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(_dobController.text)) : "",
+      "dob": parsedDob != null ? DateFormat('yyyy-MM-dd').format(parsedDob) : "",
       "gender": _genderSelect,
       "treatment_id": safeTreatmentId,
       "category_id": safeCategoryId,

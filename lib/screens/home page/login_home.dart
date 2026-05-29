@@ -362,7 +362,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       physics: NeverScrollableScrollPhysics(),
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
-      childAspectRatio: 1.6,
+      childAspectRatio: 1.45,
       children: [
         _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100),
         _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, AyurezeTheme.healingGreen50),
@@ -378,7 +378,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       decoration: AyurezeTheme.panelDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -391,13 +391,21 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               Icon(Icons.arrow_forward_ios, size: 12, color: AyurezeTheme.textSecondary.withOpacity(0.5)),
             ],
           ),
-          Column(
+          const SizedBox(height: 10),
+          Expanded(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AyurezeTheme. textPrimary)),
               const SizedBox(height: 2),
-              Text(title, style: TextStyle(fontSize: 12, color: AyurezeTheme.textSecondary)),
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: AyurezeTheme.textSecondary),
+              ),
             ],
+          ),
           ),
         ],
       ),
@@ -538,8 +546,11 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
 Widget _buildAppointmentCard(dynamic app) {
     final statusMap = {
       'pending': AppointmentStatus.pending,
+      'approve': AppointmentStatus.approved,
       'approved': AppointmentStatus.approved,
+      'completed': AppointmentStatus.complete,
       'complete': AppointmentStatus.complete,
+      'canceled': AppointmentStatus.cancel,
       'cancelled': AppointmentStatus.cancel,
       'waiting': AppointmentStatus.waiting,
     };

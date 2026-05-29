@@ -77,6 +77,7 @@ class Today {
   int? userId;
   int? rate;
   int? review;
+  String? appointmentStatus;
   User? user;
   Hospital? hospital;
 
@@ -92,6 +93,7 @@ class Today {
       this.userId,
       this.rate,
       this.review,
+      this.appointmentStatus,
       this.user,
       this.hospital});
 
@@ -107,6 +109,7 @@ class Today {
     userId = json['user_id'];
     rate = json['rate'];
     review = json['review'];
+    appointmentStatus = json['appointment_status'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     hospital = json['hospital'] != null
         ? new Hospital.fromJson(json['hospital'])
@@ -126,6 +129,7 @@ class Today {
     data['user_id'] = this.userId;
     data['rate'] = this.rate;
     data['review'] = this.review;
+    data['appointment_status'] = this.appointmentStatus;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }
@@ -148,6 +152,7 @@ class Tomorrow {
   int? userId;
   int? rate;
   int? review;
+  String? appointmentStatus;
   User? user;
   Hospital? hospital;
 
@@ -163,6 +168,7 @@ class Tomorrow {
       this.userId,
       this.rate,
       this.review,
+      this.appointmentStatus,
       this.user,
       this.hospital});
 
@@ -178,6 +184,7 @@ class Tomorrow {
     userId = json['user_id'];
     rate = json['rate'];
     review = json['review'];
+    appointmentStatus = json['appointment_status'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     hospital = json['hospital'] != null
         ? new Hospital.fromJson(json['hospital'])
@@ -197,6 +204,7 @@ class Tomorrow {
     data['user_id'] = this.userId;
     data['rate'] = this.rate;
     data['review'] = this.review;
+    data['appointment_status'] = this.appointmentStatus;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }
@@ -219,6 +227,7 @@ class Upcoming {
   int? userId;
   int? rate;
   int? review;
+  String? appointmentStatus;
   User? user;
   Hospital? hospital;
 
@@ -234,6 +243,7 @@ class Upcoming {
       this.userId,
       this.rate,
       this.review,
+      this.appointmentStatus,
       this.user,
       this.hospital});
 
@@ -249,6 +259,7 @@ class Upcoming {
     userId = json['user_id'];
     rate = json['rate'];
     review = json['review'];
+    appointmentStatus = json['appointment_status'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     hospital = json['hospital'] != null
         ? new Hospital.fromJson(json['hospital'])
@@ -268,6 +279,7 @@ class Upcoming {
     data['user_id'] = this.userId;
     data['rate'] = this.rate;
     data['review'] = this.review;
+    data['appointment_status'] = this.appointmentStatus;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }
