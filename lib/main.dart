@@ -679,8 +679,11 @@ class _MyAppState extends State<MyApp> {
                 GlobalCupertinoLocalizations.delegate,
               ],
               localeResolutionCallback: (deviceLocal, supportedLocales) {
+                if (deviceLocal == null) {
+                  return supportedLocales.first;
+                }
                 for (var local in supportedLocales) {
-                  if (local.languageCode == deviceLocal!.languageCode &&
+                  if (local.languageCode == deviceLocal.languageCode &&
                       local.countryCode == deviceLocal.countryCode) {
                     return deviceLocal;
                   }
