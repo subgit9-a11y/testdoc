@@ -130,9 +130,10 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     });
     
     Future.delayed(const Duration(seconds: 5), () {
-      if (FirebaseAuth.instance.currentUser != null) {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null && currentUser.uid.isNotEmpty) {
         homeProvider.updateDataFirestore(FirestoreConstants.pathUserCollection,
-            FirebaseAuth.instance.currentUser!.uid, {
+            currentUser.uid, {
           'pushToken': SharedPreferenceHelper.getString(Preferences.messageToken)
         });
       }
@@ -362,7 +363,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       physics: NeverScrollableScrollPhysics(),
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
-      childAspectRatio: 1.45,
+      childAspectRatio: 1.35,
       children: [
         _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100),
         _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, AyurezeTheme.healingGreen50),
@@ -374,7 +375,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: AyurezeTheme.panelDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,13 +397,17 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AyurezeTheme. textPrimary)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AyurezeTheme. textPrimary)),
+              ),
               const SizedBox(height: 2),
               Text(
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12, color: AyurezeTheme.textSecondary),
+                style: TextStyle(fontSize: 11, color: AyurezeTheme.textSecondary),
               ),
             ],
           ),

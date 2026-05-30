@@ -23,16 +23,19 @@ class OslerDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? safeValue = (value != null && items.contains(value)) ? value : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) ...[
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          const SizedBox(height: 8),
+        ],
         DropdownButtonFormField<String>(
-          value: value,
+          value: safeValue,
           hint: Text(hint, style: TextStyle(color: AyurezeTheme.textSecondary)),
           decoration: InputDecoration(
             filled: true,

@@ -415,7 +415,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(
@@ -435,7 +436,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                 ),
                               ],
                             ),
-                            Column(
+                            ),
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(
@@ -453,7 +456,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                 ),
                               ],
                             ),
-                            Column(
+                            ),
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(context,
@@ -465,14 +470,17 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  "${appointmentType ?? '-'} ${appointmentType != null ? ' appointment' : ''}\n$appointment",
+                                  "${appointmentType ?? '-'}${appointmentType != null ? ' appointment' : ''}\n${appointment ?? ''}",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: AyurezeTheme.textPrimary,
                                   ),
                                   textAlign: TextAlign.center,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
                                 )
                               ],
+                            ),
                             )
                           ],
                         ),
@@ -1069,6 +1077,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                               patientId: userId.toString(),
                                               patientName: name ?? "Patient",
                                               patientPhone: phoneNo,
+                                              doctorId: SharedPreferenceHelper.getString(Preferences.doctorId),
+                                              prescriptionId: id?.toString(),
                                               astraFillData: _astraFillData,
                                             ),
                                           ),

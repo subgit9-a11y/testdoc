@@ -23,7 +23,7 @@ class ModernDrawer extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 260,
+              constraints: const BoxConstraints(minHeight: 260),
               width: double.infinity,
               padding: const EdgeInsets.only(top: 54, left: 22, right: 22, bottom: 22),
               decoration: AyurezeTheme.heroDecoration(),
@@ -66,11 +66,15 @@ class ModernDrawer extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     "Dr. ${dName ?? "Doctor"}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     phone ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.white.withOpacity(0.74), fontSize: 13),
                   ),
                   const SizedBox(height: 14),
