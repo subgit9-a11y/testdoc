@@ -554,7 +554,8 @@ Widget _buildAppointmentCard(dynamic app) {
       'cancelled': AppointmentStatus.cancel,
       'waiting': AppointmentStatus.waiting,
     };
-    final status = statusMap[app.appointmentStatus?.toLowerCase()] ?? AppointmentStatus.pending;
+    final statusKey = (app?.appointmentStatus ?? '').toString().toLowerCase();
+    final status = statusMap[statusKey] ?? AppointmentStatus.pending;
 
     return OslerCard(
       margin: EdgeInsets.only(bottom: 12),
@@ -626,40 +627,33 @@ Widget _buildAppointmentCard(dynamic app) {
       }
 
       setState(() {
-        if (response.data!.today!.isNotEmpty) {
-          response.data!.today!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          todayAppointments.addAll(response.data!.today!);
+        final todayList = response.data?.today ?? <Today>[];
+        final tomorrowList = response.data?.tomorrow ?? <Tomorrow>[];
+        final upcomingList = response.data?.upcoming ?? <Upcoming>[];
+
+        DateTime parseTimeSafe(String? value) {
+          final today = DateTime.now().toString().split(" ")[0];
+          final time = (value ?? "00:00 AM").toUpperCase();
+          try {
+            return DateFormat("yyyy-MM-dd h:mm a").parse("$today $time");
+          } catch (_) {
+            return DateTime(1970, 1, 1);
+          }
         }
 
-        if (response.data!.tomorrow!.isNotEmpty) {
-          response.data!.tomorrow!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          tomorrowAppointments.addAll(response.data!.tomorrow!);
+        if (todayList.isNotEmpty) {
+          todayList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          todayAppointments.addAll(todayList);
         }
 
-        if (response.data!.upcoming!.isNotEmpty) {
-          response.data!.upcoming!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          upcomingAppointments.addAll(response.data!.upcoming!);
+        if (tomorrowList.isNotEmpty) {
+          tomorrowList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          tomorrowAppointments.addAll(tomorrowList);
+        }
+
+        if (upcomingList.isNotEmpty) {
+          upcomingList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          upcomingAppointments.addAll(upcomingList);
         }
 
         // Simple way to estimate active patients: unique patient names across all categories

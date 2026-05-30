@@ -174,7 +174,6 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                                Preferences.language_name,
                                selectedLanguage.name,
                              );
-                             updateProfile();
                              if (!mounted) return;
                              Navigator.pushReplacementNamed(context, "loginHome");
                            },
