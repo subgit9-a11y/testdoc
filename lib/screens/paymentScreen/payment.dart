@@ -90,18 +90,6 @@ class _PaymentScreen extends State<PaymentScreen> {
                 color: AyurezeTheme.textPrimary,
               ),
             ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  _scaffoldKey.currentState!.openDrawer();
-                },
-                icon: SvgPicture.asset(
-                  "assets/icons/dMenuBar.svg",
-                  height: 16,
-                  color: AyurezeTheme.forestDeep,
-                ),
-              ),
-            ],
           ),
           body: FutureBuilder(
             future: payments,
