@@ -501,7 +501,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                           : Text(''),
                                                                                     ],
                                                                                   ),
-                                                                                  SizedBox(height: 5)
+                                                                                  SizedBox(height: 16)
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -701,7 +701,7 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
                                                                                       : Text(''),
                                                                                 ],
                                                                               ),
-                                                                              SizedBox(height: 5)
+                                                                              SizedBox(height: 16)
                                                                             ],
                                                                           ),
                                                                         ),
