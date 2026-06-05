@@ -84,7 +84,6 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
   bool hideButton = true;
 
   //checkbox
-  List<Tab> tabList = [];
   TabController? _tabController;
 
   //Add Medicine Data dialog
@@ -123,16 +122,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
       appointmentDetail = appointmentDetails();
       _loadAstraFillData(); // Load patient's health intake from Astra
 
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.patient_information).toString(),
-      ));
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.patient_illness).toString(),
-      ));
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.doctor_prescription).toString(),
-      ));
-      _tabController = new TabController(vsync: this, length: tabList.length);
+      _tabController = new TabController(vsync: this, length: 3);
 
       listOfMedicine.clear();
 
@@ -493,7 +483,11 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                           labelColor: AyurezeTheme.textPrimary,
                           controller: _tabController,
                           indicatorSize: TabBarIndicatorSize.tab,
-                          tabs: tabList,
+                          tabs: [
+                            Tab(text: getTranslated(context, AppString.patient_information)),
+                            Tab(text: getTranslated(context, AppString.patient_illness)),
+                            Tab(text: getTranslated(context, AppString.doctor_prescription)),
+                          ],
                           unselectedLabelColor: AyurezeTheme.textSecondary,
                         ),
                       ),

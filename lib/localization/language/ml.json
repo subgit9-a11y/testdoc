@@ -329,5 +329,8 @@
     "login_email_validator": "ഇമെയിൽ നൽകുക",
     "login_email_validator2": "സാധുവായ ഇമെയിൽ നൽകുക",
     "login_password_validator": "പാസ്‌വേഡ് നൽകുക",
-    "doctor": "ഡോക്ടർ"
+    "doctor": "ഡോക്ടർ",
+    "gender_other": "മറ്റുള്ളവ",
+    "revenue_model_commission": "കമ്മീഷൻ",
+    "revenue_model_subscription": "സബ്‌സ്‌ക്രിപ്‌ഷൻ"
 }

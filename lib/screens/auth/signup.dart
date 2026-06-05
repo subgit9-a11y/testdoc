@@ -54,13 +54,15 @@ class _CreateAccountState extends State<CreateAccount> {
       _name.text = widget.prefillData!['name'] ?? "";
       _email.text = widget.prefillData!['email'] ?? "";
     }
+  }
 
-    Future.delayed(Duration.zero, () {
-      gender = [
-        getTranslated(context, AppString.gender_male).toString(),
-        getTranslated(context, AppString.gender_female).toString(),
-      ];
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    gender = [
+      getTranslated(context, AppString.gender_male),
+      getTranslated(context, AppString.gender_female),
+    ];
   }
 
   @override

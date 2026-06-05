@@ -329,5 +329,8 @@
     "login_email_validator": "ಇಮೇಲ್ ನಮೂದಿಸಿ",
     "login_email_validator2": "ಮಾನ್ಯ ಇಮೇಲ್ ನಮೂದಿಸಿ",
     "login_password_validator": "ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
-    "doctor": "ವೈದ್ಯ"
+    "doctor": "ವೈದ್ಯ",
+    "gender_other": "ಇತರ",
+    "revenue_model_commission": "ಕಮಿಷನ್",
+    "revenue_model_subscription": "ಚಂದಾದಾರಿಕೆ"
 }

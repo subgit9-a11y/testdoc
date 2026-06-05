@@ -44,8 +44,15 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
    
   String? _genderSelect;
   String? _selectedRevenueModel;
-  List<String> _revenueModels = ["Commission", "Subscription"];
-  List<String> _genders = ["Male", "Female", "Other"];
+  final List<MapEntry<String, String>> _revenueModelOptions = [
+    MapEntry('Commission', 'revenue_model_commission'),
+    MapEntry('Subscription', 'revenue_model_subscription'),
+  ];
+  final List<MapEntry<String, String>> _genderOptions = [
+    MapEntry('Male', 'gender_male'),
+    MapEntry('Female', 'gender_female'),
+    MapEntry('Other', 'gender_other'),
+  ];
   
   File? _certificateImage;
   String? _existingCertificateUrl;
@@ -423,7 +430,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildLabel("Gender"),
-                                    _buildGenericDropdown(_genders, (val) => setState(() => _genderSelect = val), _genderSelect),
+                                    _buildLabeledDropdown(_genderOptions, (val) => setState(() => _genderSelect = val), _genderSelect),
                                   ],
                                 ),
                               ),
@@ -455,7 +462,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                     ),
                     const SizedBox(height: 10),
                     _buildLabel("Revenue Model"),
-                    _buildGenericDropdown(_revenueModels, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
+                    _buildLabeledDropdown(_revenueModelOptions, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
 
                   const SizedBox(height: 35),
                   _buildSectionHeader("Practice Details", Icons.description_outlined),
@@ -575,6 +582,34 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             return DropdownMenuItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledDropdown(List<MapEntry<String, String>> options, Function(String?) onChanged, String? value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: AyurezeTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AyurezeTheme.border.withOpacity(0.6)),
+        boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.06), blurRadius: 5, spreadRadius: 0)],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          icon: Icon(Icons.keyboard_arrow_down, color: AyurezeTheme.textSecondary),
+          hint: Text("Select", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
+          items: options.map((opt) {
+            return DropdownMenuItem<String>(
+              value: opt.key,
+              child: Text(getTranslated(context, opt.value), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             );
           }).toList(),
           onChanged: onChanged,

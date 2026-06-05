@@ -329,5 +329,8 @@
     "login_email_validator": "மின்னஞ்சல் ஐ உள்ளிடவும்",
     "login_email_validator2": "சரியான மின்னஞ்சல் ஐ உள்ளிடவும்",
     "login_password_validator": "கடவுச்சொல்லை உள்ளிடவும்",
-    "doctor": "டாக்டர்"
+    "doctor": "டாக்டர்",
+    "gender_other": "மற்றவை",
+    "revenue_model_commission": "கமிஷன்",
+    "revenue_model_subscription": "சந்தா"
 }

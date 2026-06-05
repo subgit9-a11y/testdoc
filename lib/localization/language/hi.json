@@ -329,5 +329,8 @@
     "login_email_validator": "ईमेल दर्ज करें",
     "login_email_validator2": "वैध ईमेल दर्ज करें",
     "login_password_validator": "पासवर्ड दर्ज करें",
-    "doctor": "डॉक्टर"
+    "doctor": "डॉक्टर",
+    "gender_other": "अन्य",
+    "revenue_model_commission": "कमीशन",
+    "revenue_model_subscription": "सदस्यता"
 }
