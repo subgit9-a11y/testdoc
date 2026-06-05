@@ -13,6 +13,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/screens/auth/SignIn.dart';
+import 'package:doctro/services/session_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:flutter/material.dart';
@@ -422,12 +423,7 @@ class _PaymentScreen extends State<PaymentScreen> {
   bool _searching() => _search.text.isNotEmpty;
 
   Future<void> logoutUser() async {
-    SharedPreferenceHelper.clearPref();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (BuildContext context) => SignIn()),
-      ModalRoute.withName('SignIn'),
-    );
+    await SessionService.logout();
   }
 
   Future<BaseModel<Payment>> paymentsFunction() async {

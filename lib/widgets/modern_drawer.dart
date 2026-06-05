@@ -6,6 +6,7 @@ import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
+import 'package:doctro/services/session_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 
 class ModernDrawer extends StatelessWidget {
@@ -169,8 +170,8 @@ class ModernDrawer extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: Text(getTranslated(context, AppString.cancel_button).toString())),
           TextButton(
             onPressed: () {
-              SharedPreferenceHelper.clearPref();
-              Navigator.pushNamedAndRemoveUntil(context, 'SignIn', (route) => false);
+              Navigator.pop(context);
+              SessionService.logout();
             },
             child: Text(getTranslated(context, AppString.logout_button).toString(), style: const TextStyle(color: Colors.red)),
           ),
