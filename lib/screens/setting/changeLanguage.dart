@@ -71,13 +71,13 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     gender = [
-      getTranslated(context, AppString.gender_male).toString(),
-      getTranslated(context, AppString.gender_female).toString(),
+      getTranslated(context, AppString.gender_male),
+      getTranslated(context, AppString.gender_female),
     ];
 
     popular = [
-      getTranslated(context, AppString.popular_yes).toString(),
-      getTranslated(context, AppString.popular_no).toString(),
+      getTranslated(context, AppString.popular_yes),
+      getTranslated(context, AppString.popular_no),
     ];
   }
 
@@ -107,7 +107,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          getTranslated(context, AppString.chang_language).toString(),
+          getTranslated(context, AppString.chang_language),
           style: TextStyle(
             color: AyurezeTheme.textPrimary,
             fontSize: 20,

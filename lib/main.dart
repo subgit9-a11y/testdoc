@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
@@ -169,7 +169,11 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 
   static void setLocale(BuildContext context, Locale newLocale) {
-    _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    final _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    if (state == null) {
+      if (kDebugMode) debugPrint('MyApp.setLocale: ancestor state not found');
+      return;
+    }
     state.setLocale(newLocale);
   }
 }
@@ -668,9 +672,13 @@ class _MyAppState extends State<MyApp> {
                         ? LoginHomeScreen(chat: "")
                         : SignIn(),
                     locale: _locale,
-              supportedLocales: [
+              supportedLocales: const [
                 Locale(ENGLISH, 'US'),
-                // Locale(ARABIC, 'AE'),
+                Locale(TAMIL, 'IN'),
+                Locale(HINDI, 'IN'),
+                Locale(MALAYALAM, 'IN'),
+                Locale(TELUGU, 'IN'),
+                Locale(KANNADA, 'IN'),
               ],
               localizationsDelegates: [
                 LanguageLocalization.delegate,
@@ -683,9 +691,8 @@ class _MyAppState extends State<MyApp> {
                   return supportedLocales.first;
                 }
                 for (var local in supportedLocales) {
-                  if (local.languageCode == deviceLocal.languageCode &&
-                      local.countryCode == deviceLocal.countryCode) {
-                    return deviceLocal;
+                  if (local.languageCode == deviceLocal.languageCode) {
+                    return local;
                   }
                 }
                 return supportedLocales.first;

@@ -3,8 +3,10 @@ import 'package:doctro/constant/preferences.dart';
 import 'package:flutter/material.dart';
 import 'language_localization.dart';
 
-String? getTranslated(BuildContext context, String key) {
-  return LanguageLocalization.of(context)!.getTranslateValue(key);
+String getTranslated(BuildContext context, String key) {
+  final localization = LanguageLocalization.of(context);
+  if (localization == null) return key;
+  return localization.getTranslateValue(key) ?? key;
 }
 
 const String ENGLISH = "en";
@@ -13,6 +15,15 @@ const String HINDI = "hi";
 const String MALAYALAM = "ml";
 const String TELUGU = "te";
 const String KANNADA = "kn";
+
+const List<String> SUPPORTED_LANGUAGE_CODES = [
+  ENGLISH,
+  TAMIL,
+  HINDI,
+  MALAYALAM,
+  TELUGU,
+  KANNADA,
+];
 
 Future<Locale> setLocale(String languageCode) async {
   await SharedPreferenceHelper.setString(Preferences.current_language_code, languageCode);
@@ -48,5 +59,8 @@ Locale _locale(String languageCode) {
 
 Future<Locale> getLocale() async {
   String languageCode = SharedPreferenceHelper.getString(Preferences.current_language_code);
+  if (languageCode.isEmpty || languageCode == 'N_A') {
+    return const Locale(ENGLISH, 'US');
+  }
   return _locale(languageCode);
 }
