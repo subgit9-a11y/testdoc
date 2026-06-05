@@ -325,5 +325,9 @@
     "settings_terms_conditions":  "விதிமுறைகள் \u0026 நிபந்தனைகள்",
     "settings_delete_account":  "கணக்கை நீக்கு",
     "settings_account_section":  "கணக்கு \u0026 சந்தா",
-    "settings_video_call_desc":  "நோயாளிகள் நேரடியாக வீடியோ அழைப்புகளைத் தொடங்க அனுமதிக்கவும்"
+    "settings_video_call_desc":  "நோயாளிகள் நேரடியாக வீடியோ அழைப்புகளைத் தொடங்க அனுமதிக்கவும்",
+    "login_email_validator": "மின்னஞ்சல் ஐ உள்ளிடவும்",
+    "login_email_validator2": "சரியான மின்னஞ்சல் ஐ உள்ளிடவும்",
+    "login_password_validator": "கடவுச்சொல்லை உள்ளிடவும்",
+    "doctor": "டாக்டர்"
 }

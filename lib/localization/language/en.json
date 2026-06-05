@@ -325,5 +325,9 @@
   "settings_terms_conditions": "Terms & Conditions",
   "settings_delete_account": "Delete Account",
   "settings_account_section": "Account & Subscription",
-  "settings_video_call_desc": "Allow patients to initiate video calls directly"
+  "settings_video_call_desc": "Allow patients to initiate video calls directly",
+  "login_email_validator": "Please enter email",
+  "login_email_validator2": "Please enter a valid email",
+  "login_password_validator": "Please enter password",
+  "doctor": "Doctor"
 }

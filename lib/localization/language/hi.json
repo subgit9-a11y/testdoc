@@ -325,5 +325,9 @@
     "settings_terms_conditions":  "नियम एवं शर्तें",
     "settings_delete_account":  "खाता हटा दो",
     "settings_account_section":  "खाता एवं सदस्यता",
-    "settings_video_call_desc":  "मरीजों को सीधे वीडियो कॉल शुरू करने की अनुमति दें"
+    "settings_video_call_desc":  "मरीजों को सीधे वीडियो कॉल शुरू करने की अनुमति दें",
+    "login_email_validator": "ईमेल दर्ज करें",
+    "login_email_validator2": "वैध ईमेल दर्ज करें",
+    "login_password_validator": "पासवर्ड दर्ज करें",
+    "doctor": "डॉक्टर"
 }
