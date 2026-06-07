@@ -132,7 +132,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Error: e');
+      debugPrint('Error: $e');
     }
   }
 
