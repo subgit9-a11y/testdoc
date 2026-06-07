@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -548,7 +549,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           : url != null && url.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(18),
-                child: Image.network(url, fit: BoxFit.cover),
+                child: Image(image: CachedNetworkImageProvider(url), fit: BoxFit.cover),
               )
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,

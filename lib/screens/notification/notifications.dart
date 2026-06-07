@@ -11,6 +11,7 @@ import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/modern_drawer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -208,8 +209,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: Image.network(
-                item.user?.fullImage ?? "",
+              child: Image(
+                image: CachedNetworkImageProvider(item.user?.fullImage ?? ""),
                 width: 58,
                 height: 58,
                 fit: BoxFit.cover,

@@ -1021,8 +1021,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(10),
-                                                  child: Image.network(
-                                                    reportImages[index],
+                                                  child: Image(
+                                                    image: CachedNetworkImageProvider(reportImages[index]),
                                                     fit: BoxFit.fitWidth,
                                                   ),
                                                 ),

@@ -324,8 +324,8 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                                             ClipRRect(
                                                                           borderRadius:
                                                                               BorderRadius.circular(10),
-                                                                          child:
-                                                                              Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(_searchResult[i].user!.fullImage!)))),
+                                                                           child:
+                                                                               Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: CachedNetworkImageProvider(_searchResult[i].user!.fullImage!)))),
                                                                         ),
                                                                       ),
                                                                       title:
@@ -478,9 +478,9 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               10),
-                                                                      child: Container(
+                                                                       child: Container(
                                                                           decoration:
-                                                                              new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(cancelAppointmentReq[index].user!.fullImage!)))),
+                                                                              new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: CachedNetworkImageProvider(cancelAppointmentReq[index].user!.fullImage!)))),
                                                                     ),
                                                                   ),
                                                                   title:

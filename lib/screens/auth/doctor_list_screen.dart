@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -111,7 +112,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         leading: CircleAvatar(
           radius: 30,
           backgroundImage: (doc.image != null && doc.image!.isNotEmpty)
-              ? NetworkImage(doc.image!)
+              ? CachedNetworkImageProvider(doc.image!)
               : const AssetImage("assets/images/no_image.jpg") as ImageProvider,
         ),
         title: Text(

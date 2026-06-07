@@ -438,7 +438,7 @@ class _MyAppState extends State<MyApp> {
     try {
       response =
           await RestClient(await RetroApi2().dioData2()).settingRequest();
-      log("Data = ${response.data?.toJson()} ");
+      if (kDebugMode) debugPrint("Setting response received");
       if (SharedPreferenceHelper.getBoolean(Preferences.is_logged_in) == true) {
         if (response.data!.stripeSecretKey != null) {
           SharedPreferenceHelper.setString(

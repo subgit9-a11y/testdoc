@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/services/session_service.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -21,7 +22,9 @@ class RetroApi {
         SharedPreferenceHelper.getString(Preferences.refresh_token);
     final expiresIn = SharedPreferenceHelper.getInt(Preferences.expiresIn);
     final savedAt = SharedPreferenceHelper.getInt('token_saved_at');
-    logger.w('token: $token, refreshToken: $refreshToken, expiresIn: $expiresIn, savedAt: $savedAt');
+    if (kDebugMode) {
+      logger.w('token present: ${token != 'N_A' && token.isNotEmpty}, expiresIn: $expiresIn, savedAt: $savedAt');
+    }
 
     final isLoggedIn = SharedPreferenceHelper.getBoolean(Preferences.is_logged_in);
 

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/color_constant.dart';
@@ -57,7 +58,7 @@ class ModernDrawer extends StatelessWidget {
                       border: Border.all(color: AyurezeTheme.healingGreen50, width: 2),
                       image: DecorationImage(
                         image: (dFullImage != null && dFullImage!.isNotEmpty)
-                            ? NetworkImage(dFullImage!)
+                            ? CachedNetworkImageProvider(dFullImage!)
                             : const AssetImage("assets/images/no_image.jpg")
                                 as ImageProvider,
                         fit: BoxFit.cover,

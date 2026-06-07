@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/models/user_chat.dart';
+import 'package:doctro/constant/oauth_config.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -62,7 +63,7 @@ class AuthProvider extends ChangeNotifier {
           .where(FirestoreConstants.id, isEqualTo: user.uid)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
+      if (documents.isEmpty) {
         firebaseFirestore
             .collection(FirestoreConstants.pathUserCollection)
             .doc(user.uid)
@@ -111,8 +112,8 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId: Platform.isIOS ? '298839588168-up4rcmclffgne2hnlemg7n4e29qtovn2.apps.googleusercontent.com' : '298839588168-6ut75u7g4rqc8grmujtcl4m7obnq3oml.apps.googleusercontent.com',
-        serverClientId: '298839588168-6ut75u7g4rqc8grmujtcl4m7obnq3oml.apps.googleusercontent.com',
+        clientId: Platform.isIOS ? OAuthConfig.iosClientId : OAuthConfig.androidClientId,
+        serverClientId: OAuthConfig.serverClientId,
         scopes: <String>[
           'email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -137,7 +138,7 @@ class AuthProvider extends ChangeNotifier {
               .where(FirestoreConstants.id, isEqualTo: user.uid)
               .get();
           final List<DocumentSnapshot> documents = result.docs;
-          if (documents.length == 0) {
+          if (documents.isEmpty) {
             firebaseFirestore
                 .collection(FirestoreConstants.pathUserCollection)
                 .doc(user.uid)
@@ -148,8 +149,9 @@ class AuthProvider extends ChangeNotifier {
               'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
               FirestoreConstants.chattingWith: null,
               FirestoreConstants.userType: "doctor", // Defaulting to doctor
-
-              FirestoreConstants.doctorId: "0" 
+              // New Google Sign-In users have no linked doctor profile yet.
+              // Profile completion flow will set this to the real doctorId.
+              FirestoreConstants.doctorId: null
             });
 
             await prefs.setString(FirestoreConstants.id, user.uid);
@@ -170,10 +172,10 @@ class AuthProvider extends ChangeNotifier {
             await prefs.setString(Preferences.doctorId, userChat.doctorId);
              
 
-             await prefs.setString(Preferences.image, userChat.photoUrl);
-             await prefs.setString(Preferences.name, userChat.nickname);
+          await prefs.setString(Preferences.image, userChat.photoUrl);
+          await prefs.setString(Preferences.name, userChat.nickname);
           }
-          SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          await SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
           _status = Status.authenticated;
           notifyListeners();
           return user;

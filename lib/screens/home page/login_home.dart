@@ -240,7 +240,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: (dFullImage != null && dFullImage!.isNotEmpty)
-                          ? NetworkImage(dFullImage!)
+                          ? CachedNetworkImageProvider(dFullImage!)
                           : const AssetImage("assets/images/no_image.jpg")
                               as ImageProvider,
                       fit: BoxFit.cover,
@@ -325,7 +325,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Hello, Dr. ${dName?.split(' ').first ?? 'Doctor'}",
+                  "Hello, Dr. ${(dName?.trim().isNotEmpty == true) ? dName!.trim().split(' ').first : 'Doctor'}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -637,7 +637,7 @@ Widget _buildAppointmentCard(dynamic app) {
         final upcomingList = response.data?.upcoming ?? <Upcoming>[];
 
         DateTime parseTimeSafe(String? value) {
-          final today = DateTime.now().toString().split(" ")[0];
+          final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
           final time = (value ?? "00:00 AM").toUpperCase();
           try {
             return DateFormat("yyyy-MM-dd h:mm a").parse("$today $time");
