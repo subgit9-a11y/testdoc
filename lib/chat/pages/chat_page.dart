@@ -551,6 +551,14 @@ class ChatPageState extends State<ChatPage> {
   }
 
   @override
+  void dispose() {
+    textEditingController.dispose();
+    listScrollController.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

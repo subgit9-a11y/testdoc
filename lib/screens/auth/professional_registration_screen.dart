@@ -398,6 +398,22 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _dobController.dispose();
+    _licenseController.dispose();
+    _educationController.dispose();
+    _experienceController.dispose();
+    _feesController.dispose();
+    _videoFeesController.dispose();
+    _descController.dispose();
+    _languageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AyurezeTheme.canvas,

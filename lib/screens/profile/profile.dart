@@ -2330,6 +2330,31 @@ class _ProfileScreen extends State<ProfileScreen> {
       setState(() => _currentStep -= 1);
     }
   }
+
+  @override
+  void dispose() {
+    _degree.dispose();
+    _college.dispose();
+    _completeYear.dispose();
+    _certificate.dispose();
+    _year.dispose();
+    _pDegree.dispose();
+    _pExperience.dispose();
+    _pStartTime.dispose();
+    _pEndTime.dispose();
+    _pTimeSlot.dispose();
+    _vAppointmentFees.dispose();
+    _aAppointmentFees.dispose();
+    _pName.dispose();
+    _pDob.dispose();
+    _pDesc.dispose();
+    _pCollege.dispose();
+    _pCollegeYear.dispose();
+    _pCertificate.dispose();
+    _pCertificateYear.dispose();
+    _pBasedOn.dispose();
+    super.dispose();
+  }
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {

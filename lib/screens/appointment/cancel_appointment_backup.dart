@@ -60,6 +60,12 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   List<AppointmentCancel> cancelAppointmentReq = [];
 
   //Set Open Drawer

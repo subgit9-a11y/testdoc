@@ -34,6 +34,12 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 
   @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AyurezeTheme.canvas,

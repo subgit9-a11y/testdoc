@@ -60,6 +60,12 @@ class _PaymentScreen extends State<PaymentScreen> {
   final List<Payments> paymentsRequest = [];
 
   @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;

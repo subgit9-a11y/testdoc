@@ -179,7 +179,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController?.dispose();
+    _days.dispose();
     super.dispose();
   }
 

@@ -46,6 +46,13 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   }
 
   @override
+  void dispose() {
+    _pinPutController.dispose();
+    _pinPutFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;

@@ -350,5 +350,24 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
     }
     return BaseModel()..data = response;
   }
+
+  @override
+  void dispose() {
+    _pDegree.dispose();
+    _pExperience.dispose();
+    _pStartTime.dispose();
+    _pEndTime.dispose();
+    _pTimeSlot.dispose();
+    _pAppointmentFees.dispose();
+    _pName.dispose();
+    _pDob.dispose();
+    _pDesc.dispose();
+    _pCollege.dispose();
+    _pCollegeYear.dispose();
+    _pCertificate.dispose();
+    _pCertificateYear.dispose();
+    _pBasedOn.dispose();
+    super.dispose();
+  }
 }
 
