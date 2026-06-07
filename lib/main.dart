@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -63,9 +64,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+StreamSubscription<RemoteMessage>? _onMessageSub;
+StreamSubscription<RemoteMessage>? _onMessageOpenedSub;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool firebaseInitialized = false;
+
+  // Guard against duplicate listeners on hot-restart in dev mode
+  await _onMessageSub?.cancel();
+  await _onMessageOpenedSub?.cancel();
+  _onMessageSub = null;
+  _onMessageOpenedSub = null;
 
   try {
     await dotenv.load(fileName: ".env");
@@ -251,7 +261,7 @@ class _MyAppState extends State<MyApp> {
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _onMessageSub = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // final RemoteNotification? notification = message.notification;
       // final AndroidNotification? android = message.notification?.android;
       // final Map<String, dynamic> dataValue = message.data;
@@ -292,7 +302,7 @@ class _MyAppState extends State<MyApp> {
       );
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _onMessageOpenedSub = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       logger.i("Notification tapped: ${message.data}");
       // Map<String, dynamic> data = message.data;
       // logger.e(data);

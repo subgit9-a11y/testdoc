@@ -288,7 +288,8 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
 
         // 6. Save Preferences & Navigate
       if (response.success == true) {
-        _savePreferences(response);
+        await _savePreferences(response);
+        if (!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -325,21 +326,23 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     }
   }
 
-  void _savePreferences(Register response) {
+  Future<void> _savePreferences(Register response) async {
     if (response.data == null) return;
     final data = response.data!;
-    
-    SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
-    SharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? "");
-    SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? "");
-    SharedPreferenceHelper.setString(Preferences.name, data.name ?? "");
-    SharedPreferenceHelper.setString(Preferences.email, data.email ?? "");
-    SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? "");
-    SharedPreferenceHelper.setString(Preferences.gender, data.gender ?? "");
-    SharedPreferenceHelper.setString(Preferences.dob, data.dob ?? "");
-    SharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? "");
-    SharedPreferenceHelper.setString(Preferences.image, data.image ?? "");
-    SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? "");
+
+    await Future.wait([
+      SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? ""),
+      SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? ""),
+      SharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SharedPreferenceHelper.setString(Preferences.gender, data.gender ?? ""),
+      SharedPreferenceHelper.setString(Preferences.dob, data.dob ?? ""),
+      SharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? ""),
+      SharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+    ]);
   }
 
   Future<void> _updateProfile(Map<String, dynamic> profileData) async {

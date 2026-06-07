@@ -196,8 +196,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
       response = await RestClient(await RetroApi().dioData(context))
           .otpVerifyRequest(body);
       if (response.success == true) {
-        _saveUserData(response);
-        
+        await _saveUserData(response);
+        if (!mounted) return;
+
         if (response.data?.isFilled == 0) {
           // New doctor or incomplete profile: Go to Professional Registration
           Navigator.pushReplacement(
@@ -245,29 +246,33 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     return BaseModel()..data = response;
   }
 
-  void _saveUserData(OtpVerify response) {
+  Future<void> _saveUserData(OtpVerify response) async {
     if (response.data == null) return;
-    
+
     final data = response.data!;
-    SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
-    SharedPreferenceHelper.setString(Preferences.name, data.name ?? "");
-    SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? "");
-    SharedPreferenceHelper.setString(Preferences.email, data.email ?? "");
-    SharedPreferenceHelper.setString(Preferences.image, data.image ?? "");
-    SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? "");
-    SharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0);
-    SharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1);
-    
+    await Future.wait([
+      SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+      SharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0),
+      SharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1),
+    ]);
+
     if (data.token != null && data.token!.isNotEmpty) {
-      SharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
+      await SharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
     }
-    
+
+    if (!mounted) return;
+
     // Notify auth provider for chat
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       authProvider.handleSignIn();
     } catch (e) {
-      debugPrint("Auth Provider notification error: $e");
+      if (kDebugMode) debugPrint("Auth Provider notification error: $e");
     }
   }
 }

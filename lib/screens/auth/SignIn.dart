@@ -322,8 +322,9 @@ class _SignInState extends State<SignIn> {
         CommonFunction.hideDialog(context);
 
         if (response.success == true && response.data != null) {
-          _saveUserData(response);
-          SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          await _saveUserData(response);
+          await SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          if (!mounted) return;
           Navigator.pushNamedAndRemoveUntil(
             context,
             'loginHome',
@@ -375,62 +376,42 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  void _saveUserData(LoginResponse response) {
-    SharedPreferenceHelper.setString(Preferences.name, response.data!.name ?? '');
-    SharedPreferenceHelper.setString(
-      Preferences.phone_no,
-      response.data!.phone ?? '',
-    );
-    SharedPreferenceHelper.setString(Preferences.email, response.data!.email ?? '');
-    SharedPreferenceHelper.setString(Preferences.image, response.data!.image ?? '');
-    SharedPreferenceHelper.setInt(
-      Preferences.is_filled,
-      response.data!.isFilled ?? 0,
-    );
+  Future<void> _saveUserData(LoginResponse response) async {
+    await Future.wait([
+      SharedPreferenceHelper.setString(Preferences.name, response.data!.name ?? ''),
+      SharedPreferenceHelper.setString(Preferences.phone_no, response.data!.phone ?? ''),
+      SharedPreferenceHelper.setString(Preferences.email, response.data!.email ?? ''),
+      SharedPreferenceHelper.setString(Preferences.image, response.data!.image ?? ''),
+      SharedPreferenceHelper.setInt(Preferences.is_filled, response.data!.isFilled ?? 0),
+    ]);
 
     if (response.token != null) {
-      SharedPreferenceHelper.setString(
-        Preferences.auth_token,
-        response.token!,
-      );
+      await SharedPreferenceHelper.setString(Preferences.auth_token, response.token!);
     }
     if (response.refreshToken != null) {
-      SharedPreferenceHelper.setString(
-        Preferences.refresh_token,
-        response.refreshToken!,
-      );
+      await SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken!);
     }
     if (response.expiresIn != null) {
-      SharedPreferenceHelper.setInt(
-        Preferences.expiresIn,
-        int.parse('${response.expiresIn}'),
-      );
-      SharedPreferenceHelper.setInt(
-        'token_saved_at',
-        DateTime.now().millisecondsSinceEpoch,
-      );
+      await Future.wait([
+        SharedPreferenceHelper.setInt(Preferences.expiresIn, int.parse('${response.expiresIn}')),
+        SharedPreferenceHelper.setInt('token_saved_at', DateTime.now().millisecondsSinceEpoch),
+      ]);
     }
     if (response.data!.subscriptionStatus == null) {
-      SharedPreferenceHelper.setInt(Preferences.subscription_status, -1);
+      await SharedPreferenceHelper.setInt(Preferences.subscription_status, -1);
     } else {
-      SharedPreferenceHelper.setInt(
+      await SharedPreferenceHelper.setInt(
         Preferences.subscription_status,
         response.data!.subscriptionStatus!,
       );
     }
-    SharedPreferenceHelper.setString(
-      Preferences.chat_profile,
-      response.data!.fullImage ?? '',
-    );
-    SharedPreferenceHelper.setString(
-      Preferences.user_name,
-      response.data!.name ?? '',
-    );
-    SharedPreferenceHelper.setString(
-      Preferences.doctorId,
-      response.data!.id.toString(),
-    );
+    await Future.wait([
+      SharedPreferenceHelper.setString(Preferences.chat_profile, response.data!.fullImage ?? ''),
+      SharedPreferenceHelper.setString(Preferences.user_name, response.data!.name ?? ''),
+      SharedPreferenceHelper.setString(Preferences.doctorId, response.data!.id.toString()),
+    ]);
 
+    if (!mounted) return;
     authProvider.handleSignIn();
   }
 
@@ -441,7 +422,7 @@ class _SignInState extends State<SignIn> {
       "device_token": SharedPreferenceHelper.getString(Preferences.messageToken)
     };
 
-    SharedPreferenceHelper.setString(Preferences.user_email, email.text);
+    await SharedPreferenceHelper.setString(Preferences.user_email, email.text);
 
     LoginResponse response;
 
@@ -452,11 +433,13 @@ class _SignInState extends State<SignIn> {
       CommonFunction.hideDialog(context);
 
       if (response.success == true) {
-        _saveUserData(response);
+        await _saveUserData(response);
+        if (!mounted) return;
         OslerToast.success(context, response.msg!);
 
         if (response.data!.verify == 0) {
           final data = OtpData(otp: response.data!.otp, id: response.data!.id);
+          if (!mounted) return;
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -464,7 +447,8 @@ class _SignInState extends State<SignIn> {
             ),
           );
         } else {
-          SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          await SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          if (!mounted) return;
           Navigator.pushReplacementNamed(context, 'loginHome');
         }
       } else {

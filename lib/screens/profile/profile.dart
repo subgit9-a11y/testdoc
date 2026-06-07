@@ -2133,8 +2133,8 @@ class _ProfileScreen extends State<ProfileScreen> {
           await RestClient(await RetroApi().dioData(context)).uploadImage(body);
       setState(() {
         msg = response.data;
-        SharedPreferenceHelper.setString(Preferences.image, response.data!);
       });
+      await SharedPreferenceHelper.setString(Preferences.image, response.data!);
     } catch (error, stacktrace) {
 
       return BaseModel()..setException(ServerError.withError(error: error));
