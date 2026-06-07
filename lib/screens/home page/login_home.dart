@@ -669,7 +669,7 @@ Widget _buildAppointmentCard(dynamic app) {
         patientCount = uniquePatients.length;
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -924,7 +924,7 @@ Widget _buildAppointmentCard(dynamic app) {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 class SupabaseService {
   SupabaseClient get _client {
@@ -75,7 +76,7 @@ class SupabaseService {
       
       return _client.storage.from('doctor-profiles').getPublicUrl(fileName);
     } catch (e) {
-      print("Supabase Signature Upload Error: $e");
+      if (kDebugMode) debugPrint("Supabase Signature Upload Error: $e");
       return null;
     }
   }
@@ -88,7 +89,7 @@ class SupabaseService {
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('unique_id', doctorId);
     } catch (e) {
-       print("Supabase DB Signature Sync Error: $e");
+      if (kDebugMode) debugPrint("Supabase DB Signature Sync Error: $e");
     }
   }
   /// Log document verification metadata in Supabase
@@ -107,7 +108,7 @@ class SupabaseService {
         'uploaded_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print("Supabase Verification Log Error: $e");
+      if (kDebugMode) debugPrint("Supabase Verification Log Error: $e");
     }
   }
 }

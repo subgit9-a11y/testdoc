@@ -7,6 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:doctro/retrofit/apis.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 /// Astra AI Healthcare API Service
 /// 
@@ -85,9 +86,11 @@ class AstraApiService {
       },
       onError: (error, handler) async {
         // Log errors for debugging
-        print('AstraAPI Error: ${error.message}');
-        print('Status Code: ${error.response?.statusCode}');
-        print('Response: ${error.response?.data}');
+        if (kDebugMode) {
+          debugPrint('AstraAPI Error: ${error.message}');
+          debugPrint('Status Code: ${error.response?.statusCode}');
+          debugPrint('Response: ${error.response?.data}');
+        }
         return handler.next(error);
       },
     ));

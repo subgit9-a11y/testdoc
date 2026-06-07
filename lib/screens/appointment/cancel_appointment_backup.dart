@@ -585,7 +585,7 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
         _userCancel.addAll(response.data!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

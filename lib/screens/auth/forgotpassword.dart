@@ -125,7 +125,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

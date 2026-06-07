@@ -1971,7 +1971,7 @@ class _ProfileScreen extends State<ProfileScreen> {
       SharedPreferenceHelper.setInt(Preferences.is_filled, 1);
       OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2098,7 +2098,7 @@ class _ProfileScreen extends State<ProfileScreen> {
 
       setState(() {});
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2117,7 +2117,7 @@ class _ProfileScreen extends State<ProfileScreen> {
       });
       await doctorProfile();
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2136,7 +2136,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         SharedPreferenceHelper.setString(Preferences.image, response.data!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2222,7 +2222,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2249,7 +2249,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2273,7 +2273,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

@@ -25,7 +25,6 @@ class PaypalServices {
       }
       return null;
     } catch (e) {
-      // print(e);
       rethrow;
     }
   }
@@ -77,7 +76,6 @@ class PaypalServices {
             'Authorization': 'Bearer ' + accessToken
           });
 
-      // print(response.body.toString());
       final body = convert.jsonDecode(response.body);
       if (response.statusCode == 200) {
         return body["id"];

@@ -602,7 +602,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                       onFinish: (number) async {
                         if (number != null && number.toString() != '') {
                           aPaymentToken = number.toString();
-                          // print(aPaymentToken);
                           purchaseSubscriptions();
                         }
                       },
@@ -722,7 +721,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         });
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -751,7 +750,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         OslerToast.success(context, getTranslated(context, AppString.payment_success).toString());
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -838,7 +837,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     aPaymentToken = response.paymentId;
-    // print(response.paymentId);
     aPaymentToken != ""
         ? purchaseSubscriptions()
         : OslerToast.error(context, getTranslated(context, AppString.payment_not_complete).toString());

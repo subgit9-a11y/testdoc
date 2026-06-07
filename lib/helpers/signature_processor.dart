@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:image/image.dart' as img;
 
 class SignatureProcessor {
@@ -35,7 +36,7 @@ class SignatureProcessor {
       // Encode as PNG to preserve transparency
       return Uint8List.fromList(img.encodePng(processed));
     } catch (e) {
-      print("Signature Processing Error: $e");
+      if (kDebugMode) debugPrint("Signature Processing Error: $e");
       return null;
     }
   }

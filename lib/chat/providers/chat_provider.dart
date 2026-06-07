@@ -103,12 +103,9 @@ class ChatProvider {
         ),
       );
       if (response.statusCode == 200) {
-        // print("sucess");
       } else {
-        // print("not send");
       }
     } catch (e) {
-      // print("error push notification");
     }
   }
 }

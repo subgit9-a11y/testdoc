@@ -6,6 +6,7 @@ import 'package:doctro/retrofit/apis.dart';
 import 'package:doctro/model/astra/astra_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 /// Legacy Astra Service - Maintained for backward compatibility
 /// 
@@ -46,7 +47,7 @@ class AstraService {
         return handler.next(options);
       },
       onError: (error, handler) {
-        print('AstraService Error: ${error.message}');
+        if (kDebugMode) debugPrint('AstraService Error: ${error.message}');
         return handler.next(error);
       },
     ));
@@ -471,7 +472,7 @@ class AstraService {
         'user_type': 'doctor',
       });
     } catch (e) {
-      print('Failed to store FCM token: $e');
+      if (kDebugMode) debugPrint('Failed to store FCM token: $e');
     }
   }
 

@@ -1132,7 +1132,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         OslerToast.success(context, response.msg!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -1152,7 +1152,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -1193,7 +1193,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         _loadAstraFillData(patientId: userId.toString(), searchPhone: phoneNo);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

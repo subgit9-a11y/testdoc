@@ -147,7 +147,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
       }
     } catch (e) {
-      print("Error fetching profile details: $e");
+      if (kDebugMode) debugPrint("Error fetching profile details: $e");
     } finally {
       setState(() => _isLoading = false);
     }

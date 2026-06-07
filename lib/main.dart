@@ -358,7 +358,6 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isAndroid) {
       final permission = await Permission.notification.request();
       if (permission.isGranted) {
-        // print('Notification permission granted');
       }
     }
   }
@@ -370,7 +369,6 @@ class _MyAppState extends State<MyApp> {
 
     if (actionId == 'accept_action') {
       // Handle accept
-      // print('Call Accepted');
       if (doctorId != null)
         navigatorKey.currentState?.pushReplacement(
           MaterialPageRoute(
@@ -385,7 +383,6 @@ class _MyAppState extends State<MyApp> {
       return;
     } else if (actionId == 'decline_action') {
       // Handle decline
-      // print('Call Declined');
       if (doctorId != null)
         navigatorKey.currentState?.pushReplacement(
           MaterialPageRoute(
@@ -524,7 +521,7 @@ class _MyAppState extends State<MyApp> {
         }
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
