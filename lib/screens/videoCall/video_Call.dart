@@ -290,10 +290,10 @@ class _VideoCallState extends State<VideoCall> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
+    _engine.leaveChannel();
+    _engine.release();
     super.dispose();
-    await _engine.leaveChannel();
-    await _engine.release();
   }
 
   @override

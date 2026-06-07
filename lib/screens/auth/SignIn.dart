@@ -86,7 +86,7 @@ class _SignInState extends State<SignIn> {
         SharedPreferenceHelper.setString(Preferences.messageToken, token);
       }
     } catch (e) {
-      debugPrint("Error getting FCM token: $e");
+      if (kDebugMode) debugPrint("Error getting FCM token: $e");
     }
   }
 
@@ -599,7 +599,7 @@ class _SignInState extends State<SignIn> {
         }
       }
     } catch (error) {
-      debugPrint("Exception in settingRequest: $error");
+      if (kDebugMode) debugPrint("Exception in settingRequest: $error");
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

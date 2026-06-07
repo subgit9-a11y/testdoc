@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -284,7 +285,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             isFaceVerified: true,
           );
         } catch (e) {
-          debugPrint("Supabase Sync Error: $e");
+          if (kDebugMode) debugPrint("Supabase Sync Error: $e");
         }
 
         // 6. Save Preferences & Navigate
@@ -308,9 +309,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       }
     } catch (e, stack) {
       if (e is DioException) {
-        debugPrint("Registration Request Data: ${e.requestOptions.data}");
-        debugPrint("Registration Error Status: ${e.response?.statusCode}");
-        debugPrint("Registration Error Response: ${e.response?.data}");
+        if (kDebugMode) {
+          debugPrint("Registration Error Status: ${e.response?.statusCode}");
+          debugPrint("Registration Error Response: ${e.response?.data}");
+        }
 
         String errorMsg = "Registration failed";
         if (e.response?.data is Map) {
@@ -318,8 +320,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
         OslerToast.error(context, errorMsg);
       } else {
-        debugPrint("Non-Dio Error during registration: $e");
-        debugPrint("Stacktrace: $stack");
+        if (kDebugMode) {
+          debugPrint("Non-Dio Error during registration: $e");
+          debugPrint("Stacktrace: $stack");
+        }
         OslerToast.error(context, "An unexpected error occurred: $e");
       }
     } finally {
@@ -379,9 +383,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       }
     } catch (e, stack) {
       if (e is DioException) {
-        debugPrint("Update Request Data: ${e.requestOptions.data}");
-        debugPrint("Update Error Status: ${e.response?.statusCode}");
-        debugPrint("Update Error Response: ${e.response?.data}");
+        if (kDebugMode) {
+          debugPrint("Update Error Status: ${e.response?.statusCode}");
+          debugPrint("Update Error Response: ${e.response?.data}");
+        }
 
         String errorMsg = "Profile update failed";
         if (e.response?.data is Map) {
@@ -389,8 +394,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
         OslerToast.error(context, errorMsg);
       } else {
-        debugPrint("Non-Dio Error during update: $e");
-        debugPrint("Stacktrace: $stack");
+        if (kDebugMode) {
+          debugPrint("Non-Dio Error during update: $e");
+          debugPrint("Stacktrace: $stack");
+        }
         OslerToast.error(context, "An error occurred: $e");
       }
     } finally {

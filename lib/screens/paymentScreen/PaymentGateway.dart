@@ -12,6 +12,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:doctro/widgets/osler_toast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -132,7 +133,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Error: $e');
+      if (kDebugMode) debugPrint('Error: $e');
     }
   }
 

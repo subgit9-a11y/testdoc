@@ -80,7 +80,7 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    debugPrint(".env not found, using compile-time environment values.");
+    if (kDebugMode) debugPrint(".env not found, using compile-time environment values.");
   }
 
   String? getEnvSafe(String key) {
@@ -103,10 +103,10 @@ Future<void> main() async {
         anonKey: supabaseAnonKey,
       );
     } catch (e) {
-      debugPrint("Supabase initialization failed: $e");
+      if (kDebugMode) debugPrint("Supabase initialization failed: $e");
     }
   } else {
-    debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
+    if (kDebugMode) debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
   }
   
   // Use a safer initialization sequence
@@ -115,7 +115,7 @@ Future<void> main() async {
     _prefs = await SharedPreferences.getInstance();
     await SharedPreferenceHelper.init();
   } catch (e) {
-    debugPrint("Failed to initialize preferences: $e");
+    if (kDebugMode) debugPrint("Failed to initialize preferences: $e");
   }
 
   // Initialize Firebase but don't let it hang the whole app
@@ -125,10 +125,10 @@ Future<void> main() async {
     
     // Subscribe to topic in background, don't await it
     FirebaseMessaging.instance.subscribeToTopic("all").catchError((e) {
-      debugPrint("Failed to subscribe to topic: $e");
+      if (kDebugMode) debugPrint("Failed to subscribe to topic: $e");
     });
   } catch (e) {
-    debugPrint("Firebase initialization failed: $e");
+    if (kDebugMode) debugPrint("Firebase initialization failed: $e");
   }
 
   if (kDebugMode) {
@@ -139,12 +139,12 @@ Future<void> main() async {
     try {
       await SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
     } catch (e) {
-      debugPrint("Failed to store device platform: $e");
+      if (kDebugMode) debugPrint("Failed to store device platform: $e");
     }
   }
 
   if (_prefs == null) {
-    debugPrint("CRITICAL: SharedPreferences failed to initialize. Starting with empty prefs.");
+    if (kDebugMode) debugPrint("CRITICAL: SharedPreferences failed to initialize. Starting with empty prefs.");
     // Ideally we should show an error screen, but for now we'll try to continue
     _prefs = await SharedPreferences.getInstance(); 
   }
