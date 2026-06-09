@@ -82,11 +82,15 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     for (final format in formats) {
       try {
         return format.parseStrict(value);
-      } catch (_) {}
+      } catch (e) {
+        if (kDebugMode) debugPrint('DateFormat parse failed for $value: $e');
+      }
     }
     try {
       return DateTime.parse(value);
-    } catch (_) {
+    } catch (e) {
+      if (kDebugMode) debugPrint('DateTime.parse fallback failed for $value: $e');
+    }
       return null;
     }
   }

@@ -1,6 +1,7 @@
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/main.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 class SessionService {
@@ -15,7 +16,9 @@ class SessionService {
     try {
       SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, false);
       SharedPreferenceHelper.clearPref();
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('SessionService clearPref failed: $e');
+    }
 
     final nav = navigatorKey.currentState;
     if (nav != null) {

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
+import 'package:flutter/foundation.dart' show FlutterError;
+import 'package:flutter/widgets.dart' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
@@ -148,6 +150,23 @@ Future<void> main() async {
     // Ideally we should show an error screen, but for now we'll try to continue
     _prefs = await SharedPreferences.getInstance(); 
   }
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      debugPrint('FlutterError: ${details.exception}');
+      debugPrint('Stack: ${details.stack}');
+    }
+    logger.e(details.exception, details.stack);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (kDebugMode) {
+      debugPrint('AsyncError: $error');
+      debugPrint('Stack: $stack');
+    }
+    logger.e(error, stack);
+    return true;
+  };
 
   runApp(MyApp(prefs: _prefs!, firebaseInitialized: firebaseInitialized));
 }

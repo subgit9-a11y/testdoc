@@ -2063,12 +2063,14 @@ class _ProfileScreen extends State<ProfileScreen> {
              DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(rawDob);
              _pDob.text = DateFormat('dd-MM-yyyy').format(parsedDate);
              _selectedDate = parsedDate;
-          } else {
-             _pDob.text = rawDob;
-             try {
-                _selectedDate = DateFormat('dd-MM-yyyy').parse(rawDob);
-             } catch (e) {}
-          }
+           } else {
+              _pDob.text = rawDob;
+              try {
+                 _selectedDate = DateFormat('dd-MM-yyyy').parse(rawDob);
+              } catch (e) {
+                if (kDebugMode) debugPrint('DateFormat dd-MM-yyyy parse failed for $rawDob: $e');
+              }
+            }
         } catch (e) {
           _pDob.text = rawDob;
         }
