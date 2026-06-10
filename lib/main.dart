@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/helpers/logger.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/helpers/notification.dart' show NotificationHandler;
 import 'package:doctro/localization/language_localization.dart';
 import 'package:doctro/model/setting.dart';
@@ -116,6 +117,7 @@ Future<void> main() async {
   try {
     _prefs = await SharedPreferences.getInstance();
     await SharedPreferenceHelper.init();
+    await SecureSharedPreferenceHelper.init();
   } catch (e) {
     if (kDebugMode) debugPrint("Failed to initialize preferences: $e");
   }

@@ -45,6 +45,7 @@ dependencies:
   retrofit: ^4.0.1
   country_picker: ^2.0.19
   shared_preferences: ^2.0.15
+  flutter_secure_storage: ^9.2.2
 #  fluttertoast: ^8.1.2
   fluttertoast: ^8.2.12
 #  pinput: ^3.0.1
@@ -100,6 +101,7 @@ dependencies:
   image: ^4.2.0
   minio: ^3.5.8
   flutter_dotenv: ^5.2.1
+  geolocator: ^14.0.2
 
   
 

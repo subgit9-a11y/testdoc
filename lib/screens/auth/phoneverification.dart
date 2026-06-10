@@ -16,6 +16,7 @@ import 'package:doctro/chat/providers/auth_provider.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
@@ -258,18 +259,18 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
     final data = response.data!;
     await Future.wait([
-      SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
-      SharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
-      SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
-      SharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
-      SharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
-      SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
-      SharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0),
-      SharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1),
+      SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SecureSharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+      SecureSharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0),
+      SecureSharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1),
     ]);
 
     if (data.token != null && data.token!.isNotEmpty) {
-      await SharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
+      await SecureSharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
     }
 
     if (!mounted) return;

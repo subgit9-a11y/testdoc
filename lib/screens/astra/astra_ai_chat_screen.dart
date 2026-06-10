@@ -4,6 +4,8 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:doctro/services/astra_api_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:doctro/model/astra/ai_response_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -120,8 +122,24 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               })
           .toList();
 
-      Map<String, dynamic> response;
-      
+      // Prepare base metadata
+      final Map<String, dynamic> baseMetadata = {
+        'role': 'doctor',
+        'precise': true // Request precise clinical response
+      };
+
+      // Try fetching live GPS coordinates to feed the MCP weather tool
+      try {
+        if (await Permission.location.isGranted) {
+          final position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.low);
+          baseMetadata['latitude'] = position.latitude;
+          baseMetadata['longitude'] = position.longitude;
+        }
+      } catch (_) {
+        // Silently proceed if location fails so chat isn't blocked
+      }
+
       if (voicePath != null) {
         // Handle voice processing
         if (mounted) {
@@ -138,47 +156,63 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         final voiceResponse = await _apiService.processVoice(File(voicePath), effectiveUserId);
         String extractedText = voiceResponse['text'] ?? "Voice processed successfully.";
         
-        response = await _apiService.brainChat({
+        final response = await _apiService.brainChat({
           'q': extractedText,
           'user_id': effectiveUserId,
           'session_id': _sessionId,
           'history': history,
           'user_metadata': {
-            'role': 'doctor', 
+            ...baseMetadata,
             'source': 'voice',
-            'precise': true // Request precise clinical response
           }
         });
+        final aiResponse = AIChatResponse.fromJson(response);
+        if (aiResponse.sessionId != null) _sessionId = aiResponse.sessionId;
+        if (mounted) {
+          setState(() {
+            _messages.add(ChatMessage(
+              text: aiResponse.response ?? "I apologize, I couldn't process that request.",
+              isMe: false,
+              time: DateTime.now(),
+            ));
+            _isLoading = false;
+          });
+        }
       } else {
-        // Regular text chat
-        response = await _apiService.brainChat({
+        // Regular text chat via SSE STREAM!
+        int aiMessageIndex = _messages.length;
+        if (mounted) {
+          setState(() {
+            _messages.add(ChatMessage(
+              text: "", // Empty initial text
+              isMe: false,
+              time: DateTime.now(),
+            ));
+            _isLoading = false; // We start getting data immediately
+          });
+        }
+
+        final stream = _apiService.brainChatStream({
           'q': message,
           'user_id': effectiveUserId,
           'session_id': _sessionId,
           'history': history,
-          'user_metadata': {
-            'role': 'doctor',
-            'precise': true // Request precise clinical response
+          'user_metadata': baseMetadata
+        });
+
+        await for (String chunk in stream) {
+          if (mounted) {
+            setState(() {
+              // Append chunk to the existing AI message
+              _messages[aiMessageIndex] = ChatMessage(
+                text: _messages[aiMessageIndex].text + chunk,
+                isMe: false,
+                time: _messages[aiMessageIndex].time,
+              );
+            });
+            _scrollToBottom();
           }
-        });
-      }
-
-      final aiResponse = AIChatResponse.fromJson(response);
-      
-      // Store session ID for memory
-      if (aiResponse.sessionId != null) {
-        _sessionId = aiResponse.sessionId;
-      }
-
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-            text: aiResponse.response ?? "I apologize, I couldn't process that request.",
-            isMe: false,
-            time: DateTime.now(),
-          ));
-          _isLoading = false;
-        });
+        }
       }
     } catch (e) {
       final String errorText = e.toString();

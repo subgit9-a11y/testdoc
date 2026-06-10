@@ -9,6 +9,7 @@ import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/constant/common_function.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/model/login.dart';
 import 'package:doctro/model/otp_verify.dart';
@@ -66,7 +67,7 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
     if (Platform.isAndroid) {
-      SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
+      SecureSharedPreferenceHelper.setString(Preferences.device_platform, "Android");
     }
     settingRequest();
     getToken();
@@ -83,7 +84,7 @@ class _SignInState extends State<SignIn> {
     try {
       String? token = await FirebaseMessaging.instance.getToken();
       if (token != null && token.isNotEmpty) {
-        SharedPreferenceHelper.setString(Preferences.messageToken, token);
+        await SecureSharedPreferenceHelper.setString(Preferences.messageToken, token);
       }
     } catch (e) {
       if (kDebugMode) debugPrint("Error getting FCM token: $e");
@@ -312,7 +313,7 @@ class _SignInState extends State<SignIn> {
           "email": user.email,
           "password": "GOOGLE_USER_AUTH",
           "device_token":
-              SharedPreferenceHelper.getString(Preferences.messageToken)
+              await SecureSharedPreferenceHelper.getString(Preferences.messageToken)
         };
 
         final response =
@@ -323,7 +324,7 @@ class _SignInState extends State<SignIn> {
 
         if (response.success == true && response.data != null) {
           await _saveUserData(response);
-          await SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          await SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
           if (!mounted) return;
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -378,37 +379,37 @@ class _SignInState extends State<SignIn> {
 
   Future<void> _saveUserData(LoginResponse response) async {
     await Future.wait([
-      SharedPreferenceHelper.setString(Preferences.name, response.data!.name ?? ''),
-      SharedPreferenceHelper.setString(Preferences.phone_no, response.data!.phone ?? ''),
-      SharedPreferenceHelper.setString(Preferences.email, response.data!.email ?? ''),
-      SharedPreferenceHelper.setString(Preferences.image, response.data!.image ?? ''),
-      SharedPreferenceHelper.setInt(Preferences.is_filled, response.data!.isFilled ?? 0),
+      SecureSharedPreferenceHelper.setString(Preferences.name, response.data!.name ?? ''),
+      SecureSharedPreferenceHelper.setString(Preferences.phone_no, response.data!.phone ?? ''),
+      SecureSharedPreferenceHelper.setString(Preferences.email, response.data!.email ?? ''),
+      SecureSharedPreferenceHelper.setString(Preferences.image, response.data!.image ?? ''),
+      SecureSharedPreferenceHelper.setInt(Preferences.is_filled, response.data!.isFilled ?? 0),
     ]);
 
     if (response.token != null) {
-      await SharedPreferenceHelper.setString(Preferences.auth_token, response.token!);
+      await SecureSharedPreferenceHelper.setString(Preferences.auth_token, response.token!);
     }
     if (response.refreshToken != null) {
-      await SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken!);
+      await SecureSharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken!);
     }
     if (response.expiresIn != null) {
       await Future.wait([
-        SharedPreferenceHelper.setInt(Preferences.expiresIn, int.parse('${response.expiresIn}')),
-        SharedPreferenceHelper.setInt('token_saved_at', DateTime.now().millisecondsSinceEpoch),
+        SecureSharedPreferenceHelper.setInt(Preferences.expiresIn, int.parse('${response.expiresIn}')),
+        SecureSharedPreferenceHelper.setInt('token_saved_at', DateTime.now().millisecondsSinceEpoch),
       ]);
     }
     if (response.data!.subscriptionStatus == null) {
-      await SharedPreferenceHelper.setInt(Preferences.subscription_status, -1);
+      await SecureSharedPreferenceHelper.setInt(Preferences.subscription_status, -1);
     } else {
-      await SharedPreferenceHelper.setInt(
+      await SecureSharedPreferenceHelper.setInt(
         Preferences.subscription_status,
         response.data!.subscriptionStatus!,
       );
     }
     await Future.wait([
-      SharedPreferenceHelper.setString(Preferences.chat_profile, response.data!.fullImage ?? ''),
-      SharedPreferenceHelper.setString(Preferences.user_name, response.data!.name ?? ''),
-      SharedPreferenceHelper.setString(Preferences.doctorId, response.data!.id.toString()),
+      SecureSharedPreferenceHelper.setString(Preferences.chat_profile, response.data!.fullImage ?? ''),
+      SecureSharedPreferenceHelper.setString(Preferences.user_name, response.data!.name ?? ''),
+      SecureSharedPreferenceHelper.setString(Preferences.doctorId, response.data!.id.toString()),
     ]);
 
     if (!mounted) return;
@@ -419,10 +420,10 @@ class _SignInState extends State<SignIn> {
     Map<String, dynamic> body = {
       "email": email.text,
       "password": password.text,
-      "device_token": SharedPreferenceHelper.getString(Preferences.messageToken)
+      "device_token": await SecureSharedPreferenceHelper.getString(Preferences.messageToken)
     };
 
-    await SharedPreferenceHelper.setString(Preferences.user_email, email.text);
+    await SecureSharedPreferenceHelper.setString(Preferences.user_email, email.text);
 
     LoginResponse response;
 
@@ -447,7 +448,7 @@ class _SignInState extends State<SignIn> {
             ),
           );
         } else {
-          await SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
+          await SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
           if (!mounted) return;
           Navigator.pushReplacementNamed(context, 'loginHome');
         }
@@ -481,86 +482,86 @@ class _SignInState extends State<SignIn> {
       response =
           await RestClient(await RetroApi2().dioData2()).settingRequest();
 
-      if (SharedPreferenceHelper.getBoolean(Preferences.is_logged_in) == true) {
+      if (await SecureSharedPreferenceHelper.getBoolean(Preferences.is_logged_in) == true) {
         if (response.data!.stripeSecretKey != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.stripeSecretKey,
             response.data!.stripeSecretKey!,
           );
         }
 
         if (response.data!.stripePublicKey != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.stripPublicKey,
             response.data!.stripePublicKey!,
           );
         }
 
         if (response.data!.flutterwaveEncryptionKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.flutterWave_encryption_key,
             response.data!.flutterwaveEncryptionKey!,
           );
         }
 
         if (response.data!.flutterwaveKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.flutterWave_key,
             response.data!.flutterwaveKey!,
           );
         }
 
         if (response.data!.paystackPublicKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.payStack_public_key,
             response.data!.paystackPublicKey!,
           );
         }
 
         if (response.data!.razorKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.razor_key,
             response.data!.razorKey!,
           );
         }
 
         if (response.data!.paypalProducationKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.payPal_production_key,
             response.data!.paypalProducationKey!,
           );
         }
 
         if (response.data!.paypalSandboxKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.payPal_sandbox_key,
             response.data!.paypalSandboxKey!,
           );
         }
 
         if (response.data!.paypalClientId != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.paypal_client_key,
             response.data!.paypalClientId!,
           );
         }
 
         if (response.data!.paypalSecretKey != null) {
-          SharedPreferenceHelper.setString(
+          SecureSharedPreferenceHelper.setString(
             Preferences.paypal_secret_key,
             response.data!.paypalSecretKey!,
           );
         }
 
         if (response.data!.currencySymbol != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.currency_symbol,
             response.data!.currencySymbol!,
           );
         }
 
         if (response.data!.currencyCode != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.currency_code,
             response.data!.currencyCode!,
           );
@@ -568,7 +569,7 @@ class _SignInState extends State<SignIn> {
 
         if (response.data!.doctorAppId != null) {
           setState(() {
-            SharedPreferenceHelper.setString(
+            SecureSharedPreferenceHelper.setString(
               Preferences.doctorAppId,
               response.data!.doctorAppId!,
             );
@@ -576,14 +577,14 @@ class _SignInState extends State<SignIn> {
         }
       } else {
         if (response.data!.currencySymbol != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.currency_symbol,
             response.data!.currencySymbol!,
           );
         }
 
         if (response.data!.currencyCode != null) {
-          SharedPreferenceHelper.setString(
+          await SecureSharedPreferenceHelper.setString(
             Preferences.currency_code,
             response.data!.currencyCode!,
           );
@@ -591,7 +592,7 @@ class _SignInState extends State<SignIn> {
 
         if (response.data!.doctorAppId != null) {
           setState(() {
-            SharedPreferenceHelper.setString(
+            SecureSharedPreferenceHelper.setString(
               Preferences.doctorAppId,
               response.data!.doctorAppId!,
             );

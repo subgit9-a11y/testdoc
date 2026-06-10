@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/services/session_service.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,16 +18,16 @@ class RetroApi {
     dio.options.connectTimeout = const Duration(seconds: 30);
     dio.options.receiveTimeout = const Duration(seconds: 30);
 
-    final token = SharedPreferenceHelper.getString(Preferences.auth_token);
+    final token = await SecureSharedPreferenceHelper.getString(Preferences.auth_token);
     final refreshToken =
-        SharedPreferenceHelper.getString(Preferences.refresh_token);
-    final expiresIn = SharedPreferenceHelper.getInt(Preferences.expiresIn);
-    final savedAt = SharedPreferenceHelper.getInt('token_saved_at');
+        await SecureSharedPreferenceHelper.getString(Preferences.refresh_token);
+    final expiresIn = await SecureSharedPreferenceHelper.getInt(Preferences.expiresIn);
+    final savedAt = await SecureSharedPreferenceHelper.getInt('token_saved_at');
     if (kDebugMode) {
       logger.w('token present: ${token != 'N_A' && token.isNotEmpty}, expiresIn: $expiresIn, savedAt: $savedAt');
     }
 
-    final isLoggedIn = SharedPreferenceHelper.getBoolean(Preferences.is_logged_in);
+    final isLoggedIn = await SecureSharedPreferenceHelper.getBoolean(Preferences.is_logged_in);
 
     if (token != 'N_A' && token.isNotEmpty) {
       dio.options.headers["Authorization"] = "Bearer $token";
@@ -47,10 +48,10 @@ class RetroApi {
               requestOptions.path.contains('login') ||
               requestOptions.path.contains('setting');
 
-          if (status == 401 && isLoggedIn && !isAuthPath) {
+           if (status == 401 && isLoggedIn && !isAuthPath) {
             try {
               final savedRefreshToken =
-                  SharedPreferenceHelper.getString(Preferences.refresh_token);
+                  await SecureSharedPreferenceHelper.getString(Preferences.refresh_token);
 
               if (savedRefreshToken == 'N_A' || savedRefreshToken.isEmpty) {
                 await SessionService.handleSessionExpired();
@@ -112,19 +113,19 @@ class RetroApi {
         options: Options(contentType: Headers.formUrlEncodedContentType),
       );
 
-      if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
         final data = response.data;
         final newIdToken = data['id_token'];
         final newRefreshToken = data['refresh_token'];
         final newExpiresIn = int.parse(data['expires_in']);
 
-        await SharedPreferenceHelper.setString(
+        await SecureSharedPreferenceHelper.setString(
             Preferences.auth_token, newIdToken);
-        await SharedPreferenceHelper.setString(
+        await SecureSharedPreferenceHelper.setString(
             Preferences.refresh_token, newRefreshToken);
-        await SharedPreferenceHelper.setInt(
+        await SecureSharedPreferenceHelper.setInt(
             Preferences.expiresIn, newExpiresIn);
-        await SharedPreferenceHelper.setInt(
+        await SecureSharedPreferenceHelper.setInt(
             'token_saved_at', DateTime.now().millisecondsSinceEpoch);
 
         return newIdToken;

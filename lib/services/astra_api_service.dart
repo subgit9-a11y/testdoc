@@ -7,7 +7,6 @@ import 'package:http_parser/http_parser.dart';
 import 'package:doctro/retrofit/apis.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 /// Astra AI Healthcare API Service
 /// 
@@ -86,11 +85,9 @@ class AstraApiService {
       },
       onError: (error, handler) async {
         // Log errors for debugging
-        if (kDebugMode) {
-          debugPrint('AstraAPI Error: ${error.message}');
-          debugPrint('Status Code: ${error.response?.statusCode}');
-          debugPrint('Response: ${error.response?.data}');
-        }
+        print('AstraAPI Error: ${error.message}');
+        print('Status Code: ${error.response?.statusCode}');
+        print('Response: ${error.response?.data}');
         return handler.next(error);
       },
     ));
@@ -558,6 +555,53 @@ class AstraApiService {
     }
   }
 
+  /// Get ALL Shopify products (for debugging)
+  Future<Map<String, dynamic>> getAllShopifyProducts() async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/products/all');
+      List products = _extractProducts(response.data);
+      return {'success': true, 'products': products, 'count': products.length};
+    } catch (e) {
+      try {
+        final response = await _dio.get('/api/v1/shopify/products');
+        List products = _extractProducts(response.data);
+        return {'success': true, 'products': products, 'count': products.length};
+      } catch (e2) {
+        return {'success': false, 'error': e2.toString()};
+      }
+    }
+  }
+
+  /// Get Shopify store info
+  Future<Map<String, dynamic>> getShopifyStoreInfo() async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/store-info');
+      return response.data;
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Get draft order status
+  Future<Map<String, dynamic>> getDraftOrderStatus(String draftOrderId) async {
+    try {
+      final response = await _dio.get('/api/v1/shopify/draft-order/$draftOrderId');
+      return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// Validate prescription only (without creating order)
+  Future<Map<String, dynamic>> validatePrescription(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post('/api/v1/shopify/validate-prescription', data: data);
+      return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // ============================================================
   // ASTRA BRAIN AI ENDPOINTS
   // ============================================================
@@ -575,6 +619,34 @@ class AstraApiService {
       
       final response = await _postWithDnsFallback(Apis.astra_brain_chat, data: data);
       return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// General AI Chat with Astra Brain (Streaming)
+  Stream<String> brainChatStream(Map<String, dynamic> data) async* {
+    try {
+      if (data['user_metadata'] == null) {
+        data['user_metadata'] = {'role': 'doctor'};
+      } else if (data['user_metadata'] is Map && data['user_metadata']['role'] == null) {
+        data['user_metadata']['role'] = 'doctor';
+      }
+      
+      final response = await _postWithDnsFallback(
+        Apis.astra_brain_chat, 
+        data: data,
+        options: Options(responseType: ResponseType.stream),
+      );
+
+      final stream = response.data.stream;
+      
+      await for (var chunk in stream) {
+        if (chunk is List<int>) {
+           String text = String.fromCharCodes(chunk);
+           yield text;
+        }
+      }
     } catch (e) {
       throw _handleError(e);
     }
@@ -1093,12 +1165,12 @@ class AstraApiService {
         text.contains('timed out');
   }
 
-  Future<Response<dynamic>> _postWithDnsFallback(String path, {dynamic data}) async {
+  Future<Response<dynamic>> _postWithDnsFallback(String path, {dynamic data, Options? options}) async {
     try {
-      return await _dio.post(path, data: data);
+      return await _dio.post(path, data: data, options: options);
     } on DioException catch (e) {
       if (!_isConnectionLevelError(e)) rethrow;
-      return await _postViaIpv4(path, data: data);
+      return await _postViaIpv4(path, data: data, options: options);
     }
   }
 
@@ -1111,9 +1183,9 @@ class AstraApiService {
     }
   }
 
-  Future<Response<dynamic>> _postViaIpv4(String path, {dynamic data}) async {
+  Future<Response<dynamic>> _postViaIpv4(String path, {dynamic data, Options? options}) async {
     final dio = await _createIpv4Dio();
-    return dio.post(path, data: data);
+    return dio.post(path, data: data, options: options);
   }
 
   Future<Response<dynamic>> _getViaIpv4(String path) async {

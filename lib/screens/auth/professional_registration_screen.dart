@@ -16,6 +16,7 @@ import 'package:doctro/screens/auth/registration_success_screen.dart';
 import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/model/register.dart';
 import 'package:intl/intl.dart';
 
@@ -340,26 +341,26 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     final data = response.data!;
 
     await Future.wait([
-      SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
-      SharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? ""),
-      SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? ""),
-      SharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
-      SharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
-      SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
-      SharedPreferenceHelper.setString(Preferences.gender, data.gender ?? ""),
-      SharedPreferenceHelper.setString(Preferences.dob, data.dob ?? ""),
-      SharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? ""),
-      SharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
-      SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+      SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SecureSharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.gender, data.gender ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.dob, data.dob ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
     ]);
   }
 
   Future<void> _updateProfile(Map<String, dynamic> profileData) async {
     setState(() => _isLoading = true);
     try {
-      String doctorId = SharedPreferenceHelper.getString(Preferences.uniqueId);
+      String doctorId = await SecureSharedPreferenceHelper.getString(Preferences.uniqueId);
       if (doctorId == 'N_A' || doctorId.isEmpty) {
-        doctorId = SharedPreferenceHelper.getString(Preferences.doctorId);
+        doctorId = await SecureSharedPreferenceHelper.getString(Preferences.doctorId);
       }
       
       String? certUrl = _existingCertificateUrl;
