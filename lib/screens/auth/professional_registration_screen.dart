@@ -9,6 +9,7 @@ import 'package:doctro/constant/color_constant.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_toast.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:image_picker/image_picker.dart';

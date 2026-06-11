@@ -206,7 +206,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           .otpVerifyRequest(body);
       if (response.success == true) {
         await _saveUserData(response);
-        if (!mounted) return;
+        if (!mounted) return BaseModel();
 
         if (response.data?.isFilled == 0) {
           // New doctor or incomplete profile: Go to Professional Registration

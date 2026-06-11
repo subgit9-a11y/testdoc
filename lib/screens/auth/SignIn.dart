@@ -436,12 +436,12 @@ class _SignInState extends State<SignIn> {
 
       if (response.success == true) {
         await _saveUserData(response);
-        if (!mounted) return;
+        if (!mounted) return BaseModel();
         OslerToast.success(context, response.msg!);
 
         if (response.data!.verify == 0) {
           final data = OtpData(otp: response.data!.otp, id: response.data!.id);
-          if (!mounted) return;
+          if (!mounted) return BaseModel();
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -450,7 +450,7 @@ class _SignInState extends State<SignIn> {
           );
         } else {
           await SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
-          if (!mounted) return;
+          if (!mounted) return BaseModel();
           Navigator.pushReplacementNamed(context, 'loginHome');
         }
       } else {
