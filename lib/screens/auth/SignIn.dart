@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
 import 'package:doctro/chat/providers/auth_provider.dart' as chat;

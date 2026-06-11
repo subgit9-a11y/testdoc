@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';

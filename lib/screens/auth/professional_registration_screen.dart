@@ -92,8 +92,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     } catch (e) {
       if (kDebugMode) debugPrint('DateTime.parse fallback failed for $value: $e');
     }
-      return null;
-    }
+    return null;
   }
 
   @override

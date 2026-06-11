@@ -15,7 +15,7 @@ class SecureStorageHelper {
 
   static SharedPreferences? _prefs;
 
-  static const Set<String> _secureKeys = {
+  static const Set<String> secureKeys = {
     Preferences.auth_token,
     Preferences.refresh_token,
     Preferences.expiresIn,
@@ -44,7 +44,7 @@ class SecureStorageHelper {
     if (kDebugMode) debugPrint('SecureStorageHelper initialized');
   }
 
-  static bool _isSecureKey(String key) => _secureKeys.contains(key);
+  static bool _isSecureKey(String key) => secureKeys.contains(key);
 
   static Future<void> _ensurePrefs() async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -159,7 +159,7 @@ class SecureStorageHelper {
   }
 
   static Future<void> clearSecureOnly() async {
-    for (final key in _secureKeys) {
+    for (final key in secureKeys) {
       await _secureStorage.delete(key: key);
     }
   }

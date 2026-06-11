@@ -6,7 +6,7 @@ import 'package:doctro/constant/preferences.dart';
 /// flutter_secure_storage for sensitive keys and SharedPreferences for others.
 /// For secure keys, writes to BOTH storages so synchronous reads still work.
 class SecureSharedPreferenceHelper {
-  static const Set<String> _secureKeys = SecureStorageHelper._secureKeys;
+  static const Set<String> _secureKeys = SecureStorageHelper.secureKeys;
 
   static Future<void> init() async {
     await SecureStorageHelper.init();

@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:flutter/foundation.dart' show FlutterError;
-import 'package:flutter/widgets.dart' show PlatformDispatcher;
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
@@ -158,7 +158,7 @@ Future<void> main() async {
       debugPrint('FlutterError: ${details.exception}');
       debugPrint('Stack: ${details.stack}');
     }
-    logger.e(details.exception, details.stack);
+    logger.e("FlutterError", error: details.exception, stackTrace: details.stack);
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -166,7 +166,7 @@ Future<void> main() async {
       debugPrint('AsyncError: $error');
       debugPrint('Stack: $stack');
     }
-    logger.e(error, stack);
+    logger.e("AsyncError", error: error, stackTrace: stack);
     return true;
   };
 
