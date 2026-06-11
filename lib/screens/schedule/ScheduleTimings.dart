@@ -461,7 +461,7 @@ actions: <Widget>[
         workingReq.addAll(response.data!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -490,7 +490,7 @@ actions: <Widget>[
       doctorWorkingHoursFunction();
       OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doctro/chat/constants/colors.dart';
 import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/models/message_chat.dart';
@@ -256,8 +257,8 @@ class ChatPageState extends State<ChatPage> {
                     ? Container(
                         child: OutlinedButton(
                           child: Material(
-                            child: Image.network(
-                              messageChat.content,
+                            child: Image(
+                              image: CachedNetworkImageProvider(messageChat.content),
                               loadingBuilder: (BuildContext context,
                                   Widget child,
                                   ImageChunkEvent? loadingProgress) {
@@ -352,8 +353,8 @@ class ChatPageState extends State<ChatPage> {
                 children: <Widget>[
                   isLastMessageLeft(index)
                       ? Material(
-                          child: Image.network(
-                            peerAvatar,
+                          child: Image(
+                            image: CachedNetworkImageProvider(peerAvatar),
                             loadingBuilder: (BuildContext context, Widget child,
                                 ImageChunkEvent? loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -404,8 +405,8 @@ class ChatPageState extends State<ChatPage> {
                           ? Container(
                               child: TextButton(
                                 child: Material(
-                                  child: Image.network(
-                                    messageChat.content,
+                                  child: Image(
+                                    image: CachedNetworkImageProvider(messageChat.content),
                                     loadingBuilder: (BuildContext context,
                                         Widget child,
                                         ImageChunkEvent? loadingProgress) {
@@ -548,6 +549,14 @@ class ChatPageState extends State<ChatPage> {
                     chat: "chat",
                   )));
     }
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    listScrollController.dispose();
+    focusNode.dispose();
+    super.dispose();
   }
 
   @override

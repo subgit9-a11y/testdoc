@@ -17,6 +17,7 @@ import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_toast.dart';
+import 'package:doctro/main.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -70,13 +71,13 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     gender = [
-      getTranslated(context, AppString.gender_male).toString(),
-      getTranslated(context, AppString.gender_female).toString(),
+      getTranslated(context, AppString.gender_male),
+      getTranslated(context, AppString.gender_female),
     ];
 
     popular = [
-      getTranslated(context, AppString.popular_yes).toString(),
-      getTranslated(context, AppString.popular_no).toString(),
+      getTranslated(context, AppString.popular_yes),
+      getTranslated(context, AppString.popular_no),
     ];
   }
 
@@ -106,7 +107,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          getTranslated(context, AppString.chang_language).toString(),
+          getTranslated(context, AppString.chang_language),
           style: TextStyle(
             color: AyurezeTheme.textPrimary,
             fontSize: 20,
@@ -134,18 +135,20 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                 children: [
                   _buildHero(),
                   const SizedBox(height: 18),
-                  ...List.generate(Language.languageList().length, (index) {
-                    value = Language.languageList()[index].languageCode ==
-                            SharedPreferenceHelper.getString(
-                                Preferences.current_language_code)
-                        ? index
-                        : null;
-                    if (SharedPreferenceHelper.getString(
-                            Preferences.current_language_code) ==
-                        'N_A') {
+                  ...(() {
+                    final currentLanguageCode =
+                        SharedPreferenceHelper.getString(Preferences.current_language_code);
+                    value = currentLanguageCode == 'N_A'
+                        ? 0
+                        : Language.languageList().indexWhere(
+                            (lang) => lang.languageCode == currentLanguageCode,
+                          );
+                    if (value == -1) {
                       value = 0;
                     }
-
+                    return <Widget>[];
+                  })(),
+                  ...List.generate(Language.languageList().length, (index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Container(
@@ -154,27 +157,26 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                           value: index,
                           controlAffinity: ListTileControlAffinity.trailing,
                           groupValue: value,
-                          activeColor: AyurezeTheme.forestDeep,
-                          onChanged: (dynamic selected) async {
-                            Future.delayed(const Duration(seconds: 1), () async {
-                              value = selected;
-                              Locale local = await setLocale(
-                                Language.languageList()[index].languageCode,
-                              );
-                              setState(() {
-                                SharedPreferenceHelper.setString(
-                                  Preferences.current_language_code,
-                                  Language.languageList()[index].languageCode,
-                                );
-                                SharedPreferenceHelper.setString(
-                                  Preferences.language_name,
-                                  Language.languageList()[index].name,
-                                );
-                                updateProfile();
-                                Navigator.popAndPushNamed(context, "loginHome");
-                              });
-                            });
-                          },
+                           activeColor: AyurezeTheme.forestDeep,
+                           onChanged: (dynamic selected) async {
+                             final int selectedIndex = selected as int;
+                             final selectedLanguage = Language.languageList()[selectedIndex];
+                             value = selectedIndex;
+                             final Locale local = await setLocale(selectedLanguage.languageCode);
+                             if (!mounted) return;
+                             setState(() {});
+                             MyApp.setLocale(context, local);
+                             await SharedPreferenceHelper.setString(
+                               Preferences.current_language_code,
+                               selectedLanguage.languageCode,
+                             );
+                             await SharedPreferenceHelper.setString(
+                               Preferences.language_name,
+                               selectedLanguage.name,
+                             );
+                             if (!mounted) return;
+                             Navigator.pushReplacementNamed(context, "loginHome");
+                           },
                           title: Text(
                             Language.languageList()[index].name,
                             style: TextStyle(
@@ -347,6 +349,25 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
+  }
+
+  @override
+  void dispose() {
+    _pDegree.dispose();
+    _pExperience.dispose();
+    _pStartTime.dispose();
+    _pEndTime.dispose();
+    _pTimeSlot.dispose();
+    _pAppointmentFees.dispose();
+    _pName.dispose();
+    _pDob.dispose();
+    _pDesc.dispose();
+    _pCollege.dispose();
+    _pCollegeYear.dispose();
+    _pCertificate.dispose();
+    _pCertificateYear.dispose();
+    _pBasedOn.dispose();
+    super.dispose();
   }
 }
 

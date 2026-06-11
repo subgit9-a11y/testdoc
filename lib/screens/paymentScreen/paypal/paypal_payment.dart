@@ -58,7 +58,6 @@ class PaypalPaymentState extends State<PaypalPayment> {
           executeUrl = res["executeUrl"];
         });
       } catch (e) {
-        // print('exception:  $e');
         final snackBar = SnackBar(
           content: Text('$e'),
           duration: const Duration(seconds: 10),

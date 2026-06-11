@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/constants/firestore_constants.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 class UserChat {
   String id;
@@ -39,28 +40,44 @@ class UserChat {
 
     try {
       photoUrl = doc.get(FirestoreConstants.photoUrl);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: photoUrl missing: $e');
+    }
     try {
       nickname = doc.get(FirestoreConstants.nickname);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: nickname missing: $e');
+    }
     try {
       content = doc.get(FirestoreConstants.content);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: content missing: $e');
+    }
     try {
       shopId = doc.get(FirestoreConstants.shopId);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: shopId missing: $e');
+    }
     try {
       userType = doc.get(FirestoreConstants.userType);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: userType missing: $e');
+    }
     try {
       doctorId = doc.get(FirestoreConstants.doctorId);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: doctorId missing: $e');
+    }
     try {
       token = doc.get(FirestoreConstants.token);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: token missing: $e');
+    }
     try {
       userId = doc.get(FirestoreConstants.userId);
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('UserChat: userId missing: $e');
+    }
     return UserChat(userId: userId, id: doc.id, photoUrl: photoUrl, nickname: nickname, content: content, shopId: shopId, userType: userType, doctorId: doctorId, token: token);
   }
 }

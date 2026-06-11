@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:doctro/services/session_service.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -9,61 +12,55 @@ import '../helpers/logger.dart';
 class RetroApi {
   Future<Dio> dioData(BuildContext context) async {
     final dio = Dio();
-    dio.options.headers["Accept"] =
-        "application/json"; // config your dio headers globally
-    // dio.options.headers["Authorization"] = "Bearer" +
-    //     " " +
-    //     SharedPreferenceHelper.getString(
-    //         Preferences.auth_token); // config your dio headers globally
+    dio.options.headers["Accept"] = "application/json";
     dio.options.headers["Content-Type"] = "application/x-www-form-urlencoded";
     dio.options.followRedirects = false;
-    dio.options.connectTimeout = Duration(seconds: 30);
-    dio.options.receiveTimeout = Duration(seconds: 30);
+    dio.options.connectTimeout = const Duration(seconds: 30);
+    dio.options.receiveTimeout = const Duration(seconds: 30);
 
-    final token = SharedPreferenceHelper.getString(Preferences.auth_token);
+    final token = await SecureSharedPreferenceHelper.getString(Preferences.auth_token);
     final refreshToken =
-        SharedPreferenceHelper.getString(Preferences.refresh_token);
-    final expiresIn = SharedPreferenceHelper.getInt(Preferences.expiresIn);
-    final savedAt = SharedPreferenceHelper.getInt('token_saved_at');
-    logger.w('token: $token, refreshToken: $refreshToken, expiresIn: $expiresIn, savedAt: $savedAt');
-    
-    final isLoggedIn = SharedPreferenceHelper.getBoolean(Preferences.is_logged_in);
+        await SecureSharedPreferenceHelper.getString(Preferences.refresh_token);
+    final expiresIn = await SecureSharedPreferenceHelper.getInt(Preferences.expiresIn);
+    final savedAt = await SecureSharedPreferenceHelper.getInt('token_saved_at');
+    if (kDebugMode) {
+      logger.w('token present: ${token != 'N_A' && token.isNotEmpty}, expiresIn: $expiresIn, savedAt: $savedAt');
+    }
+
+    final isLoggedIn = await SecureSharedPreferenceHelper.getBoolean(Preferences.is_logged_in);
 
     if (token != 'N_A' && token.isNotEmpty) {
       dio.options.headers["Authorization"] = "Bearer $token";
     }
     dio.options.headers["Accept"] = "application/json";
 
-    // Interceptor
     dio.interceptors.add(
       InterceptorsWrapper(
         onError: (DioException e, ErrorInterceptorHandler handler) async {
+          if (SessionService.isLoggingOut) {
+            return handler.next(e);
+          }
+
           final requestOptions = e.requestOptions;
+          final status = e.response?.statusCode;
+          final isAuthPath = requestOptions.path.contains('refresh') ||
+              requestOptions.path.contains('register') ||
+              requestOptions.path.contains('login') ||
+              requestOptions.path.contains('setting');
 
-          if (e.response?.statusCode == 401 &&
-              isLoggedIn &&
-              !requestOptions.path.contains('refresh') &&
-              !requestOptions.path.contains('register') &&
-              !requestOptions.path.contains('login') &&
-              !requestOptions.path.contains('setting')) {
+           if (status == 401 && isLoggedIn && !isAuthPath) {
             try {
-              final refreshToken =
-                  SharedPreferenceHelper.getString(Preferences.refresh_token);
+              final savedRefreshToken =
+                  await SecureSharedPreferenceHelper.getString(Preferences.refresh_token);
 
-              if (refreshToken == 'N_A' || refreshToken.isEmpty) {
-                SharedPreferenceHelper.clearPref();
-                final navigator = Navigator.of(context);
-                final current = ModalRoute.of(context)?.settings.name;
-                if (navigator.canPop() && current != 'SignIn') {
-                  navigator.pushNamedAndRemoveUntil('SignIn', (route) => false);
-                }
+              if (savedRefreshToken == 'N_A' || savedRefreshToken.isEmpty) {
+                await SessionService.handleSessionExpired();
                 return handler.reject(e);
               }
 
-              final newToken = await refreshFirebaseToken(refreshToken);
+              final newToken = await refreshFirebaseToken(savedRefreshToken);
 
               if (newToken != null) {
-                // Retry request with new token
                 final clonedRequest = await dio.request(
                   requestOptions.path,
                   data: requestOptions.data,
@@ -78,24 +75,12 @@ class RetroApi {
                 );
                 return handler.resolve(clonedRequest);
               } else {
-                // Refresh failed, force logout
-                SharedPreferenceHelper.clearPref();
-
-                final navigator = Navigator.of(context);
-                final current = ModalRoute.of(context)?.settings.name;
-                if (navigator.canPop() && current != 'SignIn') {
-                  navigator.pushNamedAndRemoveUntil('SignIn', (route) => false);
-                }
+                await SessionService.handleSessionExpired();
                 return handler.reject(e);
               }
             } catch (err) {
               logger.w('Token refresh error: $err');
-              SharedPreferenceHelper.clearPref();
-              final navigator = Navigator.of(context);
-              final current = ModalRoute.of(context)?.settings.name;
-              if (navigator.canPop() && current != 'SignIn') {
-                navigator.pushNamedAndRemoveUntil('SignIn', (route) => false);
-              }
+              await SessionService.handleSessionExpired();
               return handler.reject(e);
             }
           }
@@ -128,20 +113,19 @@ class RetroApi {
         options: Options(contentType: Headers.formUrlEncodedContentType),
       );
 
-      if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
         final data = response.data;
         final newIdToken = data['id_token'];
         final newRefreshToken = data['refresh_token'];
         final newExpiresIn = int.parse(data['expires_in']);
 
-        // Save updated tokens
-        await SharedPreferenceHelper.setString(
+        await SecureSharedPreferenceHelper.setString(
             Preferences.auth_token, newIdToken);
-        await SharedPreferenceHelper.setString(
+        await SecureSharedPreferenceHelper.setString(
             Preferences.refresh_token, newRefreshToken);
-        await SharedPreferenceHelper.setInt(
+        await SecureSharedPreferenceHelper.setInt(
             Preferences.expiresIn, newExpiresIn);
-        await SharedPreferenceHelper.setInt(
+        await SecureSharedPreferenceHelper.setInt(
             'token_saved_at', DateTime.now().millisecondsSinceEpoch);
 
         return newIdToken;
@@ -160,8 +144,8 @@ class RetroApi2 {
     final dio = Dio();
     dio.options.headers["Accept"] = "application/json";
     dio.options.followRedirects = false;
-    dio.options.connectTimeout = Duration(seconds: 30);
-    dio.options.receiveTimeout = Duration(seconds: 30);
+    dio.options.connectTimeout = const Duration(seconds: 30);
+    dio.options.receiveTimeout = const Duration(seconds: 30);
     return dio;
   }
 }

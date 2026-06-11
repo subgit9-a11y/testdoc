@@ -28,6 +28,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   TextEditingController _email = TextEditingController();
 
   @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
@@ -125,7 +131,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

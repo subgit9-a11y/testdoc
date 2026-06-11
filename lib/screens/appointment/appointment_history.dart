@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/app_string.dart';
-import 'package:doctro/constant/color_constant.dart';
-import 'package:doctro/constant/common_function.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -13,33 +11,28 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:doctro/screens/auth/SignIn.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:doctro/widgets/modern_drawer.dart';
 import 'package:doctro/widgets/osler_card.dart';
 import 'package:doctro/widgets/osler_status_badge.dart';
-
+import 'package:flutter/material.dart';
 
 class AppointmentHistoryScreen extends StatefulWidget {
   @override
-  _AppointmentHistoryScreen createState() => _AppointmentHistoryScreen();
+  _AppointmentHistoryScreenState createState() =>
+      _AppointmentHistoryScreenState();
 }
 
-class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
+class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen>
     with TickerProviderStateMixin {
-  //Set Loader
   Future? appointment;
 
-  //Set Drawer Open
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  //Add List Data
   List<PastAppointment> pastAppointmentReq = [];
   List<UpcomingAppointment> upcomingAppointmentReq = [];
 
-  //Search Patient
   TextEditingController _search = TextEditingController();
   List<UpcomingAppointment> _searchResult = [];
   List<UpcomingAppointment> _userDetails = [];
@@ -47,79 +40,27 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
   List<PastAppointment> _pastData = [];
   bool? isShow;
 
-  //get preferences
   String? dName;
-
   String? dFullImage;
-
   String? phone;
-
   int? subscription;
 
-  //Set Height/Width using MediaQuery
   late double width;
   late double height;
 
-  //Set Tabbar
-  List<Tab> tabList = [];
-  TabController? _tabController;
-
-  List<String> _drawer = [];
-  List<String> _drawerMenu = [];
+  late TabController _tabController;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    //Set Drawer Menu Item List
-
-    _drawer = [
-      getTranslated(context, AppString.drawer_home).toString(),
-      getTranslated(context, AppString.drawer_payments).toString(),
-      getTranslated(context, AppString.drawer_canceled_appointment).toString(),
-      getTranslated(context, AppString.drawer_appointments).toString(),
-      getTranslated(context, AppString.drawer_review).toString(),
-      getTranslated(context, AppString.drawer_notification).toString(),
-      getTranslated(context, AppString.drawer_callHistory).toString(),
-      getTranslated(context, AppString.drawer_schedule_timing).toString(),
-      getTranslated(context, AppString.drawer_setting).toString(),
-      getTranslated(context, AppString.chats).toString(),
-      getTranslated(context, AppString.drawer_logout).toString(),
-    ];
-
-    _drawerMenu = [
-      getTranslated(context, AppString.drawer_home).toString(),
-      getTranslated(context, AppString.drawer_payments).toString(),
-      getTranslated(context, AppString.drawer_canceled_appointment).toString(),
-      getTranslated(context, AppString.drawer_appointments).toString(),
-      getTranslated(context, AppString.drawer_review).toString(),
-      getTranslated(context, AppString.drawer_notification).toString(),
-      getTranslated(context, AppString.drawer_callHistory).toString(),
-      getTranslated(context, AppString.drawer_schedule_timing).toString(),
-      getTranslated(context, AppString.drawer_setting).toString(),
-      getTranslated(context, AppString.chats).toString(),
-      getTranslated(context, AppString.drawer_logout).toString(),
-    ];
   }
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      tabList.add(new Tab(
-        child: Text(
-          getTranslated(context, AppString.upcoming_appointment).toString(),
-          textAlign: TextAlign.center,
-        ),
-      ));
-      tabList.add(new Tab(
-        child: Text(
-          getTranslated(context, AppString.past_appointment).toString(),
-          textAlign: TextAlign.center,
-        ),
-      ));
-      _tabController = new TabController(vsync: this, length: tabList.length);
-      _tabController!.addListener(() {
+    _tabController = TabController(vsync: this, length: 2);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
         setState(() {
           if (isShow == null) {
             isShow = true;
@@ -131,8 +72,9 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
             _search.clear();
           }
         });
-      });
-
+      }
+    });
+    Future.delayed(Duration.zero, () {
       appointment = appointmentHistoryScreen();
       dName = SharedPreferenceHelper.getString(Preferences.name);
       dFullImage = SharedPreferenceHelper.getString(Preferences.image);
@@ -144,7 +86,8 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController.dispose();
+    _search.dispose();
     super.dispose();
   }
 
@@ -153,966 +96,511 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return OrientationBuilder(
-          builder: (context, orientation) {
-            return Scaffold(
-              key: _scaffoldKey,
-              backgroundColor: AyurezeTheme.canvas,
-              drawer: const ModernDrawer(),
-              appBar: PreferredSize(
-                  preferredSize: Size(20, 140),
-                  child: SafeArea(
-                      top: true,
-                      child: Column(children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: width * 0.06,
-                                  right: width * 0.06,
-                                  top: height * 0.00),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text(
-                                          getTranslated(
-                                                  context,
-                                                  AppString
-                                                      .appointment_history_heading)
-                                              .toString(),
-                                          style: TextStyle(
-                                              fontSize: width * 0.05,
-                                              fontWeight: FontWeight.w800,
-                                              color: hintColor),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        _scaffoldKey.currentState!.openDrawer();
-                                      },
-                                      icon: SvgPicture.asset(
-                                        "assets/icons/dMenuBar.svg",
-                                        height: 16.0,
-                                        color: AyurezeTheme.forestDeep,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: AyurezeTheme.canvas,
+      drawer: const ModernDrawer(),
+      appBar: AppBar(
+        backgroundColor: AyurezeTheme.canvas,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AyurezeTheme.iconPrimary),
+        title: Text(
+          getTranslated(context, AppString.appointment_history_heading)
+              .toString(),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AyurezeTheme.textPrimary,
+          ),
+        ),
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          Navigator.pushNamedAndRemoveUntil(
+              context, 'loginHome', (route) => false);
+        },
+        child: RefreshIndicator(
+          onRefresh: appointmentHistoryScreen,
+          color: AyurezeTheme.forestDeep,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: AyurezeTheme.screenPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeroSummary(),
+                const SizedBox(height: 18),
+                _buildSearchCard(),
+                const SizedBox(height: 18),
+                _buildTabSwitch(),
+                const SizedBox(height: 14),
+                FutureBuilder(
+                  future: appointment,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return SizedBox(
+                        height: height * 0.4,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(top: height * 0.01),
-                          padding: EdgeInsets.all(10),
-                          child: Container(
-                            decoration: AyurezeTheme.panelDecoration(),
-                            child: Container(
-                                alignment: AlignmentDirectional.center,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: width * 0.05, vertical: 6),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      // height: height * 0.06,
-                                      width: width * 0.7,
-                                      child: TextField(
-                                        controller: _search,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          filled: false,
-                                          hintText: getTranslated(
-                                                  context,
-                                                  AppString
-                                                      .search_appointment_history)
-                                              .toString(),
-                                          hintStyle: TextStyle(
-                                            fontSize: width * 0.045,
-                                            color: hintColor.withOpacity(0.45),
-                                          ),
-                                        ),
-                                        onChanged: onSearchTextChanged,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Container(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/dSearch.svg',
-                                        height: 20,
-                                        color: AyurezeTheme.forestDeep,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ),
-                        ),
-                      ]))),
-              body: WillPopScope(
-                onWillPop: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, 'loginHome', (route) => false);
-                  return Future<bool>.value(false);
-                },
-                child: RefreshIndicator(
-                  onRefresh: appointmentHistoryScreen,
-                  child: FutureBuilder(
-                      future: appointment,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          return GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              FocusScope.of(context)
-                                  .requestFocus(new FocusNode());
-                            },
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () {
-                                FocusScope.of(context)
-                                    .requestFocus(new FocusNode());
-                              },
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                physics: AlwaysScrollableScrollPhysics(),
-                                child: Center(
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(top: 10),
-                                        decoration: BoxDecoration(
-                                          color: AyurezeTheme.surfaceMuted,
-                                          borderRadius: BorderRadius.circular(22),
-                                        ),
-                                        padding: EdgeInsets.all(10),
-                                        child: new TabBar(
-                                          labelColor: loginButton,
-                                          controller: _tabController,
-                                          indicatorSize:
-                                              TabBarIndicatorSize.tab,
-                                          indicatorColor: loginButton,
-                                          indicator: BoxDecoration(
-                                             color: AyurezeTheme.lightGreenSoft,
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          tabs: tabList,
-                                          unselectedLabelColor: hintColor,
-                                        ),
-                                      ),
-                                      Container(
-                                        height: height * 0.65,
-                                        child: TabBarView(
-                                          controller: _tabController,
-                                          children: [
-                                            upcomingAppointmentReq.length == 0
-                                                ? Container(
-                                                    child: Center(
-                                                      child: Image.asset(
-                                                          "assets/images/no-data.png"),
-                                                    ),
-                                                  )
-                                                : _search.text.isNotEmpty
-                                                    ? _searchResult.length > 0
-                                                        ? ListView.builder(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 40),
-                                                            scrollDirection:
-                                                                Axis.vertical,
-                                                            shrinkWrap: true,
-                                                            physics:
-                                                                AlwaysScrollableScrollPhysics(),
-                                                            itemCount:
-                                                                _searchResult
-                                                                    .length,
-                                                            itemBuilder:
-                                                                (context, i) {
-                                                              String
-                                                                  searchDate =
-                                                                  _searchResult[
-                                                                          i]
-                                                                      .date!;
-                                                              var statusColor =
-                                                                  status;
-                                                              if (_searchResult[
-                                                                          i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_pending)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    hintColor
-                                                                        .withOpacity(
-                                                                            0.6);
-                                                              } else if (_searchResult[
-                                                                          i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_cancel)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    statusCancel;
-                                                              } else if (_searchResult[
-                                                                          i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_approve)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    status;
-                                                              }
-                                                              return Container(
-                                                                  width: width *
-                                                                      0.87,
-                                                                  child: Card(
-                                                                      elevation:
-                                                                          2,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15.0),
-                                                                      ),
-                                                                      child: Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: <Widget>[
-                                                                            Container(
-                                                                              child: ListTile(
-                                                                                isThreeLine: true,
-                                                                                leading: SizedBox(
-                                                                                  height: height * 0.20,
-                                                                                  width: width * 0.15,
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(10),
-                                                                                    child: Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(_searchResult[i].user!.fullImage!)))),
-                                                                                  ),
-                                                                                ),
-                                                                                title: Text(_searchResult[i].patientName!, style: TextStyle(fontSize: 16.0)),
-                                                                                trailing: Container(
-                                                                                  child: Text(
-                                                                                    _searchResult[i].appointmentStatus!.toUpperCase(),
-                                                                                    style: TextStyle(color: statusColor),
-                                                                                  ),
-                                                                                ),
-                                                                                subtitle: Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: <Widget>[
-                                                                                    Text(
-                                                                                      _searchResult[i].treatment!,
-                                                                                      style: TextStyle(fontSize: 14, color: passwordVisibility),
-                                                                                    ),
-                                                                                    Text(
-                                                                                      _searchResult[i].patientAddress!,
-                                                                                      style: TextStyle(fontSize: 12, color: passwordVisibility),
-                                                                                      overflow: TextOverflow.ellipsis,
-                                                                                      maxLines: 2,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            Container(
-                                                                              margin: EdgeInsets.symmetric(horizontal: 20),
-                                                                              child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: [
-                                                                                  Column(
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.date_and_time).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          Text('$searchDate', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                          SizedBox(width: 5),
-                                                                                          Text(_searchResult[i].time!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  Column(
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.doctor_name).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Container(
-                                                                                        margin: EdgeInsets.only(),
-                                                                                        child: Text(_searchResult[i].doctorName!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                            Divider(
-                                                                              color: divider,
-                                                                            ),
-                                                                            Container(
-                                                                              margin: EdgeInsets.symmetric(horizontal: 20),
-                                                                              child: Column(
-                                                                                children: [
-                                                                                  Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.hospital_name_heading).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Text(getTranslated(context, AppString.hospital_address).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                    ],
-                                                                                  ),
-                                                                                  Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                    children: [
-                                                                                      _searchResult[i].hospital != null
-                                                                                          ? Container(
-                                                                                              width: 120,
-                                                                                              child: Text(_searchResult[i].hospital!.name!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                            )
-                                                                                          : Text('', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      _searchResult[i].hospital != null
-                                                                                          ? Container(
-                                                                                              width: 120,
-                                                                                              child: Text(_searchResult[i].hospital!.address!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                            )
-                                                                                          : Text(''),
-                                                                                    ],
-                                                                                  ),
-                                                                                  SizedBox(height: 5)
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ])));
-                                                            },
-                                                          )
-                                                        : Center(
-                                                            child: Container(
-                                                            child: Text(getTranslated(
-                                                                    context,
-                                                                    AppString
-                                                                        .result_not_found)
-                                                                .toString()),
-                                                          ))
-                                                    : ListView.builder(
-                                                        physics:
-                                                            AlwaysScrollableScrollPhysics(),
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                bottom: 40),
-                                                        shrinkWrap: true,
-                                                        scrollDirection:
-                                                            Axis.vertical,
-                                                        itemCount:
-                                                            upcomingAppointmentReq
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          var statusColor =
-                                                              status;
-                                                          if (upcomingAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_pending)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                hintColor
-                                                                    .withOpacity(
-                                                                        0.6);
-                                                          } else if (upcomingAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_cancel)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                statusCancel;
-                                                          } else if (upcomingAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_approve)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                status;
-                                                          }
-                                                          //Set Date Formate dd-mm-yy
-                                                          String date =
-                                                              upcomingAppointmentReq[
-                                                                      index]
-                                                                  .date!;
-                                                          return Container(
-                                                              width:
-                                                                  width * 0.87,
-                                                              child: Card(
-                                                                  elevation: 2,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15.0),
-                                                                  ),
-                                                                  child: Column(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: <Widget>[
-                                                                        Container(
-                                                                          child:
-                                                                              ListTile(
-                                                                            isThreeLine:
-                                                                                true,
-                                                                            leading:
-                                                                                SizedBox(
-                                                                              height: height * 0.20,
-                                                                              width: width * 0.15,
-                                                                              child: ClipRRect(
-                                                                                borderRadius: BorderRadius.circular(10),
-                                                                                child: Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(upcomingAppointmentReq[index].user!.fullImage!)))),
-                                                                              ),
-                                                                            ),
-                                                                            title:
-                                                                                Text(upcomingAppointmentReq[index].patientName!, style: TextStyle(fontSize: 16.0)),
-                                                                            trailing:
-                                                                                Container(
-                                                                              child: Text(
-                                                                                upcomingAppointmentReq[index].appointmentStatus!.toUpperCase(),
-                                                                                style: TextStyle(color: statusColor),
-                                                                              ),
-                                                                            ),
-                                                                            subtitle:
-                                                                                Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: <Widget>[
-                                                                                Text(
-                                                                                  upcomingAppointmentReq[index].treatment!,
-                                                                                  style: TextStyle(fontSize: 14, color: passwordVisibility),
-                                                                                ),
-                                                                                Text(
-                                                                                  upcomingAppointmentReq[index].patientAddress!,
-                                                                                  style: TextStyle(fontSize: 12, color: passwordVisibility),
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                  maxLines: 2,
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        Container(
-                                                                          margin:
-                                                                              EdgeInsets.symmetric(horizontal: 20),
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Column(
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Text(getTranslated(context, AppString.date_and_time).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                  Row(
-                                                                                    children: [
-                                                                                      Text('$date', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      SizedBox(width: 5),
-                                                                                      Text(upcomingAppointmentReq[index].time!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                    ],
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              Column(
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                children: [
-                                                                                  Text(getTranslated(context, AppString.doctor_name).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                  Container(
-                                                                                    margin: EdgeInsets.only(),
-                                                                                    child: Text(upcomingAppointmentReq[index].doctorName!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                        Divider(
-                                                                          color:
-                                                                              divider,
-                                                                        ),
-                                                                        Container(
-                                                                          margin:
-                                                                              EdgeInsets.symmetric(horizontal: 20),
-                                                                          child:
-                                                                              Column(
-                                                                            children: [
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                children: [
-                                                                                  Text(getTranslated(context, AppString.hospital_name_heading).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                  Text(getTranslated(context, AppString.hospital_address).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                ],
-                                                                              ),
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: [
-                                                                                  upcomingAppointmentReq[index].hospital != null
-                                                                                      ? Container(
-                                                                                          width: 120,
-                                                                                          child: Text(upcomingAppointmentReq[index].hospital!.name!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                        )
-                                                                                      : Text('', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                  upcomingAppointmentReq[index].hospital != null
-                                                                                      ? Container(
-                                                                                          width: 100,
-                                                                                          child: Text(upcomingAppointmentReq[index].hospital!.address!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                        )
-                                                                                      : Text(''),
-                                                                                ],
-                                                                              ),
-                                                                              SizedBox(height: 5)
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ])));
-                                                        },
-                                                      ),
-                                            pastAppointmentReq.length == 0
-                                                ? Container(
-                                                    height: height / 2,
-                                                    child: Image.asset(
-                                                        "assets/images/no-data.png"),
-                                                  )
-                                                : _search.text.isNotEmpty
-                                                    ? _pastSearch.length > 0
-                                                        ? new ListView.builder(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 40),
-                                                            shrinkWrap: true,
-                                                            itemCount:
-                                                                _pastSearch
-                                                                    .length,
-                                                            itemBuilder:
-                                                                (context, i) {
-                                                              String
-                                                                  searchDate =
-                                                                  _pastSearch[i]
-                                                                      .date!;
-                                                              var statusColor =
-                                                                  status;
-                                                              if (_pastSearch[i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_pending)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    hintColor
-                                                                        .withOpacity(
-                                                                            0.6);
-                                                              } else if (_pastSearch[
-                                                                          i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_cancel)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    statusCancel;
-                                                              } else if (_pastSearch[
-                                                                          i]
-                                                                      .appointmentStatus!
-                                                                      .toUpperCase() ==
-                                                                  getTranslated(
-                                                                          context,
-                                                                          AppString
-                                                                              .status_approve)
-                                                                      .toString()) {
-                                                                statusColor =
-                                                                    status;
-                                                              }
-                                                              return Container(
-                                                                  width: width *
-                                                                      0.87,
-                                                                  child: Card(
-                                                                      elevation:
-                                                                          2,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15.0),
-                                                                      ),
-                                                                      child: Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: <Widget>[
-                                                                            Container(
-                                                                              child: ListTile(
-                                                                                isThreeLine: true,
-                                                                                leading: SizedBox(
-                                                                                  height: height * 0.20,
-                                                                                  width: width * 0.15,
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(10),
-                                                                                    child: Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(_pastSearch[i].user!.fullImage!)))),
-                                                                                  ),
-                                                                                ),
-                                                                                title: Text(_pastSearch[i].patientName!, style: TextStyle(fontSize: 16.0)),
-                                                                                trailing: Container(
-                                                                                  child: Text(
-                                                                                    _pastSearch[i].appointmentStatus!.toUpperCase(),
-                                                                                    style: TextStyle(color: statusColor),
-                                                                                  ),
-                                                                                ),
-                                                                                subtitle: Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: <Widget>[
-                                                                                    Text(
-                                                                                      _pastSearch[i].treatment!,
-                                                                                      style: TextStyle(fontSize: 14, color: passwordVisibility),
-                                                                                    ),
-                                                                                    Text(
-                                                                                      _pastSearch[i].patientAddress!,
-                                                                                      style: TextStyle(fontSize: 12, color: passwordVisibility),
-                                                                                      overflow: TextOverflow.ellipsis,
-                                                                                      maxLines: 2,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            Container(
-                                                                              margin: EdgeInsets.symmetric(horizontal: 20),
-                                                                              child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: [
-                                                                                  Column(
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.date_and_time).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          Text("$searchDate", style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                          Container(
-                                                                                            margin: EdgeInsets.only(left: 5),
-                                                                                            child: Text(_pastSearch[i].time!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                          ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  Column(
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.doctor_name).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Container(
-                                                                                        margin: EdgeInsets.only(),
-                                                                                        child: Text(_pastSearch[i].doctorName!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                            Divider(
-                                                                              color: divider,
-                                                                            ),
-                                                                            Container(
-                                                                              margin: EdgeInsets.symmetric(horizontal: 20),
-                                                                              child: Column(
-                                                                                children: [
-                                                                                  Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                    children: [
-                                                                                      Text(getTranslated(context, AppString.hospital_name_heading).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                      Text(getTranslated(context, AppString.hospital_address).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                    ],
-                                                                                  ),
-                                                                                  Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                    children: [
-                                                                                      _pastSearch[i].hospital?.name != null
-                                                                                          ? Container(
-                                                                                              width: 120,
-                                                                                              child: Text(_pastSearch[i].hospital!.name.toString(), style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                            )
-                                                                                          : Text('', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      _pastSearch[i].hospital?.address != null
-                                                                                          ? Container(
-                                                                                              width: 100,
-                                                                                              child: Text(_pastSearch[i].hospital!.address.toString(), style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                            )
-                                                                                          : Text(''),
-                                                                                    ],
-                                                                                  ),
-                                                                                  SizedBox(height: 5)
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ])));
-                                                            },
-                                                          )
-                                                        : Center(
-                                                            child: Container(
-                                                            child: Text(getTranslated(
-                                                                    context,
-                                                                    AppString
-                                                                        .result_not_found)
-                                                                .toString()),
-                                                          ))
-                                                    : ListView.builder(
-                                                        physics:
-                                                            AlwaysScrollableScrollPhysics(),
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                bottom: 40),
-                                                        shrinkWrap: true,
-                                                        scrollDirection:
-                                                            Axis.vertical,
-                                                        itemCount:
-                                                            pastAppointmentReq
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          String date =
-                                                              pastAppointmentReq[
-                                                                      index]
-                                                                  .date!;
-                                                          var statusColor =
-                                                              status;
-                                                          if (pastAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_pending)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                hintColor
-                                                                    .withOpacity(
-                                                                        0.6);
-                                                          } else if (pastAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_cancel)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                statusCancel;
-                                                          } else if (pastAppointmentReq[
-                                                                      index]
-                                                                  .appointmentStatus!
-                                                                  .toUpperCase() ==
-                                                              getTranslated(
-                                                                      context,
-                                                                      AppString
-                                                                          .status_approve)
-                                                                  .toString()) {
-                                                            statusColor =
-                                                                status;
-                                                          }
-                                                          return Container(
-                                                              width:
-                                                                  width * 0.87,
-                                                              child: Card(
-                                                                  elevation: 2,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15.0),
-                                                                  ),
-                                                                  child: Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: <Widget>[
-                                                                        Container(
-                                                                          child:
-                                                                              ListTile(
-                                                                            isThreeLine:
-                                                                                true,
-                                                                            leading:
-                                                                                SizedBox(
-                                                                              height: height * 0.20,
-                                                                              width: width * 0.15,
-                                                                              child: ClipRRect(
-                                                                                borderRadius: BorderRadius.circular(10),
-                                                                                child: Container(decoration: new BoxDecoration(image: new DecorationImage(fit: BoxFit.fitHeight, image: NetworkImage(pastAppointmentReq[index].user!.fullImage!)))),
-                                                                              ),
-                                                                            ),
-                                                                            title:
-                                                                                Text(pastAppointmentReq[index].patientName!, style: TextStyle(fontSize: 16.0)),
-                                                                            trailing:
-                                                                                Container(
-                                                                              child: Text(
-                                                                                pastAppointmentReq[index].appointmentStatus!.toUpperCase(),
-                                                                                style: TextStyle(color: statusColor),
-                                                                              ),
-                                                                            ),
-                                                                            subtitle:
-                                                                                Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: <Widget>[
-                                                                                Text(
-                                                                                  pastAppointmentReq[index].treatment!,
-                                                                                  style: TextStyle(fontSize: 14, color: passwordVisibility),
-                                                                                ),
-                                                                                Text(
-                                                                                  pastAppointmentReq[index].patientAddress!,
-                                                                                  style: TextStyle(fontSize: 12, color: passwordVisibility),
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                  maxLines: 2,
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        Container(
-                                                                          margin:
-                                                                              EdgeInsets.symmetric(horizontal: 20),
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Column(
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Text(getTranslated(context, AppString.date_and_time).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                  Row(
-                                                                                    children: [
-                                                                                      Text("$date", style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      Container(
-                                                                                        margin: EdgeInsets.only(left: 5),
-                                                                                        child: Text(pastAppointmentReq[index].time!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                  children: [
-                                                                                    Text(getTranslated(context, AppString.doctor_name).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                    Container(
-                                                                                      margin: EdgeInsets.only(),
-                                                                                      child: Text(pastAppointmentReq[index].doctorName!, style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                        Divider(
-                                                                          color:
-                                                                              divider,
-                                                                        ),
-                                                                        Container(
-                                                                          margin:
-                                                                              EdgeInsets.symmetric(horizontal: 20),
-                                                                          child:
-                                                                              Column(
-                                                                            children: [
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                children: [
-                                                                                  Text(getTranslated(context, AppString.hospital_name_heading).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                  Text(getTranslated(context, AppString.hospital_address).toString(), style: TextStyle(fontSize: 14, color: passwordVisibility)),
-                                                                                ],
-                                                                              ),
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: [
-                                                                                  pastAppointmentReq[index].hospital != null
-                                                                                      ? Container(
-                                                                                          width: 120,
-                                                                                          child: Text(pastAppointmentReq[index].hospital!.name!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                        )
-                                                                                      : Text('', style: TextStyle(fontSize: 14, color: hintColor)),
-                                                                                  pastAppointmentReq[index].hospital != null
-                                                                                      ? Container(
-                                                                                          width: 100,
-                                                                                          child: Text(pastAppointmentReq[index].hospital!.address!, style: TextStyle(fontSize: 14, color: hintColor), overflow: TextOverflow.ellipsis, maxLines: 2),
-                                                                                        )
-                                                                                      : Text(''),
-                                                                                ],
-                                                                              ),
-                                                                              SizedBox(height: 5)
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ])));
-                                                        },
-                                                      ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Center(child: CircularProgressIndicator(color: AyurezeTheme.forestDeep));
-                        }
-                      }),
+                      );
+                    }
+                    if (_tabController.index == 0) {
+                      return _buildUpcomingList();
+                    } else {
+                      return _buildPastList();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroSummary() {
+    final int upcomingCount = upcomingAppointmentReq.length;
+    final int pastCount = pastAppointmentReq.length;
+    final int total = upcomingCount + pastCount;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: AyurezeTheme.heroDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              "Appointment ledger",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            "$total total appointments",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              height: 1.05,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _buildPill("$upcomingCount upcoming", AyurezeTheme.healingGreen10),
+              const SizedBox(width: 8),
+              _buildPill("$pastCount past", Colors.white.withOpacity(0.18)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPill(String text, Color bg) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: bg == AyurezeTheme.healingGreen10
+              ? AyurezeTheme.forestDeep
+              : Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchCard() {
+    return OslerCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(AppIcons.search, size: 18, color: AyurezeTheme.textSecondary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _search,
+              onChanged: onSearchTextChanged,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: getTranslated(
+                        context, AppString.search_appointment_history)
+                    .toString(),
+                hintStyle: TextStyle(
+                  color: AyurezeTheme.textSecondary.withOpacity(0.6),
+                  fontSize: 14,
                 ),
               ),
-            );
-          },
-        );
-      },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabSwitch() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: AyurezeTheme.mutedPanelDecoration(),
+      child: TabBar(
+        controller: _tabController,
+        labelColor: Colors.white,
+        unselectedLabelColor: AyurezeTheme.textSecondary,
+        indicator: BoxDecoration(
+          color: AyurezeTheme.forestDeep,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w800,
+        ),
+        tabs: [
+          Tab(text: getTranslated(context, AppString.upcoming_appointment).toString()),
+          Tab(text: getTranslated(context, AppString.past_appointment).toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingList() {
+    final list = _search.text.isNotEmpty
+        ? _searchResult
+        : upcomingAppointmentReq;
+    if (list.isEmpty) {
+      return _buildEmptyState("No upcoming appointments");
+    }
+    return Column(
+      children: list
+          .map((appt) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildUpcomingCard(appt),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildPastList() {
+    final list = _search.text.isNotEmpty ? _pastSearch : pastAppointmentReq;
+    if (list.isEmpty) {
+      return _buildEmptyState("No past appointments");
+    }
+    return Column(
+      children: list
+          .map((appt) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildPastCard(appt),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildEmptyState(String text) {
+    return SizedBox(
+      height: height * 0.35,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/no-data.png", height: 90),
+            const SizedBox(height: 10),
+            Text(
+              text,
+              style: TextStyle(
+                color: AyurezeTheme.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingCard(UpcomingAppointment appt) {
+    final String name = appt.patientName ?? "Patient";
+    final String? image = appt.user?.fullImage;
+    final String treatment = appt.treatment ?? "";
+    final String date = appt.date ?? "";
+    final String time = appt.time ?? "";
+    final String doctor = appt.doctorName ?? "";
+    final String status =
+        (appt.appointmentStatus ?? "pending").toLowerCase();
+
+    return OslerCard(
+      onTap: () {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ClipOval(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: (image != null && image.isNotEmpty)
+                      ? CachedNetworkImage(
+                          imageUrl: image,
+                          fit: BoxFit.cover,
+                          errorWidget: (c, u, e) => Container(
+                            color: AyurezeTheme.surfaceMuted,
+                            child: Icon(
+                              Icons.person,
+                              color: AyurezeTheme.textSecondary,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: AyurezeTheme.surfaceMuted,
+                          child: Icon(
+                            Icons.person,
+                            color: AyurezeTheme.textSecondary,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AyurezeTheme.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (treatment.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        treatment,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AyurezeTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              OslerStatusBadge(
+                status: OslerStatusBadge.fromString(status),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AyurezeTheme.surfaceMuted,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Icon(AppIcons.clock,
+                    size: 14, color: AyurezeTheme.forestDeep),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    "$date  •  $time",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AyurezeTheme.textPrimary,
+                    ),
+                  ),
+                ),
+                if (doctor.isNotEmpty)
+                  Flexible(
+                    child: Text(
+                      "Dr. $doctor",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AyurezeTheme.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (appt.hospital != null &&
+              (appt.hospital!.name != null || appt.hospital!.address != null)) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(AppIcons.hospital,
+                    size: 14, color: AyurezeTheme.textSecondary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    appt.hospital!.name ?? "",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AyurezeTheme.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPastCard(PastAppointment appt) {
+    final String name = appt.patientName ?? "Patient";
+    final String? image = appt.user?.fullImage;
+    final String treatment = appt.treatment ?? "";
+    final String date = appt.date ?? "";
+    final String time = appt.time ?? "";
+    final String doctor = appt.doctorName ?? "";
+    final String status =
+        (appt.appointmentStatus ?? "complete").toLowerCase();
+
+    return OslerCard(
+      onTap: () {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ClipOval(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: (image != null && image.isNotEmpty)
+                      ? CachedNetworkImage(
+                          imageUrl: image,
+                          fit: BoxFit.cover,
+                          errorWidget: (c, u, e) => Container(
+                            color: AyurezeTheme.surfaceMuted,
+                            child: Icon(
+                              Icons.person,
+                              color: AyurezeTheme.textSecondary,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: AyurezeTheme.surfaceMuted,
+                          child: Icon(
+                            Icons.person,
+                            color: AyurezeTheme.textSecondary,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AyurezeTheme.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (treatment.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        treatment,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AyurezeTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              OslerStatusBadge(
+                status: OslerStatusBadge.fromString(status),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AyurezeTheme.surfaceMuted,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Icon(AppIcons.clock,
+                    size: 14, color: AyurezeTheme.forestDeep),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    "$date  •  $time",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AyurezeTheme.textPrimary,
+                    ),
+                  ),
+                ),
+                if (doctor.isNotEmpty)
+                  Flexible(
+                    child: Text(
+                      "Dr. $doctor",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AyurezeTheme.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1126,66 +614,21 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
       response = await RestClient(await RetroApi().dioData(context))
           .appointmentHistoryScreenRequest();
       setState(() {
-        pastAppointmentReq.addAll(response.data!.pastAppointment!);
-        upcomingAppointmentReq.addAll(response.data!.upcomingAppointment!);
-        _userDetails.addAll(response.data!.upcomingAppointment!);
-        _pastData.addAll(response.data!.pastAppointment!);
+        if (response.data != null) {
+          if (response.data!.pastAppointment != null) {
+            pastAppointmentReq.addAll(response.data!.pastAppointment!);
+            _pastData.addAll(response.data!.pastAppointment!);
+          }
+          if (response.data!.upcomingAppointment != null) {
+            upcomingAppointmentReq.addAll(response.data!.upcomingAppointment!);
+            _userDetails.addAll(response.data!.upcomingAppointment!);
+          }
+        }
       });
-    } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+    } catch (error) {
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
-  }
-
-  Future<void> logoutUser() async {
-    SharedPreferenceHelper.clearPref();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (BuildContext context) => SignIn()),
-      ModalRoute.withName('SignIn'),
-    );
-  }
-
-  showAlertDialog(BuildContext context) {
-    // set up the button
-    Widget cancel = TextButton(
-      child: Text(
-        getTranslated(context, AppString.cancel_button).toString(),
-        style: TextStyle(color: hintColor),
-      ),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-
-    Widget okButton = TextButton(
-      child: Text(
-        getTranslated(context, AppString.logout_button).toString(),
-        style: TextStyle(color: hintColor),
-      ),
-      onPressed: () {
-        CommonFunction.checkNetwork().then((value) {
-          if (value == true) {
-            logoutUser();
-          }
-        });
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      content: Text(
-          getTranslated(context, AppString.are_you_sure_logout).toString()),
-      actions: [cancel, okButton],
-    );
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 
   onSearchTextChanged(String text) async {
@@ -1195,20 +638,23 @@ class _AppointmentHistoryScreen extends State<AppointmentHistoryScreen>
       setState(() {});
       return;
     }
-
-    isShow == null
-        ? _userDetails.forEach((upcomingAppointment) {
-            if ((upcomingAppointment.patientName ?? "")
-                .toLowerCase()
-                .contains(text.toLowerCase()))
-              _searchResult.add(upcomingAppointment);
-          })
-        : _pastData.forEach((pastAppointment) {
-            if ((pastAppointment.patientName ?? "")
-                .toLowerCase()
-                .contains(text.toLowerCase())) _pastSearch.add(pastAppointment);
-          });
-
+    if (isShow == null) {
+      _userDetails.forEach((appt) {
+        if ((appt.patientName ?? "")
+            .toLowerCase()
+            .contains(text.toLowerCase())) {
+          _searchResult.add(appt);
+        }
+      });
+    } else {
+      _pastData.forEach((appt) {
+        if ((appt.patientName ?? "")
+            .toLowerCase()
+            .contains(text.toLowerCase())) {
+          _pastSearch.add(appt);
+        }
+      });
+    }
     setState(() {});
   }
 }

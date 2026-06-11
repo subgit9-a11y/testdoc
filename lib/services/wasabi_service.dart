@@ -3,24 +3,17 @@ import 'dart:typed_data';
 import 'package:minio/minio.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 class WasabiService {
   static final WasabiService _instance = WasabiService._internal();
 
-  String _env(String key) {
-    try {
-      return dotenv.maybeGet(key) ?? '';
-    } catch (_) {
-      return '';
-    }
-  }
-  
   // Credentials from Environment
-  late final String _accessKey;
-  late final String _secretKey;
-  late final String _region;
-  late final String _bucket;
-  late final String _endpoint;
+  final String _accessKey;
+  final String _secretKey;
+  final String _region;
+  final String _bucket;
+  final String _endpoint;
 
   Minio? _minio;
 
@@ -28,13 +21,13 @@ class WasabiService {
     return _instance;
   }
 
-  WasabiService._internal() {
-    _accessKey = _env('WASABI_ACCESS_KEY');
-    _secretKey = _env('WASABI_SECRET_KEY');
-    _region = _env('WASABI_REGION');
-    _bucket = _env('WASABI_BUCKET');
-    _endpoint = _env('WASABI_ENDPOINT');
-
+  WasabiService._internal()
+      : _accessKey = WasabiService._readEnv('WASABI_ACCESS_KEY'),
+        _secretKey = WasabiService._readEnv('WASABI_SECRET_KEY'),
+        _region = WasabiService._readEnv('WASABI_REGION'),
+        _bucket = WasabiService._readEnv('WASABI_BUCKET'),
+        _endpoint = WasabiService._readEnv('WASABI_ENDPOINT'),
+        _minio = null {
     if (_endpoint.isNotEmpty && _accessKey.isNotEmpty && _secretKey.isNotEmpty) {
       _minio = Minio(
         endPoint: _endpoint,
@@ -42,6 +35,14 @@ class WasabiService {
         secretKey: _secretKey,
         region: _region,
       );
+    }
+  }
+
+  static String _readEnv(String key) {
+    try {
+      return dotenv.maybeGet(key) ?? '';
+    } catch (_) {
+      return '';
     }
   }
 
@@ -71,7 +72,7 @@ class WasabiService {
       // Return the Wasabi Public URL
       return "https://$_bucket.$_endpoint/$folderPath";
     } catch (e) {
-      print("Wasabi Upload Error: $e");
+      if (kDebugMode) debugPrint("Wasabi Upload Error: $e");
       return null;
     }
   }
@@ -98,7 +99,7 @@ class WasabiService {
 
       return "https://$_bucket.$_endpoint/$folderPath";
     } catch (e) {
-      print("Wasabi Byte Upload Error: $e");
+      if (kDebugMode) debugPrint("Wasabi Byte Upload Error: $e");
       return null;
     }
   }

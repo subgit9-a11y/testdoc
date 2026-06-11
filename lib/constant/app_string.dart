@@ -82,6 +82,7 @@ class AppString{
 //Gender Selection
   static const String gender_male = "gender_male";
   static const String gender_female = "gender_female";
+  static const String gender_other = "gender_other";
 
 //Profile Popular List
   static const String popular_yes = "popular_yes";
@@ -236,6 +237,8 @@ class AppString{
   static const String profile_time_slot_hint = "profile_time_slot_hint";
   static const String revenue_model = "revenue_model";
   static const String revenue_model_hint = "revenue_model_hint";
+  static const String revenue_model_commission = "revenue_model_commission";
+  static const String revenue_model_subscription = "revenue_model_subscription";
   static const String profile_start_time = "profile_start_time";
   static const String profile_start_time_hint = "profile_start_time_hint";
   static const String profile_end_time = "profile_end_time";

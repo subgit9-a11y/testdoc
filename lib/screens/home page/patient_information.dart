@@ -84,7 +84,6 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
   bool hideButton = true;
 
   //checkbox
-  List<Tab> tabList = [];
   TabController? _tabController;
 
   //Add Medicine Data dialog
@@ -123,16 +122,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
       appointmentDetail = appointmentDetails();
       _loadAstraFillData(); // Load patient's health intake from Astra
 
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.patient_information).toString(),
-      ));
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.patient_illness).toString(),
-      ));
-      tabList.add(new Tab(
-        text: getTranslated(context, AppString.doctor_prescription).toString(),
-      ));
-      _tabController = new TabController(vsync: this, length: tabList.length);
+      _tabController = new TabController(vsync: this, length: 3);
 
       listOfMedicine.clear();
 
@@ -189,7 +179,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController?.dispose();
+    _days.dispose();
     super.dispose();
   }
 
@@ -415,7 +406,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(
@@ -435,7 +427,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                 ),
                               ],
                             ),
-                            Column(
+                            ),
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(
@@ -453,7 +447,9 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                 ),
                               ],
                             ),
-                            Column(
+                            ),
+                            Expanded(
+                              child: Column(
                               children: [
                                 Text(
                                   getTranslated(context,
@@ -465,14 +461,17 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  "${appointmentType ?? '-'} ${appointmentType != null ? ' appointment' : ''}\n$appointment",
+                                  "${appointmentType ?? '-'}${appointmentType != null ? ' appointment' : ''}\n${appointment ?? ''}",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: AyurezeTheme.textPrimary,
                                   ),
                                   textAlign: TextAlign.center,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
                                 )
                               ],
+                            ),
                             )
                           ],
                         ),
@@ -485,7 +484,11 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                           labelColor: AyurezeTheme.textPrimary,
                           controller: _tabController,
                           indicatorSize: TabBarIndicatorSize.tab,
-                          tabs: tabList,
+                          tabs: [
+                            Tab(text: getTranslated(context, AppString.patient_information)),
+                            Tab(text: getTranslated(context, AppString.patient_illness)),
+                            Tab(text: getTranslated(context, AppString.doctor_prescription)),
+                          ],
                           unselectedLabelColor: AyurezeTheme.textSecondary,
                         ),
                       ),
@@ -1018,8 +1021,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(10),
-                                                  child: Image.network(
-                                                    reportImages[index],
+                                                  child: Image(
+                                                    image: CachedNetworkImageProvider(reportImages[index]),
                                                     fit: BoxFit.fitWidth,
                                                   ),
                                                 ),
@@ -1069,6 +1072,8 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
                                               patientId: userId.toString(),
                                               patientName: name ?? "Patient",
                                               patientPhone: phoneNo,
+                                              doctorId: SharedPreferenceHelper.getString(Preferences.doctorId),
+                                              prescriptionId: id?.toString(),
                                               astraFillData: _astraFillData,
                                             ),
                                           ),
@@ -1128,7 +1133,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         OslerToast.success(context, response.msg!);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -1148,7 +1153,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -1189,7 +1194,7 @@ class _patientDetailsScreenState extends State<patientDetailsScreen>
         _loadAstraFillData(patientId: userId.toString(), searchPhone: phoneNo);
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

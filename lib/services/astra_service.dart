@@ -6,6 +6,7 @@ import 'package:doctro/retrofit/apis.dart';
 import 'package:doctro/model/astra/astra_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 
 /// Legacy Astra Service - Maintained for backward compatibility
 /// 
@@ -13,22 +14,21 @@ import 'package:http_parser/http_parser.dart';
 /// which provides access to all Astra AI Healthcare endpoints.
 class AstraService {
   static final AstraService _instance = AstraService._internal();
-  late Dio _dio;
-  
+  final Dio _dio;
+
   /// Use the actual backend URL here.
-  final String baseUrl = Apis.astraBaseUrl; 
+  final String baseUrl = Apis.astraBaseUrl;
 
   factory AstraService() {
     return _instance;
   }
 
-  AstraService._internal() {
-    _dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: Duration(seconds: 45),
-      receiveTimeout: Duration(seconds: 90),
-    ));
-
+  AstraService._internal()
+    : _dio = Dio(BaseOptions(
+        baseUrl: Apis.astraBaseUrl,
+        connectTimeout: const Duration(seconds: 45),
+        receiveTimeout: const Duration(seconds: 90),
+      )) {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         // Add Firebase Auth Token
@@ -46,7 +46,7 @@ class AstraService {
         return handler.next(options);
       },
       onError: (error, handler) {
-        print('AstraService Error: ${error.message}');
+        if (kDebugMode) debugPrint('AstraService Error: ${error.message}');
         return handler.next(error);
       },
     ));
@@ -471,7 +471,7 @@ class AstraService {
         'user_type': 'doctor',
       });
     } catch (e) {
-      print('Failed to store FCM token: $e');
+      if (kDebugMode) debugPrint('Failed to store FCM token: $e');
     }
   }
 

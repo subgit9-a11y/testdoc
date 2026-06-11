@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doctro/chat/constants/colors.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/localization/localization_constant.dart';
@@ -31,7 +32,7 @@ class FullPhotoPage extends StatelessWidget {
         ),
       ),
       body: PhotoView(
-        imageProvider: NetworkImage(url),
+        imageProvider: CachedNetworkImageProvider(url),
       ),
     );
   }

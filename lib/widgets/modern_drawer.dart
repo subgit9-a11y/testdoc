@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:doctro/constant/app_icons.dart';
 import 'package:doctro/constant/color_constant.dart';
@@ -6,6 +7,7 @@ import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
+import 'package:doctro/services/session_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 
 class ModernDrawer extends StatelessWidget {
@@ -23,7 +25,7 @@ class ModernDrawer extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 260,
+              constraints: const BoxConstraints(minHeight: 260),
               width: double.infinity,
               padding: const EdgeInsets.only(top: 54, left: 22, right: 22, bottom: 22),
               decoration: AyurezeTheme.heroDecoration(),
@@ -56,7 +58,7 @@ class ModernDrawer extends StatelessWidget {
                       border: Border.all(color: AyurezeTheme.healingGreen50, width: 2),
                       image: DecorationImage(
                         image: (dFullImage != null && dFullImage!.isNotEmpty)
-                            ? NetworkImage(dFullImage!)
+                            ? CachedNetworkImageProvider(dFullImage!)
                             : const AssetImage("assets/images/no_image.jpg")
                                 as ImageProvider,
                         fit: BoxFit.cover,
@@ -66,11 +68,15 @@ class ModernDrawer extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     "Dr. ${dName ?? "Doctor"}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     phone ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.white.withOpacity(0.74), fontSize: 13),
                   ),
                   const SizedBox(height: 14),
@@ -165,8 +171,8 @@ class ModernDrawer extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: Text(getTranslated(context, AppString.cancel_button).toString())),
           TextButton(
             onPressed: () {
-              SharedPreferenceHelper.clearPref();
-              Navigator.pushNamedAndRemoveUntil(context, 'SignIn', (route) => false);
+              Navigator.pop(context);
+              SessionService.logout();
             },
             child: Text(getTranslated(context, AppString.logout_button).toString(), style: const TextStyle(color: Colors.red)),
           ),

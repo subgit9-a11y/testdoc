@@ -106,7 +106,6 @@ reportView(ctx, List<Map<String, dynamic>> pdfData, int? id, int? userId,
           ),
         );
       } catch (e) {
-        // print(e.toString());
       }
 
       request.headers.addAll(headers);
@@ -117,7 +116,6 @@ reportView(ctx, List<Map<String, dynamic>> pdfData, int? id, int? userId,
       });
 
       var res = await request.send();
-      // print(res);
     });
     material.Navigator.of(ctx).push(
       material.MaterialPageRoute(
@@ -154,7 +152,6 @@ reportView(ctx, List<Map<String, dynamic>> pdfData, int? id, int? userId,
           ),
         );
       } catch (e) {
-        // print(e.toString());
       }
 
       request.headers.addAll(headers);
@@ -165,7 +162,6 @@ reportView(ctx, List<Map<String, dynamic>> pdfData, int? id, int? userId,
       });
 
       var res = await request.send();
-      // print(res);
     });
     material.Navigator.of(ctx).push(
       material.MaterialPageRoute(

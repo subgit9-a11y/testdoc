@@ -35,6 +35,14 @@ class _ChangePasswordState extends State<ChangePassword> {
   bool _isHidden2 = true;
 
   @override
+  void dispose() {
+    _oldPassword.dispose();
+    _newPassword.dispose();
+    _confirmPassword.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;

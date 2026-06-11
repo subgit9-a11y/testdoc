@@ -4,6 +4,8 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:doctro/services/astra_api_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:doctro/model/astra/ai_response_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -120,6 +122,23 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               })
           .toList();
 
+      // Prepare base metadata
+      final Map<String, dynamic> baseMetadata = {
+        'role': 'doctor',
+        'precise': true // Request precise clinical response
+      };
+
+      // Try fetching live GPS coordinates to feed the MCP weather tool
+      try {
+        if (await Permission.location.isGranted) {
+          final position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.low);
+          baseMetadata['latitude'] = position.latitude;
+          baseMetadata['longitude'] = position.longitude;
+        }
+      } catch (_) {
+        // Silently proceed if location fails so chat isn't blocked
+      }
       if (voicePath != null) {
         // Handle voice processing
         if (mounted) {
@@ -142,9 +161,8 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           'session_id': _sessionId,
           'history': history,
           'user_metadata': {
-            'role': 'doctor', 
+            ...baseMetadata,
             'source': 'voice',
-            'precise': true // Request precise clinical response
           }
         });
         final aiResponse = AIChatResponse.fromJson(response);
@@ -178,10 +196,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           'user_id': effectiveUserId,
           'session_id': _sessionId,
           'history': history,
-          'user_metadata': {
-            'role': 'doctor',
-            'precise': true // Request precise clinical response
-          }
+          'user_metadata': baseMetadata
         });
 
         await for (String chunk in stream) {
@@ -196,6 +211,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
             });
             _scrollToBottom();
           }
+
         }
       }
     } catch (e) {

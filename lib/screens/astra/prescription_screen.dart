@@ -21,6 +21,7 @@ class PrescriptionScreen extends StatefulWidget {
   final String patientName;
   final String? patientPhone;
   final String? doctorId;
+  final String? prescriptionId;
   final Map<String, dynamic>? astraFillData;
 
   const PrescriptionScreen({
@@ -29,6 +30,7 @@ class PrescriptionScreen extends StatefulWidget {
     required this.patientName,
     this.patientPhone,
     this.doctorId,
+    this.prescriptionId,
     this.astraFillData,
   }) : super(key: key);
 
@@ -135,7 +137,18 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         TextEditingController(text: (med['dosage'] ?? '1 tablet').toString());
     final TextEditingController durationController =
         TextEditingController(text: (med['duration_days'] ?? 5).toString());
-    String frequency = (med['frequency'] ?? 'twice_daily').toString();
+    final Map<String, String> frequencyLabelToValue = const {
+      'Once daily': 'once_daily',
+      'Twice daily': 'twice_daily',
+      'Thrice daily': 'thrice_daily',
+    };
+    final Map<String, String> frequencyValueToLabel = const {
+      'once_daily': 'Once daily',
+      'twice_daily': 'Twice daily',
+      'thrice_daily': 'Thrice daily',
+    };
+    final rawFrequency = (med['frequency'] ?? 'twice_daily').toString().toLowerCase();
+    String frequencyLabel = frequencyValueToLabel[rawFrequency] ?? 'Twice daily';
 
     await showDialog(
       context: context,
@@ -155,11 +168,11 @@ const SizedBox(height: 10),
                   OslerDropdown(
                     label: '',
                     hint: "Select frequency",
-                    value: frequency,
+                    value: frequencyLabel,
                     items: const ['Once daily', 'Twice daily', 'Thrice daily'],
                     onChanged: (v) {
                       if (v != null) {
-                        setLocalState(() => frequency = v);
+                        setLocalState(() => frequencyLabel = v);
                       }
                     },
                   ),
@@ -182,7 +195,7 @@ const SizedBox(height: 10),
                   _medicines[index]['dosage'] = dosageController.text.trim().isEmpty
                       ? '1 tablet'
                       : dosageController.text.trim();
-                  _medicines[index]['frequency'] = frequency;
+                  _medicines[index]['frequency'] = frequencyLabelToValue[frequencyLabel] ?? 'twice_daily';
                   _medicines[index]['duration_days'] = parsedDays < 1 ? 1 : parsedDays;
                 });
                 Navigator.pop(context);
@@ -219,6 +232,9 @@ const SizedBox(height: 10),
       bool allHaveShopify = _medicines.every((m) => m['shopify_variant_id'] != null && m['shopify_variant_id'].toString().isNotEmpty);
       
       final payload = {
+        "prescription_id": (widget.prescriptionId != null && widget.prescriptionId!.trim().isNotEmpty)
+            ? widget.prescriptionId!.trim()
+            : "draft_${DateTime.now().millisecondsSinceEpoch}",
         "doctor_id": doctorId,
         "patient_id": widget.patientId,
         "patient_name": widget.patientName,
@@ -347,7 +363,9 @@ const SizedBox(height: 10),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("${med['dosage']} | ${med['frequency']} | ${med['duration_days']} days"),
+                              Text(
+                                "${med['dosage']} | ${((med['frequency'] ?? '').toString().replaceAll('_', ' '))} | ${med['duration_days']} days",
+                              ),
                               Row(
                                 children: [
                                   IconButton(

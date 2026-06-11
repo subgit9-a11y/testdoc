@@ -7,6 +7,9 @@ class HomeProvider {
   HomeProvider({required this.firebaseFirestore});
 
   Future<void> updateDataFirestore(String collectionPath, String path, Map<String, String> dataNeedUpdate) {
+    if (collectionPath.trim().isEmpty || path.trim().isEmpty) {
+      return Future.value();
+    }
     return firebaseFirestore.collection(collectionPath).doc(path).update(dataNeedUpdate);
   }
 

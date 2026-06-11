@@ -1,7 +1,7 @@
 import 'package:doctro/retrofit/server_error.dart';
 
 class BaseModel<T> {
-  late ServerError error;
+  ServerError? error;
   T? data;
 
   setException(ServerError error) {

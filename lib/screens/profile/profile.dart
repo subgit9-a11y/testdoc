@@ -177,7 +177,7 @@ class _ProfileScreen extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AyurezeTheme.canvas,
       appBar: PreferredSize(
-        preferredSize: Size(width! * 0.3, 220),
+        preferredSize: const Size.fromHeight(220),
         child: SafeArea(
           top: true,
           child: Padding(
@@ -1928,21 +1928,18 @@ class _ProfileScreen extends State<ProfileScreen> {
         data.add(hospitalReq[i].id.toString());
       }
     }
+    hospitalIds = data.join(',');
 
-    for (int j = 0; j < data.length; j++) {
-      if (data.length <= 1) {
-        hospitalIds = data[j];
-      } else {
-        hospitalIds += data[j] + ',';
+    if (_pDob.text.isNotEmpty) {
+      try {
+        newDateApiPass = DateFormat('yyyy-MM-dd')
+            .format(DateFormat('dd-MM-yyyy').parse(_pDob.text));
+      } catch (_) {
+        newDateApiPass = _pDob.text;
       }
+    } else {
+      newDateApiPass = "";
     }
-
-    if (data.length > 1) {
-      String result = hospitalIds.substring(0, hospitalIds.length - 1);
-      hospitalIds = result + " ";
-    }
-
-    newDateApiPass = DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(_pDob.text));
     Map<String, dynamic> body = {
       "name": _pName.text,
       "treatment_id": 1, // Default value as it is removed from UI
@@ -1974,7 +1971,7 @@ class _ProfileScreen extends State<ProfileScreen> {
       SharedPreferenceHelper.setInt(Preferences.is_filled, 1);
       OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2066,12 +2063,14 @@ class _ProfileScreen extends State<ProfileScreen> {
              DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(rawDob);
              _pDob.text = DateFormat('dd-MM-yyyy').format(parsedDate);
              _selectedDate = parsedDate;
-          } else {
-             _pDob.text = rawDob;
-             try {
-                _selectedDate = DateFormat('dd-MM-yyyy').parse(rawDob);
-             } catch (e) {}
-          }
+           } else {
+              _pDob.text = rawDob;
+              try {
+                 _selectedDate = DateFormat('dd-MM-yyyy').parse(rawDob);
+              } catch (e) {
+                if (kDebugMode) debugPrint('DateFormat dd-MM-yyyy parse failed for $rawDob: $e');
+              }
+            }
         } catch (e) {
           _pDob.text = rawDob;
         }
@@ -2101,7 +2100,7 @@ class _ProfileScreen extends State<ProfileScreen> {
 
       setState(() {});
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2117,10 +2116,10 @@ class _ProfileScreen extends State<ProfileScreen> {
         for (int i = 0; i < response.data!.length; i++) {
           hospitalReq.add(response.data![i]);
         }
-        doctorProfile();
       });
+      await doctorProfile();
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2136,10 +2135,10 @@ class _ProfileScreen extends State<ProfileScreen> {
           await RestClient(await RetroApi().dioData(context)).uploadImage(body);
       setState(() {
         msg = response.data;
-        SharedPreferenceHelper.setString(Preferences.image, response.data!);
       });
+      await SharedPreferenceHelper.setString(Preferences.image, response.data!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2147,32 +2146,34 @@ class _ProfileScreen extends State<ProfileScreen> {
 
   void proImageFromGallery() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        SharedPreferenceHelper.setString(Preferences.image, pickedFile.path);
-        proImage = File(SharedPreferenceHelper.getString(Preferences.image));
-        List<int> imageBytes = proImage!.readAsBytesSync();
-        image = base64Encode(imageBytes);
-        uploadImage();
-      } else {
-        // print('No image selected.');
-      }
-    });
+    if (pickedFile == null) return;
+    try {
+      proImage = File(pickedFile.path);
+      List<int> imageBytes = await proImage!.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+      setState(() {
+        image = base64Image;
+      });
+      await uploadImage();
+    } catch (_) {
+      // user cancelled or read failed
+    }
   }
 
   void proImageFromCamera() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if (pickedFile != null) {
-        SharedPreferenceHelper.setString(Preferences.image, pickedFile.path);
-        proImage = File(SharedPreferenceHelper.getString(Preferences.image));
-        List<int> imageBytes = proImage!.readAsBytesSync();
-        image = base64Encode(imageBytes);
-        uploadImage();
-      } else {
-        // print('No image selected.');
-      }
-    });
+    if (pickedFile == null) return;
+    try {
+      proImage = File(pickedFile.path);
+      List<int> imageBytes = await proImage!.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+      setState(() {
+        image = base64Image;
+      });
+      await uploadImage();
+    } catch (_) {
+      // user cancelled or read failed
+    }
   }
 
   void chooseProfileImage() {
@@ -2223,7 +2224,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2250,7 +2251,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2274,7 +2275,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -2330,6 +2331,31 @@ class _ProfileScreen extends State<ProfileScreen> {
     if (_currentStep > 0) {
       setState(() => _currentStep -= 1);
     }
+  }
+
+  @override
+  void dispose() {
+    _degree.dispose();
+    _college.dispose();
+    _completeYear.dispose();
+    _certificate.dispose();
+    _year.dispose();
+    _pDegree.dispose();
+    _pExperience.dispose();
+    _pStartTime.dispose();
+    _pEndTime.dispose();
+    _pTimeSlot.dispose();
+    _vAppointmentFees.dispose();
+    _aAppointmentFees.dispose();
+    _pName.dispose();
+    _pDob.dispose();
+    _pDesc.dispose();
+    _pCollege.dispose();
+    _pCollegeYear.dispose();
+    _pCertificate.dispose();
+    _pCertificateYear.dispose();
+    _pBasedOn.dispose();
+    super.dispose();
   }
 }
 

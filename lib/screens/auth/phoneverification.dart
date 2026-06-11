@@ -16,6 +16,7 @@ import 'package:doctro/chat/providers/auth_provider.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/constant/preferences.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
@@ -43,6 +44,13 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   void initState() {
     id = widget.data!.id;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pinPutController.dispose();
+    _pinPutFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -196,8 +204,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
       response = await RestClient(await RetroApi().dioData(context))
           .otpVerifyRequest(body);
       if (response.success == true) {
-        _saveUserData(response);
-        
+        await _saveUserData(response);
+        if (!mounted) return;
+
         if (response.data?.isFilled == 0) {
           // New doctor or incomplete profile: Go to Professional Registration
           Navigator.pushReplacement(
@@ -224,7 +233,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         OslerToast.error(context, response.msg!);
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -239,35 +248,39 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
       Navigator.pushNamed(context, 'SignIn');
       OslerToast.success(context, response.msg!);
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
   }
 
-  void _saveUserData(OtpVerify response) {
+  Future<void> _saveUserData(OtpVerify response) async {
     if (response.data == null) return;
-    
+
     final data = response.data!;
-    SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
-    SharedPreferenceHelper.setString(Preferences.name, data.name ?? "");
-    SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? "");
-    SharedPreferenceHelper.setString(Preferences.email, data.email ?? "");
-    SharedPreferenceHelper.setString(Preferences.image, data.image ?? "");
-    SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? "");
-    SharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0);
-    SharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1);
-    
+    await Future.wait([
+      SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SecureSharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+      SecureSharedPreferenceHelper.setInt(Preferences.is_filled, data.isFilled ?? 0),
+      SecureSharedPreferenceHelper.setInt(Preferences.subscription_status, data.subscriptionStatus ?? -1),
+    ]);
+
     if (data.token != null && data.token!.isNotEmpty) {
-      SharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
+      await SecureSharedPreferenceHelper.setString(Preferences.auth_token, data.token!);
     }
-    
+
+    if (!mounted) return;
+
     // Notify auth provider for chat
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       authProvider.handleSignIn();
     } catch (e) {
-      debugPrint("Auth Provider notification error: $e");
+      if (kDebugMode) debugPrint("Auth Provider notification error: $e");
     }
   }
 }

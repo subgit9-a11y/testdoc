@@ -54,13 +54,15 @@ class _CreateAccountState extends State<CreateAccount> {
       _name.text = widget.prefillData!['name'] ?? "";
       _email.text = widget.prefillData!['email'] ?? "";
     }
+  }
 
-    Future.delayed(Duration.zero, () {
-      gender = [
-        getTranslated(context, AppString.gender_male).toString(),
-        getTranslated(context, AppString.gender_female).toString(),
-      ];
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    gender = [
+      getTranslated(context, AppString.gender_male),
+      getTranslated(context, AppString.gender_female),
+    ];
   }
 
   @override
@@ -161,8 +163,12 @@ class _CreateAccountState extends State<CreateAccount> {
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icon(Icons.alternate_email_rounded, size: 20, color: AyurezeTheme.healingGreen100),
                         validator: (String? value) {
-                          if (value!.isEmpty) {
+                          if (value == null || value.trim().isEmpty) {
                             return getTranslated(context, AppString.please_enter_email).toString();
+                          }
+                          final emailRegex = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+                          if (!emailRegex.hasMatch(value.trim())) {
+                            return "Please enter a valid email address";
                           }
                           return null;
                         },
@@ -241,7 +247,12 @@ class _CreateAccountState extends State<CreateAccount> {
                           onPressed: () => setState(() => _isHidden = !_isHidden),
                         ),
                         validator: (String? value) {
-                          if (value!.isEmpty) return getTranslated(context, AppString.please_enter_password).toString();
+                          if (value == null || value.isEmpty) {
+                            return getTranslated(context, AppString.please_enter_password).toString();
+                          }
+                          if (value.length < 6) {
+                            return "Password must be at least 6 characters";
+                          }
                           return null;
                         },
                       ),

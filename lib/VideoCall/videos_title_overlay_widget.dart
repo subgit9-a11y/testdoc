@@ -47,7 +47,6 @@ class _VideoTitleOverlayWidgetState extends State<VideoTitleOverlayWidget> {
         isInPipMode = true;
         width = oldWidth - 32.0;
         height = Constants.VIDEO_TITLE_HEIGHT_PIP;
-        // print(oldHeight - height - Constants.BOTTOM_PADDING_PIP);
         offset = Offset(16, oldHeight - height - Constants.BOTTOM_PADDING_PIP);
       });
     });

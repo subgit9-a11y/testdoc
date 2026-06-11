@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doctro/chat/constants/colors.dart';
 import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/providers/auth_provider.dart';
@@ -176,8 +177,8 @@ class HomePageState extends State<HomePage> {
               children: <Widget>[
                 Material(
                   child: userChat.photoUrl.isNotEmpty
-                      ? Image.network(
-                          userChat.photoUrl,
+                      ? Image(
+                          image: CachedNetworkImageProvider(userChat.photoUrl),
                           fit: BoxFit.cover,
                           width: 50,
                           height: 50,

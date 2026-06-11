@@ -12,6 +12,7 @@ import 'package:doctro/retrofit/base_model.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:doctro/retrofit/server_error.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:doctro/widgets/osler_toast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -132,7 +133,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Error: e');
+      if (kDebugMode) debugPrint('Error: $e');
     }
   }
 
@@ -602,7 +603,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                       onFinish: (number) async {
                         if (number != null && number.toString() != '') {
                           aPaymentToken = number.toString();
-                          // print(aPaymentToken);
                           purchaseSubscriptions();
                         }
                       },
@@ -722,7 +722,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         });
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -751,7 +751,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         OslerToast.success(context, getTranslated(context, AppString.payment_success).toString());
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -838,7 +838,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     aPaymentToken = response.paymentId;
-    // print(response.paymentId);
     aPaymentToken != ""
         ? purchaseSubscriptions()
         : OslerToast.error(context, getTranslated(context, AppString.payment_not_complete).toString());

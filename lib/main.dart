@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
+import 'package:flutter/foundation.dart' show FlutterError;
+import 'package:flutter/widgets.dart' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctro/chat/pages/chat_page.dart' show ChatPage;
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/helpers/logger.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/helpers/notification.dart' show NotificationHandler;
 import 'package:doctro/localization/language_localization.dart';
 import 'package:doctro/model/setting.dart';
@@ -63,13 +67,23 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+StreamSubscription<RemoteMessage>? _onMessageSub;
+StreamSubscription<RemoteMessage>? _onMessageOpenedSub;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  bool firebaseInitialized = false;
+
+  // Guard against duplicate listeners on hot-restart in dev mode
+  await _onMessageSub?.cancel();
+  await _onMessageOpenedSub?.cancel();
+  _onMessageSub = null;
+  _onMessageOpenedSub = null;
 
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    debugPrint(".env not found, using compile-time environment values.");
+    if (kDebugMode) debugPrint(".env not found, using compile-time environment values.");
   }
 
   String? getEnvSafe(String key) {
@@ -86,12 +100,16 @@ Future<void> main() async {
       getEnvSafe('SUPABASE_ANON_KEY') ?? const String.fromEnvironment('SUPABASE_ANON_KEY');
 
   if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-    );
+    try {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+    } catch (e) {
+      if (kDebugMode) debugPrint("Supabase initialization failed: $e");
+    }
   } else {
-    debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
+    if (kDebugMode) debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
   }
   
   // Use a safer initialization sequence
@@ -99,37 +117,60 @@ Future<void> main() async {
   try {
     _prefs = await SharedPreferences.getInstance();
     await SharedPreferenceHelper.init();
+    await SecureSharedPreferenceHelper.init();
   } catch (e) {
-    debugPrint("Failed to initialize preferences: $e");
+    if (kDebugMode) debugPrint("Failed to initialize preferences: $e");
   }
 
   // Initialize Firebase but don't let it hang the whole app
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    firebaseInitialized = true;
     
     // Subscribe to topic in background, don't await it
     FirebaseMessaging.instance.subscribeToTopic("all").catchError((e) {
-      debugPrint("Failed to subscribe to topic: $e");
+      if (kDebugMode) debugPrint("Failed to subscribe to topic: $e");
     });
   } catch (e) {
-    debugPrint("Firebase initialization failed: $e");
+    if (kDebugMode) debugPrint("Firebase initialization failed: $e");
   }
 
   if (kDebugMode) {
     HttpOverrides.global = new MyHttpOverrides();
   }
   
-  if (Platform.isAndroid) {
-    SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
+  if (Platform.isAndroid && _prefs != null) {
+    try {
+      await SharedPreferenceHelper.setString(Preferences.device_platform, "Android");
+    } catch (e) {
+      if (kDebugMode) debugPrint("Failed to store device platform: $e");
+    }
   }
 
   if (_prefs == null) {
-    debugPrint("CRITICAL: SharedPreferences failed to initialize. Starting with empty prefs.");
+    if (kDebugMode) debugPrint("CRITICAL: SharedPreferences failed to initialize. Starting with empty prefs.");
     // Ideally we should show an error screen, but for now we'll try to continue
     _prefs = await SharedPreferences.getInstance(); 
   }
 
-  runApp(MyApp(prefs: _prefs!));
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      debugPrint('FlutterError: ${details.exception}');
+      debugPrint('Stack: ${details.stack}');
+    }
+    logger.e(details.exception, details.stack);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (kDebugMode) {
+      debugPrint('AsyncError: $error');
+      debugPrint('Stack: $stack');
+    }
+    logger.e(error, stack);
+    return true;
+  };
+
+  runApp(MyApp(prefs: _prefs!, firebaseInitialized: firebaseInitialized));
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -153,21 +194,22 @@ class MyHttpOverrides extends HttpOverrides {
 
 class MyApp extends StatefulWidget {
   final SharedPreferences prefs;
-  const MyApp({Key? key, required this.prefs}) : super(key: key);
+  final bool firebaseInitialized;
+  const MyApp({Key? key, required this.prefs, required this.firebaseInitialized}) : super(key: key);
 
   _MyAppState createState() => _MyAppState();
 
   static void setLocale(BuildContext context, Locale newLocale) {
-    _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
+    final _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    if (state == null) {
+      if (kDebugMode) debugPrint('MyApp.setLocale: ancestor state not found');
+      return;
+    }
     state.setLocale(newLocale);
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-
-
   Locale? _locale = const Locale('en', 'US');
   String messageImage = '';
   String messageName = '';
@@ -176,7 +218,9 @@ class _MyAppState extends State<MyApp> {
 
   void initState() {
     super.initState();
-    initApp();
+    if (widget.firebaseInitialized) {
+      initApp();
+    }
     // settingRequest();
   }
 
@@ -238,7 +282,7 @@ class _MyAppState extends State<MyApp> {
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _onMessageSub = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // final RemoteNotification? notification = message.notification;
       // final AndroidNotification? android = message.notification?.android;
       // final Map<String, dynamic> dataValue = message.data;
@@ -279,7 +323,7 @@ class _MyAppState extends State<MyApp> {
       );
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _onMessageOpenedSub = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       logger.i("Notification tapped: ${message.data}");
       // Map<String, dynamic> data = message.data;
       // logger.e(data);
@@ -345,7 +389,6 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isAndroid) {
       final permission = await Permission.notification.request();
       if (permission.isGranted) {
-        // print('Notification permission granted');
       }
     }
   }
@@ -357,7 +400,6 @@ class _MyAppState extends State<MyApp> {
 
     if (actionId == 'accept_action') {
       // Handle accept
-      // print('Call Accepted');
       if (doctorId != null)
         navigatorKey.currentState?.pushReplacement(
           MaterialPageRoute(
@@ -372,7 +414,6 @@ class _MyAppState extends State<MyApp> {
       return;
     } else if (actionId == 'decline_action') {
       // Handle decline
-      // print('Call Declined');
       if (doctorId != null)
         navigatorKey.currentState?.pushReplacement(
           MaterialPageRoute(
@@ -418,7 +459,7 @@ class _MyAppState extends State<MyApp> {
     try {
       response =
           await RestClient(await RetroApi2().dioData2()).settingRequest();
-      log("Data = ${response.data?.toJson()} ");
+      if (kDebugMode) debugPrint("Setting response received");
       if (SharedPreferenceHelper.getBoolean(Preferences.is_logged_in) == true) {
         if (response.data!.stripeSecretKey != null) {
           SharedPreferenceHelper.setString(
@@ -511,7 +552,7 @@ class _MyAppState extends State<MyApp> {
         }
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -603,6 +644,16 @@ class _MyAppState extends State<MyApp> {
         ),
       );
     } else {
+      if (!widget.firebaseInitialized) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: const FirebaseUnavailableScreen(),
+        );
+      }
+
+      final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+      final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -618,19 +669,19 @@ class _MyAppState extends State<MyApp> {
                 create: (_) => provider.AuthProvider(
                   firebaseAuth: FirebaseAuth.instance,
                   prefs: widget.prefs,
-                  firebaseFirestore: this.firebaseFirestore,
+                  firebaseFirestore: firebaseFirestore,
                 ),
               ),
               Provider<HomeProvider>(
                 create: (_) => HomeProvider(
-                  firebaseFirestore: this.firebaseFirestore,
+                  firebaseFirestore: firebaseFirestore,
                 ),
               ),
               Provider<ChatProvider>(
                 create: (_) => ChatProvider(
                   prefs: widget.prefs,
-                  firebaseFirestore: this.firebaseFirestore,
-                  firebaseStorage: this.firebaseStorage,
+                  firebaseFirestore: firebaseFirestore,
+                  firebaseStorage: firebaseStorage,
                 ),
               ),
               ChangeNotifierProvider<ThemeProvider>(
@@ -649,9 +700,13 @@ class _MyAppState extends State<MyApp> {
                         ? LoginHomeScreen(chat: "")
                         : SignIn(),
                     locale: _locale,
-              supportedLocales: [
+              supportedLocales: const [
                 Locale(ENGLISH, 'US'),
-                // Locale(ARABIC, 'AE'),
+                Locale(TAMIL, 'IN'),
+                Locale(HINDI, 'IN'),
+                Locale(MALAYALAM, 'IN'),
+                Locale(TELUGU, 'IN'),
+                Locale(KANNADA, 'IN'),
               ],
               localizationsDelegates: [
                 LanguageLocalization.delegate,
@@ -660,10 +715,12 @@ class _MyAppState extends State<MyApp> {
                 GlobalCupertinoLocalizations.delegate,
               ],
               localeResolutionCallback: (deviceLocal, supportedLocales) {
+                if (deviceLocal == null) {
+                  return supportedLocales.first;
+                }
                 for (var local in supportedLocales) {
-                  if (local.languageCode == deviceLocal!.languageCode &&
-                      local.countryCode == deviceLocal.countryCode) {
-                    return deviceLocal;
+                  if (local.languageCode == deviceLocal.languageCode) {
+                    return local;
                   }
                 }
                 return supportedLocales.first;
@@ -703,6 +760,39 @@ class _MyAppState extends State<MyApp> {
         ),
       );
     }
+  }
+}
+
+class FirebaseUnavailableScreen extends StatelessWidget {
+  const FirebaseUnavailableScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.cloud_off, size: 52, color: Colors.redAccent),
+                SizedBox(height: 12),
+                Text(
+                  'Service setup error',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'The app could not connect to required services. Please check Firebase configuration and restart the app.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

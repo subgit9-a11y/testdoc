@@ -130,9 +130,10 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
     });
     
     Future.delayed(const Duration(seconds: 5), () {
-      if (FirebaseAuth.instance.currentUser != null) {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null && currentUser.uid.isNotEmpty) {
         homeProvider.updateDataFirestore(FirestoreConstants.pathUserCollection,
-            FirebaseAuth.instance.currentUser!.uid, {
+            currentUser.uid, {
           'pushToken': SharedPreferenceHelper.getString(Preferences.messageToken)
         });
       }
@@ -239,7 +240,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: (dFullImage != null && dFullImage!.isNotEmpty)
-                          ? NetworkImage(dFullImage!)
+                          ? CachedNetworkImageProvider(dFullImage!)
                           : const AssetImage("assets/images/no_image.jpg")
                               as ImageProvider,
                       fit: BoxFit.cover,
@@ -324,7 +325,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Hello, Dr. ${dName?.split(' ').first ?? 'Doctor'}",
+                  "Hello, Dr. ${(dName?.trim().isNotEmpty == true) ? dName!.trim().split(' ').first : 'Doctor'}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -362,7 +363,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       physics: NeverScrollableScrollPhysics(),
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
-      childAspectRatio: 1.6,
+      childAspectRatio: 1.35,
       children: [
         _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100),
         _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, AyurezeTheme.healingGreen50),
@@ -374,11 +375,11 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: AyurezeTheme.panelDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -391,13 +392,25 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
               Icon(Icons.arrow_forward_ios, size: 12, color: AyurezeTheme.textSecondary.withOpacity(0.5)),
             ],
           ),
-          Column(
+          const SizedBox(height: 10),
+          Expanded(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AyurezeTheme. textPrimary)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AyurezeTheme. textPrimary)),
+              ),
               const SizedBox(height: 2),
-              Text(title, style: TextStyle(fontSize: 12, color: AyurezeTheme.textSecondary)),
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 11, color: AyurezeTheme.textSecondary),
+              ),
             ],
+          ),
           ),
         ],
       ),
@@ -538,12 +551,16 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
 Widget _buildAppointmentCard(dynamic app) {
     final statusMap = {
       'pending': AppointmentStatus.pending,
+      'approve': AppointmentStatus.approved,
       'approved': AppointmentStatus.approved,
+      'completed': AppointmentStatus.complete,
       'complete': AppointmentStatus.complete,
+      'canceled': AppointmentStatus.cancel,
       'cancelled': AppointmentStatus.cancel,
       'waiting': AppointmentStatus.waiting,
     };
-    final status = statusMap[app.appointmentStatus?.toLowerCase()] ?? AppointmentStatus.pending;
+    final statusKey = (app?.appointmentStatus ?? '').toString().toLowerCase();
+    final status = statusMap[statusKey] ?? AppointmentStatus.pending;
 
     return OslerCard(
       margin: EdgeInsets.only(bottom: 12),
@@ -615,40 +632,33 @@ Widget _buildAppointmentCard(dynamic app) {
       }
 
       setState(() {
-        if (response.data!.today!.isNotEmpty) {
-          response.data!.today!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          todayAppointments.addAll(response.data!.today!);
+        final todayList = response.data?.today ?? <Today>[];
+        final tomorrowList = response.data?.tomorrow ?? <Tomorrow>[];
+        final upcomingList = response.data?.upcoming ?? <Upcoming>[];
+
+        DateTime parseTimeSafe(String? value) {
+          final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+          final time = (value ?? "00:00 AM").toUpperCase();
+          try {
+            return DateFormat("yyyy-MM-dd h:mm a").parse("$today $time");
+          } catch (_) {
+            return DateTime(1970, 1, 1);
+          }
         }
 
-        if (response.data!.tomorrow!.isNotEmpty) {
-          response.data!.tomorrow!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          tomorrowAppointments.addAll(response.data!.tomorrow!);
+        if (todayList.isNotEmpty) {
+          todayList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          todayAppointments.addAll(todayList);
         }
 
-        if (response.data!.upcoming!.isNotEmpty) {
-          response.data!.upcoming!.sort((a, b) => DateFormat("yyyy-MM-dd h:mm a")
-              .parse(DateTime.now().toString().split(" ")[0] +
-                  " " +
-                  (a.time ?? "00:00 AM").toUpperCase())
-              .compareTo(DateFormat("yyyy-MM-dd h:mm a").parse(
-                  DateTime.now().toString().split(" ")[0] +
-                      " " +
-                      (b.time ?? "00:00 AM").toUpperCase())));
-          upcomingAppointments.addAll(response.data!.upcoming!);
+        if (tomorrowList.isNotEmpty) {
+          tomorrowList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          tomorrowAppointments.addAll(tomorrowList);
+        }
+
+        if (upcomingList.isNotEmpty) {
+          upcomingList.sort((a, b) => parseTimeSafe(a.time).compareTo(parseTimeSafe(b.time)));
+          upcomingAppointments.addAll(upcomingList);
         }
 
         // Simple way to estimate active patients: unique patient names across all categories
@@ -659,7 +669,7 @@ Widget _buildAppointmentCard(dynamic app) {
         patientCount = uniquePatients.length;
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;
@@ -914,7 +924,7 @@ Widget _buildAppointmentCard(dynamic app) {
         }
       });
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

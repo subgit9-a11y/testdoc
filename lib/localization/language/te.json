@@ -325,5 +325,12 @@
     "settings_terms_conditions":  "నిబంధనలు \u0026 షరతులు",
     "settings_delete_account":  "ఖాతాను తొలగించండి",
     "settings_account_section":  "ఖాతా \u0026 సభ్యత్వం",
-    "settings_video_call_desc":  "నేరుగా వీడియో కాల్‌లను ప్రారంభించడానికి రోగులను అనుమతించండి"
+    "settings_video_call_desc":  "నేరుగా వీడియో కాల్‌లను ప్రారంభించడానికి రోగులను అనుమతించండి",
+    "login_email_validator": "ఇమెయిల్ నమోదు చేయండి",
+    "login_email_validator2": "చెల్లుబాటు అయ్యే ఇమెయిల్ నమోదు చేయండి",
+    "login_password_validator": "పాస్‌వర్డ్ నమోదు చేయండి",
+    "doctor": "డాక్టర్",
+    "gender_other": "ఇతర",
+    "revenue_model_commission": "కమీషన్",
+    "revenue_model_subscription": "సభ్యత్వం"
 }

@@ -99,13 +99,10 @@ class _VideoCallHistoryState extends State<VideoCallHistory> {
                         if (hourPart != "00" && minuteType != "00") {
                           duration =
                               "${hourPart + "h " + minuteType + "m " + secondType + "s "}";
-                          // print("Time3 $duration");
                         } else if (hourPart == "00" && minuteType != "00") {
                           duration = "${minuteType + "m " + secondType + "s "}";
-                          // print("Time2 $duration ");
                         } else {
                           duration = "${secondType + "s "}";
-                          // print("Time1 $duration ");
                         }
 
                         return Column(
@@ -284,7 +281,7 @@ class _VideoCallHistoryState extends State<VideoCallHistory> {
         );
       }
     } catch (error, stacktrace) {
-      // print("Exception occur: $error stackTrace: $stacktrace");
+
       return BaseModel()..setException(ServerError.withError(error: error));
     }
     return BaseModel()..data = response;

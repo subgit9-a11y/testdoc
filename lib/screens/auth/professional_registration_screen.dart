@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -14,6 +16,7 @@ import 'package:doctro/screens/auth/registration_success_screen.dart';
 import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
+import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:doctro/model/register.dart';
 import 'package:intl/intl.dart';
 
@@ -44,8 +47,15 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
    
   String? _genderSelect;
   String? _selectedRevenueModel;
-  List<String> _revenueModels = ["Commission", "Subscription"];
-  List<String> _genders = ["Male", "Female", "Other"];
+  final List<MapEntry<String, String>> _revenueModelOptions = [
+    MapEntry('Commission', 'revenue_model_commission'),
+    MapEntry('Subscription', 'revenue_model_subscription'),
+  ];
+  final List<MapEntry<String, String>> _genderOptions = [
+    MapEntry('Male', 'gender_male'),
+    MapEntry('Female', 'gender_female'),
+    MapEntry('Other', 'gender_other'),
+  ];
   
   File? _certificateImage;
   String? _existingCertificateUrl;
@@ -61,6 +71,31 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
 
   final SupabaseService _supabaseService = SupabaseService();
 
+  DateTime? _parseDobFlexible(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return null;
+    final formats = [
+      DateFormat('yyyy-MM-dd'),
+      DateFormat('dd-MM-yyyy'),
+      DateFormat('yyyy-MM-dd HH:mm:ss'),
+      DateFormat('yyyy-MM-ddTHH:mm:ss'),
+    ];
+    for (final format in formats) {
+      try {
+        return format.parseStrict(value);
+      } catch (e) {
+        if (kDebugMode) debugPrint('DateFormat parse failed for $value: $e');
+      }
+    }
+    try {
+      return DateTime.parse(value);
+    } catch (e) {
+      if (kDebugMode) debugPrint('DateTime.parse fallback failed for $value: $e');
+    }
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,17 +104,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     if (widget.personalData != null) {
       String rawDob = widget.personalData!['dob'] ?? "";
       if (rawDob.isNotEmpty) {
-        try {
-          // If signup passes yyyy-MM-dd reformat it
-          if (rawDob.contains("-") && rawDob.indexOf("-") == 4) {
-             DateTime d = DateFormat('yyyy-MM-dd').parse(rawDob);
-             _dobController.text = DateFormat('dd-MM-yyyy').format(d);
-          } else {
-             _dobController.text = rawDob;
-          }
-        } catch (e) {
-          _dobController.text = rawDob;
-        }
+        final parsedDob = _parseDobFlexible(rawDob);
+        _dobController.text = parsedDob != null
+            ? DateFormat('dd-MM-yyyy').format(parsedDob)
+            : rawDob;
       }
       _nameController.text = widget.personalData!['name'] ?? "";
       _emailController.text = widget.personalData!['email'] ?? "";
@@ -103,19 +131,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           _emailController.text = data.email ?? "";
           _phoneController.text = data.phone ?? "";
           
-          if (data.dob != null && data.dob!.contains("-")) {
-            try {
-              if (data.dob!.indexOf("-") == 4) {
-                 _dobController.text = DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(data.dob!));
-              } else {
-                 _dobController.text = data.dob!;
-              }
-            } catch (e) {
-              _dobController.text = data.dob!;
-            }
-          } else {
-            _dobController.text = data.dob ?? "";
-          }
+          final parsedDob = _parseDobFlexible(data.dob ?? "");
+          _dobController.text = parsedDob != null
+              ? DateFormat('dd-MM-yyyy').format(parsedDob)
+              : (data.dob ?? "");
           _genderSelect = data.gender;
           
           _licenseController.text = data.hospitalId ?? "";
@@ -135,7 +154,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
       }
     } catch (e) {
-      print("Error fetching profile details: $e");
+      if (kDebugMode) debugPrint("Error fetching profile details: $e");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -186,11 +205,17 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         ? "English"
         : _languageController.text.trim();
 
+    final parsedDob = _parseDobFlexible(_dobController.text);
+    if (_dobController.text.isNotEmpty && parsedDob == null) {
+      OslerToast.warning(context, "DOB must be in dd-MM-yyyy or yyyy-MM-dd format");
+      return;
+    }
+
     combinedData.addAll({
       "name": _nameController.text,
       "email": _emailController.text,
       "phone": _phoneController.text,
-      "dob": _dobController.text.isNotEmpty ? DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(_dobController.text)) : "",
+      "dob": parsedDob != null ? DateFormat('yyyy-MM-dd').format(parsedDob) : "",
       "gender": _genderSelect,
       "treatment_id": safeTreatmentId,
       "category_id": safeCategoryId,
@@ -265,12 +290,13 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             isFaceVerified: true,
           );
         } catch (e) {
-          debugPrint("Supabase Sync Error: $e");
+          if (kDebugMode) debugPrint("Supabase Sync Error: $e");
         }
 
         // 6. Save Preferences & Navigate
       if (response.success == true) {
-        _savePreferences(response);
+        await _savePreferences(response);
+        if (!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -288,9 +314,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       }
     } catch (e, stack) {
       if (e is DioException) {
-        debugPrint("Registration Request Data: ${e.requestOptions.data}");
-        debugPrint("Registration Error Status: ${e.response?.statusCode}");
-        debugPrint("Registration Error Response: ${e.response?.data}");
+        if (kDebugMode) {
+          debugPrint("Registration Error Status: ${e.response?.statusCode}");
+          debugPrint("Registration Error Response: ${e.response?.data}");
+        }
 
         String errorMsg = "Registration failed";
         if (e.response?.data is Map) {
@@ -298,8 +325,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
         OslerToast.error(context, errorMsg);
       } else {
-        debugPrint("Non-Dio Error during registration: $e");
-        debugPrint("Stacktrace: $stack");
+        if (kDebugMode) {
+          debugPrint("Non-Dio Error during registration: $e");
+          debugPrint("Stacktrace: $stack");
+        }
         OslerToast.error(context, "An unexpected error occurred: $e");
       }
     } finally {
@@ -307,29 +336,31 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     }
   }
 
-  void _savePreferences(Register response) {
+  Future<void> _savePreferences(Register response) async {
     if (response.data == null) return;
     final data = response.data!;
-    
-    SharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true);
-    SharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? "");
-    SharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? "");
-    SharedPreferenceHelper.setString(Preferences.name, data.name ?? "");
-    SharedPreferenceHelper.setString(Preferences.email, data.email ?? "");
-    SharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? "");
-    SharedPreferenceHelper.setString(Preferences.gender, data.gender ?? "");
-    SharedPreferenceHelper.setString(Preferences.dob, data.dob ?? "");
-    SharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? "");
-    SharedPreferenceHelper.setString(Preferences.image, data.image ?? "");
-    SharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? "");
+
+    await Future.wait([
+      SecureSharedPreferenceHelper.setBoolean(Preferences.is_logged_in, true),
+      SecureSharedPreferenceHelper.setString(Preferences.auth_token, response.token ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.refresh_token, response.refreshToken ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.name, data.name ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.email, data.email ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.phone_no, data.phone ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.gender, data.gender ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.dob, data.dob ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.uniqueId, data.uniqueId ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.image, data.image ?? ""),
+      SecureSharedPreferenceHelper.setString(Preferences.doctorId, data.id?.toString() ?? ""),
+    ]);
   }
 
   Future<void> _updateProfile(Map<String, dynamic> profileData) async {
     setState(() => _isLoading = true);
     try {
-      String doctorId = SharedPreferenceHelper.getString(Preferences.uniqueId);
+      String doctorId = await SecureSharedPreferenceHelper.getString(Preferences.uniqueId);
       if (doctorId == 'N_A' || doctorId.isEmpty) {
-        doctorId = SharedPreferenceHelper.getString(Preferences.doctorId);
+        doctorId = await SecureSharedPreferenceHelper.getString(Preferences.doctorId);
       }
       
       String? certUrl = _existingCertificateUrl;
@@ -357,9 +388,10 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       }
     } catch (e, stack) {
       if (e is DioException) {
-        debugPrint("Update Request Data: ${e.requestOptions.data}");
-        debugPrint("Update Error Status: ${e.response?.statusCode}");
-        debugPrint("Update Error Response: ${e.response?.data}");
+        if (kDebugMode) {
+          debugPrint("Update Error Status: ${e.response?.statusCode}");
+          debugPrint("Update Error Response: ${e.response?.data}");
+        }
 
         String errorMsg = "Profile update failed";
         if (e.response?.data is Map) {
@@ -367,13 +399,31 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
         }
         OslerToast.error(context, errorMsg);
       } else {
-        debugPrint("Non-Dio Error during update: $e");
-        debugPrint("Stacktrace: $stack");
+        if (kDebugMode) {
+          debugPrint("Non-Dio Error during update: $e");
+          debugPrint("Stacktrace: $stack");
+        }
         OslerToast.error(context, "An error occurred: $e");
       }
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _dobController.dispose();
+    _licenseController.dispose();
+    _educationController.dispose();
+    _experienceController.dispose();
+    _feesController.dispose();
+    _videoFeesController.dispose();
+    _descController.dispose();
+    _languageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -412,7 +462,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildLabel("Gender"),
-                                    _buildGenericDropdown(_genders, (val) => setState(() => _genderSelect = val), _genderSelect),
+                                    _buildLabeledDropdown(_genderOptions, (val) => setState(() => _genderSelect = val), _genderSelect),
                                   ],
                                 ),
                               ),
@@ -444,7 +494,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
                     ),
                     const SizedBox(height: 10),
                     _buildLabel("Revenue Model"),
-                    _buildGenericDropdown(_revenueModels, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
+                    _buildLabeledDropdown(_revenueModelOptions, (val) => setState(() => _selectedRevenueModel = val), _selectedRevenueModel),
 
                   const SizedBox(height: 35),
                   _buildSectionHeader("Practice Details", Icons.description_outlined),
@@ -511,7 +561,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           : url != null && url.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(18),
-                child: Image.network(url, fit: BoxFit.cover),
+                child: Image(image: CachedNetworkImageProvider(url), fit: BoxFit.cover),
               )
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -564,6 +614,34 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
             return DropdownMenuItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledDropdown(List<MapEntry<String, String>> options, Function(String?) onChanged, String? value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: AyurezeTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AyurezeTheme.border.withOpacity(0.6)),
+        boxShadow: [BoxShadow(color: AyurezeTheme.shadow.withOpacity(0.06), blurRadius: 5, spreadRadius: 0)],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          icon: Icon(Icons.keyboard_arrow_down, color: AyurezeTheme.textSecondary),
+          hint: Text("Select", style: TextStyle(fontSize: 14, color: AyurezeTheme.textSecondary)),
+          items: options.map((opt) {
+            return DropdownMenuItem<String>(
+              value: opt.key,
+              child: Text(getTranslated(context, opt.value), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             );
           }).toList(),
           onChanged: onChanged,
