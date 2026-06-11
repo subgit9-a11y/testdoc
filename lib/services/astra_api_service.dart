@@ -555,6 +555,8 @@ class AstraApiService {
     }
   }
 
+
+
   // ============================================================
   // ASTRA BRAIN AI ENDPOINTS
   // ============================================================
@@ -572,6 +574,34 @@ class AstraApiService {
       
       final response = await _postWithDnsFallback(Apis.astra_brain_chat, data: data);
       return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// General AI Chat with Astra Brain (Streaming)
+  Stream<String> brainChatStream(Map<String, dynamic> data) async* {
+    try {
+      if (data['user_metadata'] == null) {
+        data['user_metadata'] = {'role': 'doctor'};
+      } else if (data['user_metadata'] is Map && data['user_metadata']['role'] == null) {
+        data['user_metadata']['role'] = 'doctor';
+      }
+      
+      final response = await _postWithDnsFallback(
+        Apis.astra_brain_chat, 
+        data: data,
+        options: Options(responseType: ResponseType.stream),
+      );
+
+      final stream = response.data.stream;
+      
+      await for (var chunk in stream) {
+        if (chunk is List<int>) {
+           String text = String.fromCharCodes(chunk);
+           yield text;
+        }
+      }
     } catch (e) {
       throw _handleError(e);
     }
@@ -1090,12 +1120,12 @@ class AstraApiService {
         text.contains('timed out');
   }
 
-  Future<Response<dynamic>> _postWithDnsFallback(String path, {dynamic data}) async {
+  Future<Response<dynamic>> _postWithDnsFallback(String path, {dynamic data, Options? options}) async {
     try {
-      return await _dio.post(path, data: data);
+      return await _dio.post(path, data: data, options: options);
     } on DioException catch (e) {
       if (!_isConnectionLevelError(e)) rethrow;
-      return await _postViaIpv4(path, data: data);
+      return await _postViaIpv4(path, data: data, options: options);
     }
   }
 
@@ -1108,9 +1138,9 @@ class AstraApiService {
     }
   }
 
-  Future<Response<dynamic>> _postViaIpv4(String path, {dynamic data}) async {
+  Future<Response<dynamic>> _postViaIpv4(String path, {dynamic data, Options? options}) async {
     final dio = await _createIpv4Dio();
-    return dio.post(path, data: data);
+    return dio.post(path, data: data, options: options);
   }
 
   Future<Response<dynamic>> _getViaIpv4(String path) async {

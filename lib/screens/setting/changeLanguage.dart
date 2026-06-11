@@ -64,6 +64,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   int? expertiseId;
   String? hospitalId;
   String? image;
+  String? videoAppointmentFees;
 
   @override
   void didChangeDependencies() {
@@ -307,6 +308,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         categoryId = response.data!.categoryId;
         expertiseId = response.data!.expertiseId;
         hospitalId = response.data!.hospitalId;
+        videoAppointmentFees = response.data!.videoAppointmentFees;
       });
     } catch (error, stacktrace) {
       return BaseModel()..setException(ServerError.withError(error: error));
@@ -320,7 +322,9 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       "name": _pName.text,
       "dob": _pDob.text,
       "gender": _genderSelect,
-      "education": _pDegree.text,
+      "education": convertDegree != null ? json.encode(convertDegree) : _pDegree.text,
+      "certificate": eduCertificate != null ? json.encode(eduCertificate) : null,
+      "video_appointment_fees": videoAppointmentFees,
       "experience": _pExperience.text,
       "appointment_fees": _pAppointmentFees.text,
       "timeslot": _pTimeSlot.text,
@@ -328,6 +332,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       "end_time": _pEndTime.text,
       "based_on": _pBasedOn.text,
       "desc": _pDesc.text,
+      "treatment_id": treatmentId,
+      "category_id": categoryId,
+      "expertise_id": expertiseId,
+      "hospital_id": hospitalId,
+      "is_popular": _selectedPopular,
       "language": SharedPreferenceHelper.getString(Preferences.language_name),
     };
     try {

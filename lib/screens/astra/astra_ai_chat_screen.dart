@@ -120,8 +120,6 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               })
           .toList();
 
-      Map<String, dynamic> response;
-      
       if (voicePath != null) {
         // Handle voice processing
         if (mounted) {
@@ -138,7 +136,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
         final voiceResponse = await _apiService.processVoice(File(voicePath), effectiveUserId);
         String extractedText = voiceResponse['text'] ?? "Voice processed successfully.";
         
-        response = await _apiService.brainChat({
+        final response = await _apiService.brainChat({
           'q': extractedText,
           'user_id': effectiveUserId,
           'session_id': _sessionId,
@@ -149,9 +147,33 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
             'precise': true // Request precise clinical response
           }
         });
+        final aiResponse = AIChatResponse.fromJson(response);
+        if (aiResponse.sessionId != null) _sessionId = aiResponse.sessionId;
+        if (mounted) {
+          setState(() {
+            _messages.add(ChatMessage(
+              text: aiResponse.response ?? "I apologize, I couldn't process that request.",
+              isMe: false,
+              time: DateTime.now(),
+            ));
+            _isLoading = false;
+          });
+        }
       } else {
-        // Regular text chat
-        response = await _apiService.brainChat({
+        // Regular text chat via SSE STREAM!
+        int aiMessageIndex = _messages.length;
+        if (mounted) {
+          setState(() {
+            _messages.add(ChatMessage(
+              text: "", // Empty initial text
+              isMe: false,
+              time: DateTime.now(),
+            ));
+            _isLoading = false; // We start getting data immediately
+          });
+        }
+
+        final stream = _apiService.brainChatStream({
           'q': message,
           'user_id': effectiveUserId,
           'session_id': _sessionId,
@@ -161,24 +183,20 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
             'precise': true // Request precise clinical response
           }
         });
-      }
 
-      final aiResponse = AIChatResponse.fromJson(response);
-      
-      // Store session ID for memory
-      if (aiResponse.sessionId != null) {
-        _sessionId = aiResponse.sessionId;
-      }
-
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-            text: aiResponse.response ?? "I apologize, I couldn't process that request.",
-            isMe: false,
-            time: DateTime.now(),
-          ));
-          _isLoading = false;
-        });
+        await for (String chunk in stream) {
+          if (mounted) {
+            setState(() {
+              // Append chunk to the existing AI message
+              _messages[aiMessageIndex] = ChatMessage(
+                text: _messages[aiMessageIndex].text + chunk,
+                isMe: false,
+                time: _messages[aiMessageIndex].time,
+              );
+            });
+            _scrollToBottom();
+          }
+        }
       }
     } catch (e) {
       final String errorText = e.toString();
