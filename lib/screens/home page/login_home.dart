@@ -363,7 +363,7 @@ class _LoginHomeScreenState extends State<LoginHomeScreen> with SingleTickerProv
       physics: NeverScrollableScrollPhysics(),
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
-      childAspectRatio: 1.35,
+      childAspectRatio: 1.15,
       children: [
         _buildStatCard(getTranslated(context, AppString.dashboard_today_appointments).toString(), todayAppointments.length.toString(), AppIcons.calendar, AyurezeTheme.healingGreen100),
         _buildStatCard(getTranslated(context, AppString.dashboard_total_revenue).toString(), "₹${totalEarnings.toInt()}", AppIcons.wallet, AyurezeTheme.healingGreen50),

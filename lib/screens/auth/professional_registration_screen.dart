@@ -96,6 +96,15 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
     return null;
   }
 
+  String? _normalizeGender(String? gender) {
+    if (gender == null) return null;
+    final lower = gender.toLowerCase();
+    if (lower == 'male') return 'Male';
+    if (lower == 'female') return 'Female';
+    if (lower == 'other') return 'Other';
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -112,7 +121,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
       _nameController.text = widget.personalData!['name'] ?? "";
       _emailController.text = widget.personalData!['email'] ?? "";
       _phoneController.text = widget.personalData!['phone'] ?? "";
-      _genderSelect = widget.personalData!['gender'];
+      _genderSelect = _normalizeGender(widget.personalData!['gender']);
     }
 
     if (SharedPreferenceHelper.getBoolean(Preferences.is_logged_in)) {
@@ -135,7 +144,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
           _dobController.text = parsedDob != null
               ? DateFormat('dd-MM-yyyy').format(parsedDob)
               : (data.dob ?? "");
-          _genderSelect = data.gender;
+          _genderSelect = _normalizeGender(data.gender);
           
           _licenseController.text = data.hospitalId ?? "";
           _educationController.text = data.education ?? "";
