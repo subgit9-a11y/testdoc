@@ -10,6 +10,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../helpers/logger.dart';
 
 class RetroApi {
+  static Future<String?>? _isRefreshing;
+
   Future<Dio> dioData(BuildContext context) async {
     final dio = Dio();
     dio.options.headers["Accept"] = "application/json";
@@ -58,7 +60,14 @@ class RetroApi {
                 return handler.reject(e);
               }
 
-              final newToken = await refreshFirebaseToken(savedRefreshToken);
+              String? newToken;
+              if (_isRefreshing != null) {
+                newToken = await _isRefreshing;
+              } else {
+                _isRefreshing = refreshFirebaseToken(savedRefreshToken);
+                newToken = await _isRefreshing;
+                _isRefreshing = null;
+              }
 
               if (newToken != null) {
                 final clonedRequest = await dio.request(

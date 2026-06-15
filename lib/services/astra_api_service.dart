@@ -467,7 +467,7 @@ class AstraApiService {
   Future<Map<String, dynamic>> createDraftOrder(Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/api/v1/shopify/draft-order', data: data);
-      return response.data;
+      return response.data ?? {};
     } catch (e) {
       throw _handleError(e);
     }
@@ -573,7 +573,7 @@ class AstraApiService {
       }
       
       final response = await _postWithDnsFallback(Apis.astra_brain_chat, data: data);
-      return response.data;
+      return response.data ?? {};
     } catch (e) {
       throw _handleError(e);
     }
@@ -596,11 +596,15 @@ class AstraApiService {
 
       final stream = response.data.stream;
       
-      await for (var chunk in stream) {
-        if (chunk is List<int>) {
-           String text = String.fromCharCodes(chunk);
-           yield text;
+      try {
+        await for (var chunk in stream) {
+          if (chunk is List<int>) {
+             String text = String.fromCharCodes(chunk);
+             yield text;
+          }
         }
+      } finally {
+        response.data.close();
       }
     } catch (e) {
       throw _handleError(e);
@@ -611,7 +615,7 @@ class AstraApiService {
   Future<Map<String, dynamic>> generateDoctorSummary(Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/api/v1/brain/doctor-summary', data: data);
-      return response.data;
+      return response.data ?? {};
     } catch (e) {
       throw _handleError(e);
     }
@@ -690,7 +694,7 @@ class AstraApiService {
         data: formData,
         options: Options(headers: {"Content-Type": "multipart/form-data"}),
       );
-      return response.data;
+      return response.data ?? {};
     } catch (e) {
       throw _handleError(e);
     }

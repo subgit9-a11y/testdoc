@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:minio/minio.dart';
 import 'package:path/path.dart' as path;
@@ -67,10 +68,13 @@ class WasabiService {
         folderPath,
         file.openRead().map((chunk) => Uint8List.fromList(chunk)),
         size: await file.length(),
-      );
+      ).timeout(const Duration(seconds: 30));
 
       // Return the Wasabi Public URL
       return "https://$_bucket.$_endpoint/$folderPath";
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("Wasabi Upload Timed Out");
+      return null;
     } catch (e) {
       if (kDebugMode) debugPrint("Wasabi Upload Error: $e");
       return null;
@@ -95,9 +99,12 @@ class WasabiService {
         folderPath,
         Stream.value(bytes),
         size: bytes.length,
-      );
+      ).timeout(const Duration(seconds: 30));
 
       return "https://$_bucket.$_endpoint/$folderPath";
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("Wasabi Byte Upload Timed Out");
+      return null;
     } catch (e) {
       if (kDebugMode) debugPrint("Wasabi Byte Upload Error: $e");
       return null;

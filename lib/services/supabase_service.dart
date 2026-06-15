@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
@@ -42,7 +43,9 @@ class SupabaseService {
         'photo_url': photoUrl,
         'is_face_verified': isFaceVerified,
         'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'unique_id');
+      }, onConflict: 'unique_id').timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      throw Exception("Network Request Timed Out. Please check your internet connection.");
     } catch (e) {
       throw Exception("Supabase Database Error: $e");
     }
@@ -54,12 +57,15 @@ class SupabaseService {
       final fileName = '$doctorId/profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final path = await _client.storage
           .from('doctor-profiles')
-          .upload(fileName, photoFile);
+          .upload(fileName, photoFile)
+          .timeout(const Duration(seconds: 15));
       
       if (path.isNotEmpty) {
         return _client.storage.from('doctor-profiles').getPublicUrl(fileName);
       }
       return null;
+    } on TimeoutException {
+      throw Exception("Network Request Timed Out. Please check your internet connection.");
     } catch (e) {
       throw Exception("Supabase Storage Error: $e");
     }
@@ -72,9 +78,13 @@ class SupabaseService {
       // We assume a bucket 'doctor-profiles' exists or use a folder inside it
       await _client.storage
           .from('doctor-profiles')
-          .uploadBinary(fileName, signatureBytes, fileOptions: const FileOptions(contentType: 'image/png'));
+          .uploadBinary(fileName, signatureBytes, fileOptions: const FileOptions(contentType: 'image/png'))
+          .timeout(const Duration(seconds: 15));
       
       return _client.storage.from('doctor-profiles').getPublicUrl(fileName);
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("Supabase Signature Upload Timed Out");
+      return null;
     } catch (e) {
       if (kDebugMode) debugPrint("Supabase Signature Upload Error: $e");
       return null;
@@ -87,7 +97,9 @@ class SupabaseService {
       await _client.from('doctors').update({
         'signature_url': signatureUrl,
         'updated_at': DateTime.now().toIso8601String(),
-      }).eq('unique_id', doctorId);
+      }).eq('unique_id', doctorId).timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("Supabase DB Signature Sync Timed Out");
     } catch (e) {
       if (kDebugMode) debugPrint("Supabase DB Signature Sync Error: $e");
     }
@@ -106,7 +118,9 @@ class SupabaseService {
         'document_number': docNumber,
         'wasabi_url': wasabiUrl,
         'uploaded_at': DateTime.now().toIso8601String(),
-      });
+      }).timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("Supabase Verification Log Timed Out");
     } catch (e) {
       if (kDebugMode) debugPrint("Supabase Verification Log Error: $e");
     }
