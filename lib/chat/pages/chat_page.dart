@@ -81,6 +81,7 @@ class ChatPageState extends State<ChatPage> {
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
+  final DateFormat _timestampFormatter = DateFormat('dd MMM kk:mm');
 
   late ChatProvider chatProvider;
   late AuthProvider authProvider;
@@ -239,19 +240,21 @@ class ChatPageState extends State<ChatPage> {
         return Row(
           children: <Widget>[
             messageChat.type == TypeMessage.text
-                ? Container(
-                    child: Text(
-                      messageChat.content,
-                      style:
-                          const TextStyle(color: Theme.of(context).colorScheme.primary),
+                ? Flexible(
+                    child: Container(
+                      child: Text(
+                        messageChat.content,
+                        style:
+                            const TextStyle(color: Theme.of(context).colorScheme.primary),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(8)),
+                      margin: EdgeInsets.only(
+                          bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(8)),
-                    margin: EdgeInsets.only(
-                        bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
                   )
                 : messageChat.type == TypeMessage.image
                     ? Container(
@@ -389,17 +392,19 @@ class ChatPageState extends State<ChatPage> {
                         )
                       : Container(width: 35),
                   messageChat.type == TypeMessage.text
-                      ? Container(
-                          child: Text(
-                            messageChat.content,
-                            style: const TextStyle(color: colorWhite),
+                      ? Flexible(
+                          child: Container(
+                            child: Text(
+                              messageChat.content,
+                              style: const TextStyle(color: colorWhite),
+                            ),
+                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(8)),
+                            margin: const EdgeInsets.only(left: 10),
                           ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          width: 200,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(8)),
-                          margin: const EdgeInsets.only(left: 10),
                         )
                       : messageChat.type == TypeMessage.image
                           ? Container(
@@ -492,7 +497,7 @@ class ChatPageState extends State<ChatPage> {
               isLastMessageLeft(index)
                   ? Container(
                       child: Text(
-                        DateFormat('dd MMM kk:mm').format(
+                        _timestampFormatter.format(
                             DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(messageChat.timestamp))),
                         style: const TextStyle(
@@ -589,8 +594,9 @@ class ChatPageState extends State<ChatPage> {
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: _handlePop,
-        child: Stack(
-          children: <Widget>[
+        child: SafeArea(
+          child: Stack(
+            children: <Widget>[
             Column(
               children: <Widget>[
                 buildListMessage(),
@@ -598,7 +604,8 @@ class ChatPageState extends State<ChatPage> {
               ],
             ),
             buildLoading()
-          ],
+            ],
+          ),
         ),
       ),
     );

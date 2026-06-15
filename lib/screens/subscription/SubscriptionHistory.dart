@@ -20,6 +20,7 @@ class SubscriptionHistory extends StatefulWidget {
 }
 
 class _SubscriptionHistoryState extends State<SubscriptionHistory> {
+  final DateFormat _dateFormatter = DateFormat('dd MMM yyyy');
   Future? purchaseReq;
 
   final List<PurchaseDetails> purchaseDetail = [];
@@ -210,10 +211,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   Widget _buildHistoryCard(PurchaseDetails item) {
     final statusActive = item.status == 1;
     final endDate = item.endDate != null
-        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.endDate!))
+        ? _dateFormatter.format(DateTime.parse(item.endDate!))
         : "--";
     final startDate = item.startDate != null
-        ? DateFormat('dd MMM yyyy').format(DateTime.parse(item.startDate!))
+        ? _dateFormatter.format(DateTime.parse(item.startDate!))
         : "--";
 
     return OslerCard(

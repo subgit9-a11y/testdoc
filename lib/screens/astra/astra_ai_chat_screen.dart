@@ -24,6 +24,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final AstraApiService _apiService = AstraApiService();
   final List<ChatMessage> _messages = [];
+  final DateFormat _timeFormatter = DateFormat('hh:mm a');
   
   // Voice Recording state
   final AudioRecorder _audioRecorder = AudioRecorder();
@@ -312,12 +313,14 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               child: Icon(Icons.psychology, color: AyurezeTheme.textPrimary, size: 20),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Astra AI Assistant", 
-                  style: TextStyle(color: AyurezeTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
-                Row(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Astra AI Assistant", 
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: AyurezeTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Row(
                   children: [
                     Container(
                       width: 8,
@@ -333,7 +336,8 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                 ),
               ],
             ),
-          ],
+          ),
+        ],
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: AyurezeTheme.textPrimary, size: 20),
@@ -365,7 +369,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                 children: [
                    SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2, color: AyurezeTheme.forestDeep)),
                    const SizedBox(width: 10),
-                    Text("Astra is thinking...", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 12)),
+                    const Text("Astra is thinking...", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 12)),
                 ],
               ),
             ),
@@ -413,7 +417,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
             ),
             const SizedBox(height: 5),
             Text(
-              DateFormat('hh:mm a').format(message.time),
+              _timeFormatter.format(message.time),
               style: TextStyle(
                 color: message.isMe ? Colors.white70 : AyurezeTheme.textSecondary,
                 fontSize: 10,
