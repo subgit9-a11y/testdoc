@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doctro/chat/constants/colors.dart';
+
 import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/providers/auth_provider.dart';
 import 'package:doctro/chat/providers/home_provider.dart';
@@ -107,7 +107,7 @@ class HomePageState extends State<HomePage> {
         backgroundColor: colorWhite,
         title: Text(
           getTranslated(context, AppString.chats).toString(),
-          style: TextStyle(color: ColorConstants.primaryColor),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
         ),
         centerTitle: true,
         foregroundColor: colorBlack,
@@ -146,7 +146,7 @@ class HomePageState extends State<HomePage> {
                         } else {
                           return const Center(
                             child: CircularProgressIndicator(
-                              color: ColorConstants.themeColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           );
                         }
@@ -190,7 +190,7 @@ class HomePageState extends State<HomePage> {
                               height: 50,
                               child: Center(
                                 child: CircularProgressIndicator(
-                                  color: ColorConstants.themeColor,
+                                  color: Theme.of(context).colorScheme.primary,
                                   value: loadingProgress.expectedTotalBytes !=
                                               null &&
                                           loadingProgress.expectedTotalBytes !=
@@ -206,14 +206,14 @@ class HomePageState extends State<HomePage> {
                             return const Icon(
                               Icons.account_circle,
                               size: 50,
-                              color: ColorConstants.greyColor,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             );
                           },
                         )
                       : const Icon(
                           Icons.account_circle,
                           size: 50,
-                          color: ColorConstants.greyColor,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   borderRadius: const BorderRadius.all(Radius.circular(25)),
                   clipBehavior: Clip.hardEdge,
@@ -227,7 +227,7 @@ class HomePageState extends State<HomePage> {
                             userChat.nickname,
                             maxLines: 1,
                             style: const TextStyle(
-                                color: ColorConstants.primaryColor),
+                                color: Theme.of(context).colorScheme.primary),
                           ),
                           alignment: Alignment.centerLeft,
                           margin: const EdgeInsets.fromLTRB(10, 0, 0, 5),
@@ -237,7 +237,7 @@ class HomePageState extends State<HomePage> {
                             userChat.content,
                             maxLines: 1,
                             style: const TextStyle(
-                                color: ColorConstants.primaryColor),
+                                color: Theme.of(context).colorScheme.primary),
                           ),
                           alignment: Alignment.centerLeft,
                           margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -269,7 +269,7 @@ class HomePageState extends State<HomePage> {
             },
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all<Color>(ColorConstants.greyColor2),
+                  MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.surfaceVariant),
               shape: MaterialStateProperty.all<OutlinedBorder>(
                 const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),

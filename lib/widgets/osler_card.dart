@@ -36,7 +36,7 @@ class OslerCard extends StatelessWidget {
               border: showBorder ? Border.all(color: AyurezeTheme.border) : null,
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x0F000000),
+                  color: Theme.of(context).shadowColor.withOpacity(0.06),
                   blurRadius: 18,
                   offset: Offset(0, 10),
                 ),

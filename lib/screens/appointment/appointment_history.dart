@@ -177,7 +177,7 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.14),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.14),
               borderRadius: BorderRadius.circular(999),
             ),
             child: const Text(
@@ -266,7 +266,7 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen>
       decoration: AyurezeTheme.mutedPanelDecoration(),
       child: TabBar(
         controller: _tabController,
-        labelColor: Colors.white,
+        labelColor: Theme.of(context).colorScheme.onPrimary,
         unselectedLabelColor: AyurezeTheme.textSecondary,
         indicator: BoxDecoration(
           color: AyurezeTheme.forestDeep,

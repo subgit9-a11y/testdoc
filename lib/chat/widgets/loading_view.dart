@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
+
 
 class LoadingView extends StatelessWidget {
   @override
@@ -8,10 +8,10 @@ class LoadingView extends StatelessWidget {
     return Container(
       child: const Center(
         child: CircularProgressIndicator(
-          color: ColorConstants.themeColor,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      color: Colors.white.withOpacity(0.8),
+      color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
     );
   }
 }

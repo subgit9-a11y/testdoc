@@ -159,14 +159,13 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.14),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.14),
               borderRadius: BorderRadius.circular(999),
             ),
             child: const Text(
               "Cancelled ledger",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 11,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.w700,
               ),
             ),

@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doctro/chat/constants/colors.dart';
+
 import 'package:doctro/chat/constants/firestore_constants.dart';
 import 'package:doctro/chat/models/message_chat.dart';
 import 'package:doctro/chat/providers/auth_provider.dart';
@@ -147,7 +147,7 @@ class ChatPageState extends State<ChatPage> {
   void _modalBottomSheetMenu() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: Padding(
@@ -179,7 +179,7 @@ class ChatPageState extends State<ChatPage> {
                             getTranslated(
                                     context, AppString.choose_image_camera)
                                 .toString(),
-                            style: TextStyle(color: colorBlack, fontSize: 18),
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                           ),
                         ),
                       ),
@@ -228,7 +228,7 @@ class ChatPageState extends State<ChatPage> {
     } else {
       Fluttertoast.showToast(
           msg: getTranslated(context, AppString.nothing_send).toString(),
-          backgroundColor: ColorConstants.greyColor);
+          backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant);
     }
   }
 
@@ -243,12 +243,12 @@ class ChatPageState extends State<ChatPage> {
                     child: Text(
                       messageChat.content,
                       style:
-                          const TextStyle(color: ColorConstants.primaryColor),
+                          const TextStyle(color: Theme.of(context).colorScheme.primary),
                     ),
                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
                     width: 200,
                     decoration: BoxDecoration(
-                        color: ColorConstants.greyColor2,
+                        color: Theme.of(context).colorScheme.surfaceVariant,
                         borderRadius: BorderRadius.circular(8)),
                     margin: EdgeInsets.only(
                         bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
@@ -265,7 +265,7 @@ class ChatPageState extends State<ChatPage> {
                                 if (loadingProgress == null) return child;
                                 return Container(
                                   decoration: const BoxDecoration(
-                                    color: ColorConstants.greyColor2,
+                                    color: Theme.of(context).colorScheme.surfaceVariant,
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(8),
                                     ),
@@ -274,7 +274,7 @@ class ChatPageState extends State<ChatPage> {
                                   height: 200,
                                   child: Center(
                                     child: CircularProgressIndicator(
-                                      color: ColorConstants.themeColor,
+                                      color: Theme.of(context).colorScheme.primary,
                                       value:
                                           loadingProgress.expectedTotalBytes !=
                                                       null &&
@@ -360,7 +360,7 @@ class ChatPageState extends State<ChatPage> {
                               if (loadingProgress == null) return child;
                               return Center(
                                 child: CircularProgressIndicator(
-                                  color: ColorConstants.themeColor,
+                                  color: Theme.of(context).colorScheme.primary,
                                   value: loadingProgress.expectedTotalBytes !=
                                               null &&
                                           loadingProgress.expectedTotalBytes !=
@@ -375,7 +375,7 @@ class ChatPageState extends State<ChatPage> {
                               return const Icon(
                                 Icons.account_circle,
                                 size: 35,
-                                color: ColorConstants.greyColor,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               );
                             },
                             width: 35,
@@ -397,7 +397,7 @@ class ChatPageState extends State<ChatPage> {
                           padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
                           width: 200,
                           decoration: BoxDecoration(
-                              color: ColorConstants.primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                               borderRadius: BorderRadius.circular(8)),
                           margin: const EdgeInsets.only(left: 10),
                         )
@@ -413,7 +413,7 @@ class ChatPageState extends State<ChatPage> {
                                       if (loadingProgress == null) return child;
                                       return Container(
                                         decoration: const BoxDecoration(
-                                          color: ColorConstants.greyColor2,
+                                          color: Theme.of(context).colorScheme.surfaceVariant,
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(8),
                                           ),
@@ -422,7 +422,7 @@ class ChatPageState extends State<ChatPage> {
                                         height: 200,
                                         child: Center(
                                           child: CircularProgressIndicator(
-                                            color: ColorConstants.themeColor,
+                                            color: Theme.of(context).colorScheme.primary,
                                             value: loadingProgress
                                                             .expectedTotalBytes !=
                                                         null &&
@@ -496,7 +496,7 @@ class ChatPageState extends State<ChatPage> {
                             DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(messageChat.timestamp))),
                         style: const TextStyle(
-                            color: ColorConstants.greyColor,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                             fontStyle: FontStyle.italic),
                       ),
@@ -564,10 +564,10 @@ class ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: ColorConstants.greyColor2,
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         title: Text(
           this.peerNickname ?? '',
-          style: const TextStyle(color: ColorConstants.primaryColor),
+          style: const TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         centerTitle: true,
         leading: InkWell(
@@ -583,7 +583,7 @@ class ChatPageState extends State<ChatPage> {
             },
             child: Icon(
               Icons.arrow_back_ios,
-              color: ColorConstants.black,
+              color: Theme.of(context).colorScheme.onSurface,
             )),
       ),
       body: PopScope(
@@ -620,7 +620,7 @@ class ChatPageState extends State<ChatPage> {
               child: IconButton(
                 icon: const Icon(Icons.image),
                 onPressed: _modalBottomSheetMenu,
-                color: ColorConstants.primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             color: colorWhite,
@@ -631,12 +631,12 @@ class ChatPageState extends State<ChatPage> {
                 onSendMessage(textEditingController.text, TypeMessage.text);
               },
               style: const TextStyle(
-                  color: ColorConstants.primaryColor, fontSize: 15),
+                  color: Theme.of(context).colorScheme.primary, fontSize: 15),
               controller: textEditingController,
               decoration: InputDecoration.collapsed(
                 hintText:
                     getTranslated(context, AppString.type_message).toString(),
-                hintStyle: TextStyle(color: ColorConstants.greyColor),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               focusNode: focusNode,
             ),
@@ -648,7 +648,7 @@ class ChatPageState extends State<ChatPage> {
                 icon: const Icon(Icons.send),
                 onPressed: () =>
                     onSendMessage(textEditingController.text, TypeMessage.text),
-                color: ColorConstants.primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             color: colorWhite,
@@ -659,7 +659,7 @@ class ChatPageState extends State<ChatPage> {
       height: 50,
       decoration: const BoxDecoration(
           border: Border(
-              top: BorderSide(color: ColorConstants.greyColor2, width: 0.5)),
+              top: BorderSide(color: Theme.of(context).colorScheme.surfaceVariant, width: 0.5)),
           color: colorWhite),
     );
   }
@@ -691,7 +691,7 @@ class ChatPageState extends State<ChatPage> {
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(
-                      color: ColorConstants.themeColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   );
                 }
@@ -699,7 +699,7 @@ class ChatPageState extends State<ChatPage> {
             )
           : const Center(
               child: CircularProgressIndicator(
-                color: ColorConstants.themeColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
     );

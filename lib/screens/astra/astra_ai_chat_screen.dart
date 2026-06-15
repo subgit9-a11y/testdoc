@@ -323,7 +323,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _isBrainOnline ? Colors.green : AyurezeTheme.warning,
+                        color: _isBrainOnline ? Theme.of(context).colorScheme.primary : AyurezeTheme.warning,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -394,7 +394,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
           ),
           boxShadow: [
             if (!message.isMe)
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Column(
@@ -404,10 +404,10 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               message.text,
               style: TextStyle(
                 color: message.isError 
-                    ? Colors.red 
+                    ? Theme.of(context).colorScheme.error 
                     : (message.isSystem
                         ? AyurezeTheme.forestDeep
-                        : (message.isMe ? Colors.white : AyurezeTheme.textPrimary)),
+                        : (message.isMe ? Theme.of(context).colorScheme.onPrimary : AyurezeTheme.textPrimary)),
                 fontSize: 14,
               ),
             ),

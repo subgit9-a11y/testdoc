@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doctro/chat/constants/colors.dart';
+
 import 'package:doctro/constant/app_string.dart';
 import 'package:doctro/localization/localization_constant.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +14,11 @@ class FullPhotoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorConstants.greyColor2,
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         elevation: 0,
         title: Text(
           getTranslated(context, AppString.full_photo).toString(),
-          style: TextStyle(color: ColorConstants.primaryColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         centerTitle: true,
         leading: InkWell(
@@ -27,7 +27,7 @@ class FullPhotoPage extends StatelessWidget {
           },
           child: Icon(
             Icons.arrow_back_ios,
-            color: ColorConstants.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),

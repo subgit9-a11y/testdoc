@@ -94,7 +94,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     AppString.settings_dark_mode,
                   ).toString(),
                   value: isDarkMode,
-                  color: const Color(0xFF7E8D9B),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   onChanged: (val) async {
                     setState(() => isDarkMode = val);
                     // Use ThemeProvider for instant theme change

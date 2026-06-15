@@ -124,12 +124,12 @@ class _SignInState extends State<SignIn> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.14),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.14),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: const Text(
                             "Doctor workspace",
-                            style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.w700),
                           ),
                         ),
                         const SizedBox(height: 18),

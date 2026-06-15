@@ -128,7 +128,7 @@ class _VideoCallState extends State<VideoCall> {
                       color: Colors.red,
                       shape: BoxShape.circle,
                       boxShadow: [
-                        BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
+                        BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.26), blurRadius: 10, offset: const Offset(0, 4))
                       ],
                     ),
                     child: Icon(AppIcons.callEnd, color: Colors.white, size: 28),
@@ -512,7 +512,7 @@ class _VideoCallState extends State<VideoCall> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0F766E), Color(0xFF134E4A)],
+            colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
           ),
         ),
         child: Center(

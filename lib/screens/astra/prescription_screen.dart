@@ -349,7 +349,7 @@ const SizedBox(height: 10),
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundColor: noShopify ? AyurezeTheme.warning : AyurezeTheme.forestDeep,
-                            child: Text("${idx + 1}", style: TextStyle(color: Colors.white))),
+                            child: Text("${idx + 1}", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary))),
                           title: Row(
                             children: [
                               Expanded(child: Text(med['medicine_name'] ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.bold))),
@@ -593,7 +593,7 @@ class _SearchMedicineSheetState extends State<SearchMedicineSheet> {
                     return ListTile(
                       title: Text(item['medicine_name'] ?? item['title'] ?? 'Unknown'),
                       subtitle: Text("₹ ${item['price'] ?? '0'}"),
-                      trailing: Icon(Icons.add_circle, color: Colors.green),
+                      trailing: Icon(Icons.add_circle, color: Theme.of(context).colorScheme.primary),
                       onTap: () => widget.onSelect(item),
                     );
                   },
