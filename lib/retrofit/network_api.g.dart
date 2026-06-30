@@ -31,7 +31,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'doctor_login',
+            'https://astra.ayureze.in/api/v1/auth/doctor_login',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -58,7 +58,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'doctor_register',
+            'https://astra.ayureze.in/api/v1/auth/doctor_register',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -302,7 +302,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'check_otp',
+            'https://astra.ayureze.in/api/v1/auth/check_otp',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -682,7 +682,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'doctor_change_password',
+            'https://astra.ayureze.in/api/v1/auth/doctor_change_password',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -709,7 +709,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'forgot_password',
+            'https://astra.ayureze.in/api/v1/auth/forgot_password',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -820,7 +820,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'add_call_history',
+            'https://astra.ayureze.in/api/v1/video/add-call-history',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -847,7 +847,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'video_call_history',
+            'https://astra.ayureze.in/api/v1/video/history',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -874,7 +874,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'generateDoctorAgoraToken',
+            'https://astra.ayureze.in/api/v1/video/generate-token',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -901,7 +901,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'updatePatientVcall',
+            'https://astra.ayureze.in/api/v1/video/update-patient-vcall',
             queryParameters: queryParameters,
             data: _data,
           )

@@ -205,10 +205,8 @@ class _VideoCallState extends State<VideoCall> {
         throw Exception('Camera or Microphone permission not granted');
       }
       _engine = await createAgoraRtcEngine();
-      await _engine.initialize(RtcEngineContext(
-          appId: appId != null
-              ? appId
-              : SharedPreferenceHelper.getString(Preferences.agoraAppId)));
+      await _engine.initialize(const RtcEngineContext(
+          appId: "aaf7c4d9c2d849368b79b1583e5023ed"));
       await _engine.enableVideo();
       await _engine.setVideoEncoderConfiguration(
         const VideoEncoderConfiguration(
@@ -447,7 +445,7 @@ class _VideoCallState extends State<VideoCall> {
       response =
           await RestClient(await RetroApi().dioData(context)).settingRequest();
 
-      appId = response.data!.agoraAppId;
+      appId = "aaf7c4d9c2d849368b79b1583e5023ed";
       if (widget.flag != "OutGoing") {
         await doctorProfile();
       } else {

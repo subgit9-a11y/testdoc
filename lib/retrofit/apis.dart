@@ -7,8 +7,8 @@ class Apis {
   static const String baseUrl = 'https://ayureze.org/public/api/';
   static const String astraBaseUrl = 'https://astra.ayureze.in/';
 
-  static const String login = "doctor_login";
-  static const String register = "doctor_register";
+  static const String login = "https://astra.ayureze.in/api/v1/auth/doctor_login";
+  static const String register = "https://astra.ayureze.in/api/v1/auth/doctor_register";
   static const String appointment = "doctor_appointment";
   static const String appointment_details = "appointment_details/{id}";
   static const String appointment_history = "appointment_history";
@@ -17,7 +17,7 @@ class Apis {
   static const String doctor_profile = "doctor_profile";
   static const String review = "doctor_review";
   static const String payment = "payment";
-  static const String check_otp = "check_otp";
+  static const String check_otp = "https://astra.ayureze.in/api/v1/auth/check_otp";
   static const String update_doctor = "update_doctor";
   static const String treatment = "treatment";
   static const String categories = "categories/{id}";
@@ -31,15 +31,15 @@ class Apis {
   static const String cancel_appointment = "cancel_appointment";
   static const String finance_detail = "finance_details";
   static const String update_time = "update_time";
-  static const String change_password = "doctor_change_password";
-  static const String forgot_password = "forgot_password";
+  static const String change_password = "https://astra.ayureze.in/api/v1/auth/doctor_change_password";
+  static const String forgot_password = "https://astra.ayureze.in/api/v1/auth/forgot_password";
   static const String notification = "notification";
   static const String all_medicines = "allMedicines";
   static const String resend_otp = "resendOtp/{id}";
-  static const String videoCallAddHistory = "add_call_history";
-  static const String videoCallShowHistory = "video_call_history";
-  static const String generateDoctorAgoraToken = "generateDoctorAgoraToken";
-  static const String updatePatientVcall = "updatePatientVcall";
+  static const String videoCallAddHistory = "https://astra.ayureze.in/api/v1/video/add-call-history";
+  static const String videoCallShowHistory = "https://astra.ayureze.in/api/v1/video/history";
+  static const String generateDoctorAgoraToken = "https://astra.ayureze.in/api/v1/video/generate-token";
+  static const String updatePatientVcall = "https://astra.ayureze.in/api/v1/video/update-patient-vcall";
 
   // ============================================================
   // ASTRA AI HEALTHCARE ENDPOINTS
