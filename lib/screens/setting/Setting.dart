@@ -24,6 +24,7 @@ import '../../retrofit/server_error.dart';
 import '../subscription/SubscriptionHistory.dart';
 import 'ChangePassword.dart';
 import 'changeLanguage.dart';
+import '../wallet/wallet_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   @override
@@ -184,6 +185,17 @@ class _SettingScreenState extends State<SettingScreen> {
                   AppString.settings_account_section,
                 ).toString(),
                 items: [
+                  _buildNavigationItem(
+                    icon: Icons.account_balance_wallet_rounded,
+                    title: "My Earnings & Wallet",
+                    color: Colors.green,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WalletScreen(),
+                      ),
+                    ),
+                  ),
                   _buildNavigationItem(
                     icon: Icons.history_rounded,
                     title: getTranslated(
