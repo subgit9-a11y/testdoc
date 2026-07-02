@@ -1,0 +1,496 @@
+"""
+Astra Brain Client - Unified API Connector for api.ayureze.in
+Version: 4.0.0
+Description: Connects ALL AI endpoints to automate features with the Astra AI Model
+
+Endpoints Connected:
+- POST /v1/chat - Core conversational AI with RAG
+- POST /v1/autopilot - Intent routing (Booking/Pharmacy/Chat)
+- POST /v1/fill - Structured data extraction
+- POST /v1/shop_assist - E-commerce product mapping
+- POST /v1/extract_schedule - Prescription reminder extraction
+- POST /v1/doctor_summary - Clinical scribe/summarization
+- POST /v1/analyze_safety - Safety sentinel (PII, self-harm)
+- POST /v1/detect_emotion - Sentiment analysis
+- POST /v1/profile_analysis - Buddy matching/risk assessment
+- POST /v1/generate_wellness - Meditation/yoga generation
+- POST /v1/adjust_tone - Empathetic text rewriting
+- GET /health - Health check
+"""
+
+import logging
+import httpx
+import asyncio
+from typing import Optional, Dict, Any, List
+from dataclasses import dataclass
+from enum import Enum
+
+logger = logging.getLogger(__name__)
+
+# ============================================================================
+# Data Models
+# ============================================================================
+
+class Intent(str, Enum):
+    """Autopilot intent types"""
+    CHAT = "CHAT"
+    SHOP_ASSIST = "SHOP_ASSIST"
+    BOOKING = "BOOKING"
+    UNKNOWN = "UNKNOWN"
+
+@dataclass
+class ChatResponse:
+    answer: str
+    mode: str
+    success: bool = True
+
+@dataclass  
+class AutopilotResponse:
+    intent: Intent
+    status: str
+    confidence: float = 1.0
+
+@dataclass
+class SafetyAnalysis:
+    is_safe: bool
+    flags: List[str]
+    risk_level: str = "low"
+
+@dataclass
+class EmotionResult:
+    emotion: str
+    intensity: str
+    confidence: float = 0.8
+
+@dataclass
+class ScheduleResult:
+    reminders: List[Dict[str, Any]]
+    raw_json: str
+
+# ============================================================================
+# Main Client
+# ============================================================================
+
+class AstraBrainClient:
+    """
+    Unified client for all Astra AI Brain endpoints at api.ayureze.in
+    """
+    
+    def __init__(self, base_url: str = "https://api.ayureze.in"):
+        self.base_url = base_url.rstrip("/")
+        self.timeout = httpx.Timeout(60.0, read=60.0, connect=10.0)
+        self._connected = False
+        logger.info(f"🧠 AstraBrainClient initialized → {self.base_url}")
+    
+    # =========================================================================
+    # Health & Connection
+    # =========================================================================
+    
+    async def check_health(self) -> Dict[str, Any]:
+        """
+        GET /health - Check if the Brain is online
+        """
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(f"{self.base_url}/health")
+                if response.status_code == 200:
+                    data = response.json()
+                    self._connected = True
+                    logger.info(f"✅ Astra Brain Online: {data}")
+                    return {"status": "online", "data": data}
+                else:
+                    logger.warning(f"⚠️ Brain returned {response.status_code}")
+                    return {"status": "degraded", "code": response.status_code}
+        except Exception as e:
+            logger.error(f"❌ Brain health check failed: {e}")
+            return {"status": "offline", "error": str(e)}
+    
+    async def ensure_connected(self) -> bool:
+        """Ensure connection is established"""
+        if not self._connected:
+            result = await self.check_health()
+            self._connected = result.get("status") == "online"
+        return self._connected
+    
+    # =========================================================================
+    # 1. Core Chat & Intelligence
+    # =========================================================================
+    
+    async def chat(self, query: str, language: str = "en") -> ChatResponse:
+        """
+        POST /v1/chat - Main conversational interface with RAG + Agent Persona
+        
+        Input: {"query": "I have acidity", "language": "en"}
+        Output: {"answer": "...", "mode": "doctor_rag"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/chat",
+                    json={"query": query, "language": language}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Chat response [mode: {data.get('mode', 'unknown')}]")
+                    return ChatResponse(
+                        answer=data.get("answer", ""),
+                        mode=data.get("mode", "unknown"),
+                        success=True
+                    )
+                else:
+                    logger.error(f"❌ Chat failed: {response.status_code}")
+                    return ChatResponse(
+                        answer="I'm having trouble connecting. Please try again.",
+                        mode="error",
+                        success=False
+                    )
+        except Exception as e:
+            logger.error(f"❌ Chat error: {e}")
+            return ChatResponse(answer=str(e), mode="error", success=False)
+    
+    # =========================================================================
+    # 2. Utility & Automation
+    # =========================================================================
+    
+    async def autopilot(self, query: str) -> AutopilotResponse:
+        """
+        POST /v1/autopilot - Auto-router for intent detection
+        
+        Input: {"query": "I want to buy ashwagandha"}
+        Output: {"intent": "SHOP_ASSIST", "status": "success"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/autopilot",
+                    json={"query": query}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    intent_str = data.get("intent", "UNKNOWN")
+                    try:
+                        intent = Intent(intent_str)
+                    except ValueError:
+                        intent = Intent.UNKNOWN
+                    
+                    logger.info(f"✅ Autopilot: {intent.value}")
+                    return AutopilotResponse(
+                        intent=intent,
+                        status=data.get("status", "success")
+                    )
+                else:
+                    return AutopilotResponse(intent=Intent.CHAT, status="fallback")
+        except Exception as e:
+            logger.error(f"❌ Autopilot error: {e}")
+            return AutopilotResponse(intent=Intent.CHAT, status="error")
+    
+    async def fill(self, text: str, schema_definition: str) -> Dict[str, Any]:
+        """
+        POST /v1/fill - Structured Data Extraction
+        
+        Input: {"text": "My name is Ravi, age 30", "schema_definition": "{name: str, age: int}"}
+        Output: {"extracted_data": "{\"name\": \"Ravi\", \"age\": 30}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/fill",
+                    json={"text": text, "schema_definition": schema_definition}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info("✅ Data extraction complete")
+                    return {
+                        "success": True,
+                        "extracted_data": data.get("extracted_data", "{}"),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Fill error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 3. Specialized Features
+    # =========================================================================
+    
+    async def shop_assist(self, query: str) -> Dict[str, Any]:
+        """
+        POST /v1/shop_assist - E-commerce helper for product mapping
+        
+        Input: {"query": "medicine for stress"}
+        Output: {"result": "{\"suggested_product\": \"Ashwagandha\"}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/shop_assist",
+                    json={"query": query}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info("✅ Shop assist response received")
+                    return {
+                        "success": True,
+                        "result": data.get("result", "{}"),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Shop assist error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    async def extract_schedule(self, prescription_text: str) -> ScheduleResult:
+        """
+        POST /v1/extract_schedule - Reminder AI for prescription times
+        
+        Input: {"prescription_text": "Take pill after breakfast"}
+        Output: {"schedule_json": "{\"reminders\": [{\"time\": \"09:00\"}]}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/extract_schedule",
+                    json={"prescription_text": prescription_text}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    schedule_json = data.get("schedule_json", "{}")
+                    
+                    # Parse reminders
+                    import json
+                    try:
+                        parsed = json.loads(schedule_json)
+                        reminders = parsed.get("reminders", [])
+                    except:
+                        reminders = []
+                    
+                    logger.info(f"✅ Extracted {len(reminders)} reminders")
+                    return ScheduleResult(reminders=reminders, raw_json=schedule_json)
+                else:
+                    return ScheduleResult(reminders=[], raw_json="{}")
+        except Exception as e:
+            logger.error(f"❌ Schedule extraction error: {e}")
+            return ScheduleResult(reminders=[], raw_json="{}")
+    
+    async def doctor_summary(self, patient_notes: str) -> Dict[str, Any]:
+        """
+        POST /v1/doctor_summary - Clinical Scribe for patient notes
+        
+        Input: {"patient_notes": "User has been feeling dizzy since..."}
+        Output: {"summary_data": "..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/doctor_summary",
+                    json={"patient_notes": patient_notes}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info("✅ Doctor summary generated")
+                    return {
+                        "success": True,
+                        "summary": data.get("summary_data", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Doctor summary error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 4. Analysis & Safety
+    # =========================================================================
+    
+    async def analyze_safety(self, user_text: str) -> SafetyAnalysis:
+        """
+        POST /v1/analyze_safety - Safety Sentinel for PII, self-harm, emergencies
+        
+        Input: {"user_text": "I want to hurt myself"}
+        Output: {"is_safe": false, "flags": ["self_harm"]}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/analyze_safety",
+                    json={"user_text": user_text}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    is_safe = data.get("is_safe", True)
+                    flags = data.get("flags", [])
+                    
+                    risk = "high" if not is_safe else "low"
+                    logger.info(f"✅ Safety analysis: safe={is_safe}, flags={flags}")
+                    
+                    return SafetyAnalysis(
+                        is_safe=is_safe,
+                        flags=flags,
+                        risk_level=risk
+                    )
+                else:
+                    # Default to safe if API fails
+                    return SafetyAnalysis(is_safe=True, flags=[], risk_level="unknown")
+        except Exception as e:
+            logger.error(f"❌ Safety analysis error: {e}")
+            return SafetyAnalysis(is_safe=True, flags=["api_error"], risk_level="unknown")
+    
+    async def detect_emotion(self, query: str) -> EmotionResult:
+        """
+        POST /v1/detect_emotion - Sentiment Analysis
+        
+        Input: {"query": "I am feeling very low"}
+        Output: {"result": "{\"emotion\": \"Sad\", \"intensity\": \"High\"}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/detect_emotion",
+                    json={"query": query}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    result_str = data.get("result", "{}")
+                    
+                    import json
+                    try:
+                        parsed = json.loads(result_str)
+                        emotion = parsed.get("emotion", "Neutral")
+                        intensity = parsed.get("intensity", "Medium")
+                    except:
+                        emotion = "Neutral"
+                        intensity = "Medium"
+                    
+                    logger.info(f"✅ Emotion: {emotion} ({intensity})")
+                    return EmotionResult(emotion=emotion, intensity=intensity)
+                else:
+                    return EmotionResult(emotion="Neutral", intensity="Medium")
+        except Exception as e:
+            logger.error(f"❌ Emotion detection error: {e}")
+            return EmotionResult(emotion="Neutral", intensity="Medium")
+    
+    async def profile_analysis(
+        self, 
+        profile_data_a: str, 
+        task: str = "buddy_match",
+        profile_data_b: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        POST /v1/profile_analysis - Predictive Analytics for buddy matching/risk
+        
+        Input: {"profile_data_a": "...", "task": "buddy_match"}
+        Output: {"analysis": "..."}
+        """
+        try:
+            payload = {"profile_data_a": profile_data_a, "task": task}
+            if profile_data_b:
+                payload["profile_data_b"] = profile_data_b
+                
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/profile_analysis",
+                    json=payload
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Profile analysis complete for task: {task}")
+                    return {
+                        "success": True,
+                        "analysis": data.get("analysis", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Profile analysis error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 5. Content Generation
+    # =========================================================================
+    
+    async def generate_wellness(self, topic: str, duration: str = "5 mins") -> Dict[str, Any]:
+        """
+        POST /v1/generate_wellness - Generate meditations, yoga plans, tips
+        
+        Input: {"topic": "Sleep Meditation", "duration": "5 mins"}
+        Output: {"content": "..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/generate_wellness",
+                    json={"topic": topic, "duration": duration}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Wellness content generated: {topic}")
+                    return {
+                        "success": True,
+                        "content": data.get("content", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Wellness generation error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    async def adjust_tone(self, text: str, target_tone: str = "polite") -> Dict[str, Any]:
+        """
+        POST /v1/adjust_tone - Rewrite text to be more empathetic/professional
+        
+        Input: {"text": "You are late.", "target_tone": "polite"}
+        Output: {"rewritten_text": "I noticed you are running a bit behind schedule..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/adjust_tone",
+                    json={"text": text, "target_tone": target_tone}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Tone adjusted to: {target_tone}")
+                    return {
+                        "success": True,
+                        "rewritten_text": data.get("rewritten_text", text),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "rewritten_text": text}
+        except Exception as e:
+            logger.error(f"❌ Tone adjustment error: {e}")
+            return {"success": False, "rewritten_text": text, "error": str(e)}
+
+
+# ============================================================================
+# Global Singleton Instance
+# ============================================================================
+
+_brain_client: Optional[AstraBrainClient] = None
+
+def get_brain_client() -> AstraBrainClient:
+    """Get or create the global AstraBrainClient instance"""
+    global _brain_client
+    if _brain_client is None:
+        _brain_client = AstraBrainClient()
+    return _brain_client
+
+# Convenience alias
+astra_brain = get_brain_client()

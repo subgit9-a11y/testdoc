@@ -1,0 +1,153 @@
+"""
+Custom WhatsApp API Webhook Handler
+Receives incoming messages from your custom WhatsApp server
+"""
+
+import logging
+from typing import Dict, Any, Optional
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/webhook", tags=["webhooks"])
+
+@router.post("/custom-whatsapp")
+async def handle_custom_whatsapp_webhook(
+    request: Request,
+    background_tasks: BackgroundTasks
+):
+    """
+    Handle incoming WhatsApp messages from custom API
+    """
+    try:
+        webhook_data = await request.json()
+        logger.info(f"📥 Received custom WhatsApp webhook: {webhook_data}")
+        
+        # Process the webhook in background to respond quickly
+        background_tasks.add_task(process_incoming_message, webhook_data)
+        
+        return {
+            "success": True,
+            "message": "Webhook received"
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def process_incoming_message(webhook_data: Dict[str, Any]):
+    """
+    Process incoming WhatsApp message based on type and content
+    """
+    try:
+        # Extract message details from ayureze webhook format
+        contact = webhook_data.get("contact", {})
+        message = webhook_data.get("message", {})
+        
+        phone_number = contact.get("phone_number")
+        message_body = message.get("body", "")
+        is_new_message = message.get("is_new_message", False)
+        timestamp = datetime.now().isoformat()
+        
+        # Only process new messages with text body
+        if not is_new_message or not message_body:
+            logger.info(f"Skipping webhook - is_new: {is_new_message}, has_body: {bool(message_body)}")
+            return
+        
+        if not phone_number:
+            logger.warning("Missing phone number in webhook")
+            return
+        
+        message_lower = message_body.lower().strip()
+        
+        logger.info(f"📨 Message from {phone_number}: {message_body}")
+        
+        # PRIORITY 1: Handle greetings first
+        greeting_keywords = ['hi', 'hello', 'hey', 'namaste', 'hii', 'hlo', 'start', 'help']
+        if any(keyword == message_lower or message_lower.startswith(keyword + ' ') for keyword in greeting_keywords):
+            customer_name = contact.get("first_name", "there")
+            await handle_welcome_message(phone_number, customer_name)
+            return
+
+        # PRIORITY 2: Handle feature keywords
+        if message_lower in ['order', 'orders', 'my orders', 'track order', '📦 orders', 'status']:
+            await handle_order_request(phone_number)
+            return
+
+        elif message_lower in ['doc', 'docs', 'documents', 'my documents', 'report', 'reports', '🔐 documents']:
+            await handle_document_request(phone_number)
+            return
+
+        elif message_lower in ['profile', 'my profile', 'user info', 'details', '👤 profile']:
+            await handle_profile_request(phone_number)
+            return
+
+        elif message_lower.startswith('search '):
+            query_parts = message_body.split(' ', 1)
+            if len(query_parts) > 1:
+                await handle_search_request(phone_number, query_parts[1])
+                return
+
+        # PRIORITY 3: Handle medicine reminder responses
+        if message_lower in ['taken', '✅ taken', 'yes', 'done']:
+            await handle_medicine_response(phone_number, 'taken', timestamp)
+            
+        elif message_lower in ['skip', '❌ skip', 'skipped', 'no']:
+            await handle_medicine_response(phone_number, 'skipped', timestamp)
+            
+        elif message_lower in ['later', '⏰ later', 'remind later', 'snooze']:
+            await handle_medicine_response(phone_number, 'later', timestamp)
+            
+        elif message_lower in ['stop', 'cancel', 'unsubscribe']:
+            await handle_stop_request(phone_number)
+            return
+            
+        # PRIORITY 4: Handle AI agent queries
+        elif len(message_body) > 10:
+            await handle_ai_query(phone_number, message_body)
+            
+        else:
+            await handle_unknown_message(phone_number)
+        
+    except Exception as e:
+        logger.error(f"Error processing incoming message: {str(e)}")
+
+# ... [The code continues with handle_welcome_message, handle_unknown_message, 
+#      handle_medicine_response, handle_ai_query, handle_order_request, 
+#      handle_document_request, handle_profile_request, and handle_stop_request] ...
+
+async def handle_search_request(phone_number: str, medicine_name: str):
+    """Search for medicine in Shopify catalog via WhatsApp"""
+    try:
+        from app.shopify_api_service import shopify_api
+        from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+        
+        whatsapp_client = CustomWhatsAppClient()
+        
+        # Search for product
+        product_info = shopify_api.get_product_info(medicine_name)
+        
+        if product_info["is_available"]:
+            message = f"""🔍 *Medicine Found!*
+
+💊 *{product_info['shopify_product_title']}*
+✅ Status: *Available*
+💰 Price: ₹{product_info.get('price', 'N/A')}
+
+You can add this to your next prescription or find it in our store.
+
+_How else can I help?_ 🌿"""
+        else:
+            message = f"🔍 *Medicine Not Found*\n\nSorry, *{medicine_name}* is not in our current catalog."
+            if product_info.get("suggested_alternatives"):
+                message += "\n\n*Suggested Alternatives:*\n"
+                message += "\n".join([f"• {alt}" for alt in product_info["suggested_alternatives"][:3]])
+            
+            message += "\n\n_Type \"HELP\" to see all features._ 🌿"
+            
+        await whatsapp_client.send_text_message(phone_number=phone_number, message_body=message)
+        
+    except Exception as e:
+        logger.error(f"Error handling search request: {str(e)}")
+

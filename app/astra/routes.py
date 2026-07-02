@@ -1,0 +1,113 @@
+
+import logging
+from typing import Optional, List, Dict, Any
+from fastapi import APIRouter, HTTPException, Depends, Request
+from pydantic import BaseModel
+
+from .pipeline import AstraPipeline
+from .capabilities import CapabilityAgent
+from .consent import ConsentManager
+from .memory import RAGMemory
+from .rate_limit import RateLimiter
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/astra", tags=["astra"])
+
+# Global instances placeholder
+pipeline_instance: Optional[AstraPipeline] = None
+capability_agent_instance: Optional[CapabilityAgent] = None
+consent_manager_instance: Optional[ConsentManager] = None
+rag_memory_instance: Optional[RAGMemory] = None
+rate_limiter_instance: Optional[RateLimiter] = None
+
+class ChatRequest(BaseModel):
+    user_id: str
+    message: Optional[str] = None
+    query: Optional[str] = None
+    is_voice: bool = False
+    metadata: Optional[Dict[str, Any]] = None
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.message:
+            self.message = self.query or ""
+
+class ChatResponse(BaseModel):
+    response: str
+
+def get_pipeline():
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Astra Pipeline not ready")
+    return pipeline_instance
+
+def get_consent_manager():
+    if not consent_manager_instance:
+        raise HTTPException(status_code=503, detail="Consent Manager not ready")
+    return consent_manager_instance
+
+def get_rag_memory():
+    if not rag_memory_instance:
+        raise HTTPException(status_code=503, detail="Memory System not ready")
+    return rag_memory_instance
+
+def get_rate_limiter():
+    if not rate_limiter_instance:
+        # Fallback if not initialized
+        return RateLimiter() 
+    return rate_limiter_instance
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_endpoint(
+    request: ChatRequest,
+    pipeline: AstraPipeline = Depends(get_pipeline),
+    consent: ConsentManager = Depends(get_consent_manager),
+    memory: RAGMemory = Depends(get_rag_memory),
+    limiter: RateLimiter = Depends(get_rate_limiter)
+):
+    # 1. Consent Check
+    if not consent.check_consent(request.user_id):
+        raise HTTPException(status_code=403, detail="User consent required for AI processing")
+
+    # 2. Rate Limit
+    if not limiter.check_rate_limit(request.user_id):
+        raise HTTPException(status_code=429, detail="Daily rate limit exceeded")
+
+    # 3. Get History
+    history = memory.get_history(request.user_id)
+
+    # 4. Pipeline Execution
+    # We pass history to pipeline, pipeline calls API
+    ai_text = await pipeline.process_query(
+        user_id=request.user_id,
+        message=request.message,
+        history=history
+    )
+
+    # 5. Update Memory (Local)
+    memory.add_message(request.user_id, "user", request.message)
+    memory.add_message(request.user_id, "assistant", ai_text)
+    
+    return ChatResponse(response=ai_text)
+
+@router.get("/health")
+async def health_check():
+    return {
+        "status": "online",
+        "pipeline": pipeline_instance is not None
+    }
+
+def initialize_astra_routes(
+    pipeline: AstraPipeline,
+    capability: CapabilityAgent,
+    consent: ConsentManager,
+    memory: RAGMemory,
+    limiter: RateLimiter
+):
+    global pipeline_instance, capability_agent_instance, consent_manager_instance, rag_memory_instance, rate_limiter_instance
+    pipeline_instance = pipeline
+    capability_agent_instance = capability
+    consent_manager_instance = consent
+    rag_memory_instance = memory
+    rate_limiter_instance = limiter
+    logger.info("✅ Astra Routes fully initialized with core components")

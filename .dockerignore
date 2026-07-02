@@ -1,0 +1,27 @@
+# Ignore virtual environments
+venv/
+.env.save
+
+# Ignore caches and build artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+
+# Ignore local audio and static uploads
+audio_cache/*
+!audio_cache/.keep
+static/*
+!static/.keep
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore zip files
+*.zip
+*.tar.gz
+
+# Ignore local DBs
+*.sqlite
+*.db

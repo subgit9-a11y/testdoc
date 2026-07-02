@@ -1,0 +1,5 @@
+.env*
+*.json
+*.txt
+AdminPanel_Hostable/.env
+QUICK_FIX_GUIDE.md

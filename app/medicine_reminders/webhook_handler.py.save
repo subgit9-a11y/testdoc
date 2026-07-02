@@ -1,0 +1,156 @@
+        raw = await request.body()
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError:
+            payload = dict(await request.form())
+
+        # 🔁 LOOP PREVENTION — MUST BE HERE, NOT AT FILE LEVEL
+        if (
+            payload.get("from_me") is True
+            or payload.get("isBot") is True
+            or payload.get("direction") == "outgoing"
+            or payload.get("sender") == "system"
+        ):
+            logger.info("🔁 Ignored outgoing/bot WhatsApp message")
+            return {"success": True, "ignored": True}
+
+        background_tasks.add_task(process_message, payload)
+        return {"success": True}
+
+    except Exception as e:
+        logger.exception("❌ Webhook receive failed")
+        return {"success": False, "error": str(e)}
+
+# ============================================================
+# CORE MESSAGE PROCESSOR
+# ============================================================
+
+async def process_message(data: Dict[str, Any]):
+    try:
+        contact = data.get("contact", {})
+        message = data.get("message", {})
+
+        phone = (
+            contact.get("phone_number")
+            or data.get("phone")
+            or data.get("From")
+            or data.get("wa_id")
+            or data.get("sender")
+        )
+
+        text = (
+            message.get("body")
+            or data.get("body")
+            or data.get("message")
+            or data.get("text")
+        )
+
+        if isinstance(message, str):
+            text = message
+
+        if not phone or not text:
+            logger.warning("⚠️ Missing phone or message")
+            return
+
+        phone = phone.replace("whatsapp:", "").strip()
+        text_clean = str(text).strip()
+        lower = text_clean.lower()
+
+        # ---------------- GREETING ----------------
+        if lower in {"hi", "hello", "hey", "namaste", "start", "help"}:
+            name = contact.get("first_name") or "there"
+            await send_welcome(phone, name)
+            return
+
+        # ---------------- MEDICINE RESPONSES ----------------
+        if lower in {"taken", "yes", "done"}:
+            await handle_medicine_response(phone, "taken")
+            return
+
+        if lower in {"skip", "skipped", "no"}:
+            await handle_medicine_response(phone, "skipped")
+            return
+
+        if lower in {"later", "snooze", "remind later"}:
+            await handle_medicine_response(phone, "later")
+            return
+
+        # ---------------- COMMANDS ----------------
+        if lower in {"orders", "order", "status"}:
+            await send_text(phone, "📦 Order tracking will be available shortly.")
+            return
+
+        if lower in {"docs", "documents", "reports"}:
+            await send_text(phone, "📄 Your medical documents will be shared soon.")
+            return
+
+        if lower in {"profile", "my profile"}:
+            await send_text(phone, "👤 Profile details will be available soon.")
+            return
+
+        if lower.startswith("search "):
+            await handle_search(phone, text_clean[7:])
+            return
+
+        # ---------------- AI QUERY ----------------
+        if len(text_clean) > 8:
+            await handle_ai_query(phone, text_clean)
+        else:
+            await send_help(phone)
+
+    except Exception:
+        logger.exception("❌ Message processing failed")
+
+# ============================================================
+# HANDLERS
+# ============================================================
+
+async def send_welcome(phone: str, name: str):
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+    msg = WELCOME_MESSAGE.format(name=name, **EMOJI)
+    await CustomWhatsAppClient().send_text_message(phone, msg)
+
+async def send_help(phone: str):
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+    msg = HELP_MESSAGE.format(**EMOJI)
+    await CustomWhatsAppClient().send_text_message(phone, msg)
+
+async def handle_medicine_response(phone: str, response: str):
+    from app.medicine_reminders.reminder_engine import ReminderEngine
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+
+    ReminderEngine().handle_patient_response(
+        patient_phone=phone,
+        response=response,
+        message_timestamp=datetime.utcnow().isoformat()
+    )
+
+    msg = CONFIRMATION_MESSAGES.get(response, "Recorded").format(**EMOJI)
+    await CustomWhatsAppClient().send_text_message(phone, msg)
+
+async def handle_ai_query(phone: str, query: str):
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+
+    ai_response = None
+    try:
+        from app.enhanced_inference import model_inference
+        if model_inference:
+            ai_response = await model_inference.generate_response(query)
+    except Exception:
+        logger.exception("⚠️ AI inference failed")
+
+    if not ai_response:
+        ai_response = "🌿 I’m checking our Ayurvedic knowledge base. Please wait."
+
+    await CustomWhatsAppClient().send_text_message(phone, ai_response)
+
+async def handle_search(phone: str, medicine: str):
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+    await CustomWhatsAppClient().send_text_message(
+        phone,
+        f"🔍 Searching for medicine: {medicine}"
+    )
+
+async def send_text(phone: str, text: str):
+    from app.medicine_reminders.custom_whatsapp_client import CustomWhatsAppClient
+    await CustomWhatsAppClient().send_text_message(phone, text)

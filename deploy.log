@@ -1,0 +1,718 @@
+STDOUT:
+Archive:  vultr_astra_deploy.zip
+  inflating: ,                       
+  inflating: .dockerignore           
+  inflating: .env                    
+  inflating: .env.example            
+  inflating: .env.save               
+  inflating: .env.txt                
+  inflating: add_dns.py              
+  inflating: add_upi_col.py          
+  inflating: ai_audit_report.json    
+  inflating: AI_CONNECTIVITY_REPORT.md  
+  inflating: ai_evaluation_suite.py  
+  inflating: AI_RESPONSE_VERIFICATION.md  
+  inflating: analyze_patients_source.py  
+  inflating: API_AYUREZE_INTEGRATION_GUIDE.md  
+  inflating: API_INTEGRATION_COMPLETE.md  
+  inflating: api_openapi.json        
+  inflating: Astra_AI_Complete_Feature_List.pdf  
+  inflating: astra_client.py         
+  inflating: Astra_Complete_App_Flow.pdf  
+  inflating: ASTRA_COMPLETE_FEATURES.md  
+  inflating: Astra_Complete_Visual_UX_Flow.pdf  
+  inflating: ASTRA_CPANEL_ADMIN_IMPLEMENTATION.md  
+  inflating: ASTRA_INTEGRATION_GUIDE.md  
+  inflating: Astra_Patient_App_Integration.pdf  
+  inflating: ASTRA_PATIENT_JOURNEY_ARCHITECTURE.md  
+  inflating: Astra_Secure_UX_Flow.pdf  
+  inflating: astra_synergy_pipeline.py  
+  inflating: astra_unified_client.py  
+  inflating: Astra_Visual_UX_Flow.pdf  
+  inflating: audit_ai_endpoints.py   
+  inflating: AUTOMATION_FLOW.md      
+  inflating: AYUREZE_ADMIN_DEPLOYMENT.md  
+  inflating: AYUREZE_AUTOMATION_FLOW.md  
+  inflating: AyurEze_End_To_End_App_Flow.pdf  
+  inflating: check_500.py            
+  inflating: check_agora.py          
+  inflating: check_agora_routes.py   
+  inflating: check_all_syntax.py     
+  inflating: check_astra_nginx.py    
+  inflating: check_astra_service.py  
+  inflating: check_companion.py      
+  inflating: check_compose.py        
+  inflating: check_compose2.py       
+  inflating: check_conflicts.py      
+  inflating: check_crash.py          
+  inflating: check_curl.py           
+  inflating: check_curl2.py          
+  inflating: check_db.py             
+  inflating: check_db_data.py        
+  inflating: check_diagnoses.py      
+  inflating: check_docker.py         
+  inflating: check_docker2.py        
+  inflating: check_docker3.py        
+  inflating: check_docker_image.py   
+  inflating: check_env.py            
+  inflating: check_env2.py           
+  inflating: check_env3.py           
+  inflating: check_files.py          
+  inflating: check_full_integration.py  
+  inflating: check_host_nginx_error.py  
+  inflating: check_host_services.py  
+  inflating: check_host_v.py         
+  inflating: check_inside_container.py  
+  inflating: check_live.py           
+  inflating: check_logs.py           
+  inflating: check_logs2.py          
+  inflating: check_logs3.py          
+  inflating: check_logs4.py          
+  inflating: check_logs_file.py      
+  inflating: check_main.py           
+  inflating: check_main2.py          
+  inflating: check_main3.py          
+  inflating: check_main4.py          
+  inflating: check_nginx.py          
+  inflating: check_nginx_configs.py  
+  inflating: check_openapi.py        
+  inflating: check_openapi2.py       
+  inflating: check_openapi_token.py  
+  inflating: check_patient_profiles.py  
+  inflating: check_pgrst.py          
+  inflating: check_pgrst2.py         
+  inflating: check_real_shopify.py   
+  inflating: check_routes.py         
+  inflating: check_routes2.py        
+  inflating: check_schema_real.py    
+  inflating: check_setup.py          
+  inflating: check_shopify.py        
+  inflating: check_syntax.py         
+  inflating: check_syntax_fast.py    
+  inflating: check_user.py           
+  inflating: check_vps.py            
+  inflating: check_vps_agora.py      
+  inflating: check_vps_health.py     
+  inflating: check_vps_syntax.py     
+  inflating: clean_resync_patients.py  
+  inflating: complete_doctor_flow.py  
+  inflating: COMPLETE_FEATURE_LIST.md  
+  inflating: COMPLETE_SETUP_SUMMARY.md  
+  inflating: comprehensive_audit.py  
+  inflating: COMPREHENSIVE_AUDIT_REPORT.md  
+  inflating: comprehensive_flow_results.txt  
+  inflating: comprehensive_user_flow.py  
+  inflating: cp_agora.py             
+  inflating: cp_and_restart.py       
+  inflating: create_mock_patient.py  
+  inflating: credential_report.txt   
+  inflating: DATABASE_TESTING_GUIDE.md  
+  inflating: debug_endpoint.py       
+  inflating: debug_failures.py       
+  inflating: debug_host_header.py    
+  inflating: debug_https.py          
+  inflating: debug_pdf_overlay.py    
+  inflating: DEBUG_Prescription_Overlay.pdf  
+  inflating: debug_reset.py          
+  inflating: deep_ayurveda_chat.py   
+  inflating: deploy.sh               
+  inflating: DEPLOYMENT_ERROR_ANALYSIS.md  
+  inflating: DEPLOYMENT_READY.md     
+  inflating: DEPLOYMENT_READY_CONFIRMATION.md  
+  inflating: DEPLOYMENT_STATUS.md    
+  inflating: deploy_fixes.py         
+  inflating: DEPLOY_NOW.md           
+  inflating: deploy_paramiko.py      
+  inflating: DETAILED_AI_BRAIN_REPORT.md  
+  inflating: diagnostics_final_results.txt  
+  inflating: diagnostics_test.py     
+  inflating: diagnostic_extra.py     
+  inflating: diag_utf8.txt           
+  inflating: docker-compose.yml      
+  inflating: Dockerfile              
+  inflating: docker_logs.txt         
+  inflating: DOCTOR_APP_FULL_IMPLEMENTATION_GUIDE.md  
+  inflating: DOCTOR_APP_INTEGRATION.md  
+  inflating: DOCTOR_APP_LOW_RAM_BUILD_GUIDE.md  
+  inflating: DOCTOR_RETRIEVAL_SUCCESS.md  
+  inflating: download_main.py        
+  inflating: fast_deploy.py          
+  inflating: fast_zip.py             
+  inflating: FEATURE_CHECKLIST.md    
+  inflating: fetch_logs.py           
+  inflating: fetch_nginx_certbot.py  
+  inflating: FINAL_API_AYUREZE_SERVER_CODE.md  
+  inflating: FINAL_STATUS_REPORT.md  
+  inflating: FINAL_SUMMARY.md        
+  inflating: FINAL_VULTR_DEPLOYMENT_GUIDE.md  
+  inflating: FINANCE_MIGRATION.sql   
+  inflating: find_astra_config.py    
+  inflating: find_exceptions.py      
+  inflating: find_med.py             
+  inflating: firebase-credentials.json  
+  inflating: firebase-service-account.json  
+  inflating: FIREBASE_MIGRATION_COMPLETE.md  
+  inflating: FIREBASE_MIGRATION_README.md  
+  inflating: fix_certbot.py          
+  inflating: fix_dns.py              
+  inflating: fix_docker.py           
+  inflating: fix_env.py              
+  inflating: fix_exceptions.py       
+  inflating: fix_port.py             
+  inflating: fix_vps_syntax.py       
+  inflating: FLUTTER_UI_IMPLEMENTATION.md  
+  inflating: force_cp.py             
+  inflating: force_cp2.py            
+  inflating: force_env.py            
+  inflating: full_diagnostic_run.py  
+  inflating: full_patient_flow.py    
+  inflating: generate_feature_list_pdf.py  
+  inflating: generate_full_flow_pdf.py  
+  inflating: generate_pdf.py         
+  inflating: generate_ux_flow_pdf.py  
+  inflating: generate_visual_pdf.py  
+  inflating: get_admin_details.py    
+  inflating: get_container_code.py   
+  inflating: get_crash_logs.py       
+  inflating: get_docker_logs.py      
+  inflating: get_one_doctor.py       
+  inflating: get_proxy_logs.py       
+  inflating: HOSTINGER_DEPLOYMENT.md  
+  inflating: import_result.txt       
+  inflating: import_test.py          
+  inflating: init_db.py              
+  inflating: inspect_db.py           
+  inflating: inspect_paths.py        
+  inflating: INTEGRATION_GUIDE.md    
+  inflating: INTEGRATION_VERIFICATION.md  
+  inflating: investigate_db.py       
+  inflating: light_validate.py       
+  inflating: list_endpoints.py       
+  inflating: list_endpoints_fast.py  
+  inflating: list_endpoints_light.py  
+  inflating: list_full_doctors.py    
+  inflating: list_profiles.py        
+  inflating: list_profiles_v2.py     
+  inflating: list_roster.py          
+  inflating: local_logs.txt          
+  inflating: local_mysql.py          
+  inflating: main.py                 
+  inflating: main.py.bak             
+  inflating: main_vps.py             
+  inflating: MIGRATION_CHECKLIST.md  
+  inflating: minimal_check.py        
+  inflating: mock_diagnostics.py     
+  inflating: mock_patient_flow.py    
+  inflating: MOCK_TEST_RESULTS.md    
+  inflating: mock_verified_on_base.pdf  
+  inflating: mock_whatsapp_storj_test.py  
+  inflating: modernization_plan.md   
+  inflating: nginx.conf              
+  inflating: NON_BLOCKING_STARTUP.md  
+  inflating: paramiko_check.txt      
+  inflating: passenger_wsgi.py       
+  inflating: PATIENT_APP_INTEGRATION.md  
+  inflating: php_test_out.txt        
+  inflating: ping_all_endpoints.py   
+  inflating: prepare_deployment.py   
+  inflating: prescription_debug_grid.pdf  
+  inflating: public_html             
+  inflating: quick_db_test.py        
+  inflating: QUICK_FIX_GUIDE.md      
+  inflating: quick_health_check.py   
+  inflating: README.md               
+  inflating: real_patient_flow_subash.py  
+  inflating: real_storj_test.py      
+  inflating: rebuild.py              
+  inflating: rebuild_docker.py       
+  inflating: rebuild_docker2.py      
+  inflating: redeploy_v4.py          
+  inflating: requirements.txt        
+  inflating: restart_backend.py      
+  inflating: restart_docker.py       
+  inflating: restore_clinical_patients.py  
+  inflating: restore_clinical_patients_v2.py  
+  inflating: restore_main.py         
+  inflating: restore_main2.py        
+  inflating: results_ascii.txt       
+  inflating: results_final_utf8.txt  
+  inflating: results_utf8.txt        
+  inflating: retrieve_admin_doctors.py  
+  inflating: retrieve_ids.py         
+  inflating: run_complete_subhash_flow.py  
+  inflating: run_full_scenario.py    
+  inflating: run_patient_headache_flow.py  
+  inflating: run_real_flow.py        
+  inflating: run_real_flow_v2.py     
+  inflating: run_real_flow_v3.py     
+  inflating: run_real_flow_v4.py     
+  inflating: run_real_flow_v5.py     
+  inflating: run_real_flow_v6.py     
+  inflating: run_real_flow_v7.py     
+  inflating: SCENARIO_REPORT.md      
+  inflating: scratch_mysql.py        
+  inflating: setup_swap.sh           
+  inflating: shell_test.txt          
+  inflating: shopify_client.py       
+  inflating: simple_doctor_test.py   
+  inflating: simple_storj_test.py    
+  inflating: simulate_patient_flow.py  
+  inflating: simulate_payout_split.py  
+  inflating: ssh_finance.py          
+  inflating: ssh_logs.py             
+  inflating: ssh_mysql.py            
+  inflating: start_with_firebase.bat  
+  inflating: STORJ_EHR_INTEGRATION.md  
+  inflating: storj_test_file.txt     
+  inflating: SUPABASE_ASTRA_FEATURES.sql  
+  inflating: SUPABASE_SCHEMA.sql     
+  inflating: supabase_schema_check.py  
+  inflating: sync_admin_data.py      
+  inflating: sync_all_patients.py    
+  inflating: sync_all_patients_v2.py  
+  inflating: sync_real_patients.py   
+  inflating: test_10_queries.py      
+  inflating: test_agora.py           
+  inflating: test_all_endpoints.py   
+  inflating: test_all_tools.py       
+  inflating: test_astra_fill.py      
+  inflating: test_automation.py      
+  inflating: test_brain.py           
+  inflating: test_brain.sh           
+  inflating: test_brain_final.py     
+  inflating: test_companion.py       
+  inflating: test_complete_integration.py  
+  inflating: test_conn.py            
+  inflating: test_connectivity.py    
+  inflating: test_cultural_clarification.py  
+  inflating: test_database_retrieval.py  
+  inflating: test_db.py              
+  inflating: test_denial_of_wallet.py  
+  inflating: test_doctors.py         
+  inflating: test_doctor_app_flow.py  
+  inflating: test_doctor_sync.py     
+  inflating: test_echo.txt           
+  inflating: test_env.py             
+  inflating: test_fastapi.py         
+  inflating: test_file.txt           
+  inflating: test_fill_real.py       
+  inflating: test_firebase_email_fix.py  
+  inflating: test_firebase_migration.py  
+  inflating: test_forgery.py         
+  inflating: test_image_pdf.py       
+  inflating: test_laravel_api.py     
+  inflating: test_live_astra.py      
+  inflating: test_local_astra.py     
+  inflating: test_local_db.py        
+  inflating: test_login_subash.py    
+  inflating: test_mapper.py          
+  inflating: test_payload_formats.py  
+  inflating: test_payload_formats_v2.py  
+  inflating: test_php_out.py         
+  inflating: test_prescription.py    
+  inflating: test_prescription.txt   
+  inflating: test_query.py           
+  inflating: test_raw_brain.py       
+  inflating: test_raw_sql.py         
+  inflating: test_result.txt         
+  inflating: test_result_debug.txt   
+  inflating: test_result_safe.txt    
+  inflating: test_security_fortress.py  
+  inflating: test_smtp_live.py       
+  inflating: test_storj.py           
+  inflating: test_summary.py         
+  inflating: test_supa.py            
+  inflating: test_supa_conn.py       
+  inflating: test_wasabi.py          
+  inflating: test_wa_connectivity.py  
+  inflating: tmp_pdf_gen.py          
+  inflating: tmp_pdf_gen_full.py     
+  inflating: tool_check.py           
+  inflating: TOOL_CONNECTIVITY_REPORT.md  
+  inflating: unified_ai_tester.py    
+  inflating: UNIFIED_API_TEST_REPORT.md  
+  inflating: unified_deploy.py       
+  inflating: update_agora_env.py     
+  inflating: update_agora_env2.py    
+  inflating: upload_agora.py         
+  inflating: upload_and_restart.py   
+  inflating: upload_main_vps.py      
+  inflating: validate_rebuild.py     
+  inflating: verify_agora.py         
+  inflating: verify_alignment.py     
+  inflating: verify_astra_ai.py      
+  inflating: verify_credentials.py   
+  inflating: verify_credentials_file.py  
+  inflating: verify_deployment.py    
+  inflating: verify_doctor_service.py  
+  inflating: verify_end_to_end.py    
+  inflating: verify_firebase_migration.py  
+  inflating: verify_real_integration.py  
+  inflating: verify_remote_brain.py  
+  inflating: verify_remote_brain_v2.py  
+  inflating: VULTR_DEPLOYMENT_GUIDE.md  
+  inflating: VULTR_DEPLOYMENT_GUIDE_NO_DOCKER.md  
+  inflating: VULTR_DEPLOY_GUIDE_FINAL.md  
+  inflating: webhook_handler.py      
+  inflating: AdminPanel_Hostable/.env  
+  inflating: AdminPanel_Hostable/cpanel_deploy.md  
+  inflating: AdminPanel_Hostable/main.py  
+  inflating: AdminPanel_Hostable/requirements.txt  
+  inflating: AdminPanel_Hostable/app/auth_middleware.py  
+  inflating: AdminPanel_Hostable/app/config.py  
+  inflating: AdminPanel_Hostable/app/database.py  
+  inflating: AdminPanel_Hostable/app/main.py  
+  inflating: AdminPanel_Hostable/app/security_utils.py  
+  inflating: AdminPanel_Hostable/app/admin/dashboard.py  
+  inflating: AdminPanel_Hostable/app/admin/routes.py  
+  inflating: AdminPanel_Hostable/app/admin/__init__.py  
+  inflating: aiastra/firebase-service-account.json  
+  inflating: api ai model/Encyclopedia-of-Ayurvedic-Pathology.json  
+  inflating: api ai model/herb.json  
+  inflating: api ai model/herb_metadata.json  
+  inflating: api ai model/New Text Document.txt  
+  inflating: api ai model/pathology_metadata.json  
+  inflating: api ai model/Siddhanta-Kosha.json  
+  inflating: api ai model/siddhanta_metadata.json  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),.....)  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),.....)____    ().=  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),.....)____    ().==  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),.....)____    ().==)  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),_  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),__  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),___  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s____    .()),____  
+  inflating: app/.vultr_astra.zip____   ,____    ,,.s________  
+  inflating: app/a.txt               
+  inflating: app/admin_db.py         
+  inflating: app/admin_doctors_ai_temp.py  
+  inflating: app/admin_patients_temp.py  
+  inflating: app/admin_routes.py     
+  inflating: app/agora_routes.py     
+  inflating: app/ai_agent_api.py     
+  inflating: app/ai_agent_api.py.bak  
+  inflating: app/ai_fallback.py      
+  inflating: app/all_products_mapping.py  
+  inflating: app/astra_brain_client.py  
+  inflating: app/astra_brain_client.py.backup2  
+  inflating: app/astra_brain_client.py.bak  
+  inflating: app/astra_brain_client.py.bak_ayurveda  
+  inflating: app/astra_brain_client.py.broken  
+  inflating: app/audit_logger.py     
+  inflating: app/audit_routes.py     
+  inflating: app/auth.py             
+  inflating: app/auth_middleware.py  
+  inflating: app/auth_routes.py      
+  inflating: app/automated_prescription_service.py  
+  inflating: app/autopilot_engine.py  
+  inflating: app/autopilot_triggers.py  
+  inflating: app/ayureze_prescription_template.py  
+  inflating: app/ayurveda_model_service.py  
+  inflating: app/background_tasks.py  
+  inflating: app/brain_api.py        
+  inflating: app/buddy_matching_service.py  
+  inflating: app/buddy_routes.py     
+  inflating: app/cashfree_client.py  
+  inflating: app/companion_analytics.py  
+  inflating: app/companion_api.py    
+  inflating: app/companion_api_enhanced.py  
+  inflating: app/companion_api_old.py  
+  inflating: app/companion_cache.py  
+  inflating: app/companion_redis_manager.py  
+  inflating: app/companion_system.py  
+  inflating: app/companion_system_old.py  
+  inflating: app/comprehensive_product_mapping.py  
+  inflating: app/config.py           
+  inflating: app/conversation_pruner.py  
+  inflating: app/database.py         
+  inflating: app/database_models.py  
+  inflating: app/database_models.py.bak  
+  inflating: app/debug_coordinates.py  
+  inflating: app/enhanced_inference.py  
+  inflating: app/enhanced_input_validator.py  
+  inflating: app/enhanced_product_mapper.py  
+  inflating: app/env_validator.py    
+  inflating: app/family_models_snippet.py  
+  inflating: app/family_routes.py    
+  inflating: app/finance_routes.py   
+  inflating: app/finance_service.py  
+  inflating: app/firebase_auth_middleware.py  
+  inflating: app/firebase_email_service.py  
+  inflating: app/firebase_utils.py   
+  inflating: app/frontend.py         
+  inflating: app/indictrans2_routes.py  
+  inflating: app/indictrans2_service.py  
+  inflating: app/inference.py        
+  inflating: app/input_sanitizer.py  
+  inflating: app/inventory_sync_service.py  
+  inflating: app/language_utils.py   
+  inflating: app/laravel_integration.py  
+  inflating: app/main.pv             
+  inflating: app/main.py             
+  inflating: app/main.py.save        
+  inflating: app/main_enhanced.py    
+  inflating: app/meditation_generator.py  
+  inflating: app/models.py           
+  inflating: app/model_registry.py   
+  inflating: app/model_registry.py.bak  
+  inflating: app/model_service.py    
+  inflating: app/notification_routes.py  
+  inflating: app/notification_routes.py.bak  
+  inflating: app/notification_routes.py.bak_notif_fix  
+  inflating: app/notification_scheduler.py  
+  inflating: app/notification_service.py  
+  inflating: app/order_management.py  
+  inflating: app/patient_management.py  
+  inflating: app/patient_management.py.bak  
+  inflating: app/patient_tokens.py   
+  inflating: app/payload_middleware.py  
+  inflating: app/pdf_form_filler.py  
+  inflating: app/pdf_worker.py       
+  inflating: app/prescription_debug_grid.pdf  
+  inflating: app/prescription_pdf_endpoint.py  
+  inflating: app/prescription_pdf_service.py  
+  inflating: app/product_mapping.py  
+  inflating: app/rate_limiter.py     
+  inflating: app/razorpay_client.py  
+  inflating: app/redis_cache.py      
+  inflating: app/rolling_context_summarizer.py  
+  inflating: app/security_utils.py   
+  inflating: app/session_manager.py  
+  inflating: app/session_manager.py.bak  
+  inflating: app/shopify--           
+  inflating: app/shopify_api_service.py  
+  inflating: app/shopify_auto_sync.py  
+  inflating: app/shopify_client      
+  inflating: app/shopify_client.py   
+  inflating: app/shopify_client.py.save  
+  inflating: app/shopify_models.py   
+  inflating: app/shopify_webhook.py  
+  inflating: app/simplified_auth.py  
+  inflating: app/smart_auto_cart.py  
+  inflating: app/smtp_email_service.py  
+  inflating: app/ssl_monitor.py      
+  inflating: app/storage_factory.py  
+  inflating: app/storj_client.py     
+  inflating: app/sync_service.py     
+  inflating: app/unified_prescription_workflow.py  
+  inflating: app/voice_models.py     
+  inflating: app/voice_service.py    
+  inflating: app/voice_synthesis.py  
+  inflating: app/wasabi_client.py    
+  inflating: app/whatsapp_companion_routes.py  
+  inflating: app/whatsapp_companion_service.py  
+  inflating: app/xss_sanitizer.py    
+  inflating: app/__init__.py         
+  inflating: app/admin/dashboard.py  
+  inflating: app/admin/routes.py     
+  inflating: app/admin/__init__.py   
+  inflating: app/advanced_notifications/escalation_system.py  
+  inflating: app/advanced_notifications/routes.py  
+  inflating: app/advanced_notifications/__init__.py  
+  inflating: app/analytics/predictive_analytics.py  
+  inflating: app/analytics/__init__.py  
+  inflating: app/api/compliance_routes.py  
+  inflating: app/assets/base_prescription.png  
+  inflating: app/astra/ayurvedic_knowledge.py  
+  inflating: app/astra/brain_routes.py  
+  inflating: app/astra/brain_routes.py.bak  
+  inflating: app/astra/capabilities.py  
+  inflating: app/astra/capabilities.yaml  
+  inflating: app/astra/capability_agent.py  
+  inflating: app/astra/consent.py    
+  inflating: app/astra/consent_manager.py  
+  inflating: app/astra/db_connection.py  
+  inflating: app/astra/dosage_service.py  
+  inflating: app/astra/emotion_detector.py  
+  inflating: app/astra/enhanced_routes.py  
+  inflating: app/astra/memory.py     
+  inflating: app/astra/nudge_engine.py  
+  inflating: app/astra/pipeline.py   
+  inflating: app/astra/rag_memory.py  
+  inflating: app/astra/rate_limit.py  
+  inflating: app/astra/response_sanitizer.py  
+  inflating: app/astra/router.py     
+  inflating: app/astra/routes.py     
+  inflating: app/astra/routes.py.bak  
+  inflating: app/astra/rules_engine.py  
+  inflating: app/astra/safety_enforcer.py  
+  inflating: app/astra/system_prompt_builder.py  
+  inflating: app/astra/telemedicine_bridge.py  
+  inflating: app/astra/tone_mapper.py  
+  inflating: app/astra/tool_registry.py  
+  inflating: app/astra/voice_service.py  
+  inflating: app/astra/__init__.py   
+  inflating: app/astra_autopilot/routes.py  
+  inflating: app/astra_autopilot/state_manager.py  
+  inflating: app/astra_autopilot/state_manager.py.bak  
+  inflating: app/astra_fill/extraction.py  
+  inflating: app/astra_fill/models.py  
+  inflating: app/astra_fill/routes.py  
+  inflating: app/astra_fill/service.py  
+  inflating: app/astra_fill/__init__.py  
+  inflating: app/astra_rate_limiter/quota_manager.py  
+  inflating: app/astra_rate_limiter/rate_limiter.py  
+  inflating: app/astra_rate_limiter/__init__.py  
+  inflating: app/buddy/buddy_service.py  
+  inflating: app/buddy/matching_service.py  
+  inflating: app/buddy/__init__.py   
+  inflating: app/catchy_prescription/extractor.py  
+  inflating: app/catchy_prescription/renderer.py  
+  inflating: app/catchy_prescription/routes.py  
+  inflating: app/catchy_prescription/__init__.py  
+  inflating: app/doctors/doctor_auth_routes.py  
+  inflating: app/doctors/doctor_routes.py  
+  inflating: app/doctors/doctor_routes.py.bak  
+  inflating: app/doctors/doctor_service.py  
+  inflating: app/doctors/doctor_service.py.bak  
+  inflating: app/doctors/mock_doctor_data.py  
+  inflating: app/doctors/patient_details_router.py  
+  inflating: app/doctors/prescription_submit_routes.py  
+  inflating: app/doctors/product_search_router.py  
+  inflating: app/doctors/__init__.py  
+  inflating: app/documents/routes.py  
+  inflating: app/documents/supabase_document_service.py  
+  inflating: app/documents/__init__.py  
+  inflating: app/medicine_reminders/..webhook_handler.py.swp_.swp  
+  inflating: app/medicine_reminders/.webhook_handler.py.swp_  
+  inflating: app/medicine_reminders/custom_whatsapp_client.py  
+  inflating: app/medicine_reminders/meta_whatsapp_client.py  
+  inflating: app/medicine_reminders/prescription_analyzer.py  
+  inflating: app/medicine_reminders/reminder_engine.py  
+  inflating: app/medicine_reminders/routes.py  
+  inflating: app/medicine_reminders/supabase_reminder_service.py  
+  inflating: app/medicine_reminders/supabase_routes.py  
+  inflating: app/medicine_reminders/webhook_handler.py  
+  inflating: app/medicine_reminders/webhook_handler.py.bak  
+  inflating: app/medicine_reminders/webhook_handler.py.save  
+  inflating: app/medicine_reminders/webhook_handler.py.save.1  
+  inflating: app/medicine_reminders/webhook_handler.py.txt  
+  inflating: app/medicine_reminders/_,  
+  inflating: app/medicine_reminders/_,()._  
+  inflating: app/medicine_reminders/_,()_  
+  inflating: app/medicine_reminders/_,=(  
+  inflating: app/medicine_reminders/_,=((_)  
+  inflating: app/medicine_reminders/__init__.py  
+  inflating: app/multilang/language_manager.py  
+  inflating: app/multilang/routes.py  
+  inflating: app/multilang/__init__.py  
+  inflating: app/patients/patient_cart_router.py  
+  inflating: app/prescriptions/prescription_automation.py  
+  inflating: app/prescriptions/prescription_routes.py  
+  inflating: app/prescriptions/prescription_service.py  
+  inflating: app/prescriptions/prescription_service.py.bak2  
+  inflating: app/prescriptions/__init__.py  
+  inflating: app/security/auth_handler.py  
+  inflating: app/security/compliance_middleware.py  
+  inflating: app/security/disha_compliance.py  
+  inflating: app/security/disha_compliance.py.bak  
+  inflating: app/security/encryption.py  
+  inflating: app/security/__init__.py  
+  inflating: app/treatment_centers/center_routes.py  
+  inflating: app/treatment_centers/center_service.py  
+  inflating: app/treatment_centers/center_service.py.bak  
+  inflating: app/treatment_centers/center_service.py.bak3  
+  inflating: app/treatment_centers/__init__.py  
+  inflating: app/utils/logger.py     
+  inflating: app/whatsapp/sender.py  
+  inflating: app/whatsapp/webhook.py  
+  inflating: app/whatsapp/__init__.py  
+  inflating: AstraLaravelAdmin/README.md  
+  inflating: AstraLaravelAdmin/app/Http/Controllers/AstraAdminController.php  
+  inflating: AstraLaravelAdmin/resources/views/astra_dashboard.blade.php  
+  inflating: AstraLaravelAdmin/routes/astra_admin.php  
+  inflating: static/.keep            
+  inflating: static/fcm-token-generator.html  
+  inflating: update_v451/deploy.sh   
+  inflating: update_v451/modernization_plan.md  
+  inflating: update_v451/app/main.py  
+  inflating: update_v451/app/prescriptions/prescription_routes.py  
+  inflating: update_v451/app/prescriptions/prescription_service.py  
+aibackend
+aibackend_proxy
+#1 [internal] load local bake definitions
+#1 reading from stdin 504B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.98kB 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 1.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context:
+#4 transferring context: 364B 0.0s done
+#4 DONE 0.3s
+
+#5 [builder 1/7] FROM docker.io/library/python:3.11-slim@sha256:b27df5841f3355e9473f9a516d38a6783b6c8dfeacaf2d14a240f443b368ddb6
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 48.28kB 0.1s done
+#6 DONE 7.8s
+
+#7 [builder 6/7] RUN pip install --no-cache-dir     torch --index-url https://download.pytorch.org/whl/cpu
+#7 CACHED
+
+#8 [builder 7/7] RUN pip install --no-cache-dir -r requirements.txt
+#8 CACHED
+
+#9 [stage-1 4/7] WORKDIR /app
+#9 CACHED
+
+#10 [builder 3/7] WORKDIR /build
+#10 CACHED
+
+#11 [builder 5/7] COPY requirements.txt .
+#11 CACHED
+
+#12 [stage-1 2/7] RUN apt-get update && apt-get install -y --no-install-recommends     libgomp1     ffmpeg     curl     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-1 5/7] RUN mkdir -p /app/logs /app/astra_memory && chown -R appuser:appuser /app
+#13 CACHED
+
+#14 [builder 2/7] RUN apt-get update && apt-get install -y --no-install-recommends     gcc     g++     make     git     curl     libffi-dev     libssl-dev     ffmpeg     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [builder 4/7] RUN python -m venv /opt/venv
+#15 CACHED
+
+#16 [stage-1 3/7] RUN useradd -m -u 1000 appuser
+#16 CACHED
+
+#17 [stage-1 6/7] COPY --from=builder /opt/venv /opt/venv
+#17 CACHED
+
+#18 [stage-1 7/7] COPY --chown=appuser:appuser . .
+#18 DONE 1.3s
+
+#19 exporting to image
+#19 exporting layers
+#19 exporting layers 0.3s done
+#19 writing image sha256:190306ddd1f4f7e578416c5677dbcea87e1c7a6275a9373effde8e406ee1ec59 0.0s done
+#19 naming to docker.io/library/vultr_astra_2-backend 0.1s done
+#19 DONE 0.5s
+
+#20 resolving provenance for metadata file
+#20 DONE 0.0s
+
+STDERR:
+ Network vultr_astra_2_default Removing 
+ Network vultr_astra_2_default Removed 
+ Image vultr_astra_2-backend Building 
+ Image vultr_astra_2-backend Built 
+ Network vultr_astra_2_default Creating 
+ Network vultr_astra_2_default Created 
+ Container aibackend Creating 
+ Container aibackend Created 
+ Container aibackend_proxy Creating 
+ Container aibackend_proxy Created 
+ Container aibackend Starting 
+ Container aibackend Started 
+ Container aibackend_proxy Starting 
+ Container aibackend_proxy Started 

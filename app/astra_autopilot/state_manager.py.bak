@@ -1,0 +1,108 @@
+"""
+Astra Autopilot State Manager (Supabase)
+
+This module manages the PatientCareState in Supabase, separating it from the 
+legacy MySQL database used for core patient/doctor records.
+"""
+
+import logging
+from datetime import datetime, timezone
+from typing import Optional, Dict, Any
+from app.astra.db_connection import get_supabase_client
+
+logger = logging.getLogger(__name__)
+
+class AutopilotStateManager:
+    """
+    Manages reading/writing PatientCareState to Supabase.
+    """
+    
+    def __init__(self):
+        self.supabase = get_supabase_client()
+        self.table_name = "patient_care_states"
+
+    def get_or_create_state(self, patient_id: str) -> Dict[str, Any]:
+        """
+        Get existing state or create a new empty one in Supabase.
+        """
+        if not self.supabase:
+            logger.error("Supabase client not available")
+            return None
+
+        try:
+            # Try to get existing
+            response = self.supabase.table(self.table_name)\
+                .select("*")\
+                .eq("patient_id", patient_id)\
+                .execute()
+
+            if response.data:
+                return response.data[0]
+            
+            # Create new row if not exists
+            new_state = {
+                "patient_id": patient_id,
+                "is_autopilot_enabled": False,  # Default OFF
+                "care_journey_stage": "new",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            insert_resp = self.supabase.table(self.table_name)\
+                .insert(new_state)\
+                .execute()
+                
+            if insert_resp.data:
+                logger.info(f"Created new Autopilot state for {patient_id}")
+                return insert_resp.data[0]
+            
+            return None
+
+        except Exception as e:
+            logger.error(f"Error in get_or_create_state: {e}")
+            return None
+
+    def update_state(self, patient_id: str, updates: Dict[str, Any]) -> bool:
+        """
+        Update fields in the patient care state.
+        """
+        if not self.supabase:
+            return False
+
+        try:
+            # Always update updated_at
+            updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+            
+            response = self.supabase.table(self.table_name)\
+                .update(updates)\
+                .eq("patient_id", patient_id)\
+                .execute()
+                
+            if response.data:
+                logger.info(f"Updated Autopilot state for {patient_id}")
+                return True
+            return False
+
+        except Exception as e:
+            logger.error(f"Error updating state for {patient_id}: {e}")
+            return False
+
+    def get_enabled_patients(self) -> list:
+        """
+        Get list of all patients who have Autopilot enabled.
+        Used by the daily scheduler.
+        """
+        if not self.supabase:
+            return []
+            
+        try:
+            response = self.supabase.table(self.table_name)\
+                .select("patient_id")\
+                .eq("is_autopilot_enabled", True)\
+                .execute()
+                
+            return [row['patient_id'] for row in response.data] if response.data else []
+            
+        except Exception as e:
+            logger.error(f"Error fetching enabled patients: {e}")
+            return []

@@ -1,0 +1,285 @@
+"""
+Doctor Service
+Handles CRUD operations for doctors using SQLAlchemy and MySQL
+"""
+
+import logging
+import os
+from datetime import datetime, timezone
+from typing import List, Dict, Any, Optional
+import uuid
+import math
+
+from app.database_models import SessionLocal, Doctor
+from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
+
+class DoctorService:
+    """Doctor service using SQLAlchemy with MySQL"""
+    
+    def __init__(self):
+        logger.info("✅ Doctor Service (MySQL) initialized")
+    
+    def haversine_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """
+        Calculate distance between two coordinates using Haversine formula
+        Returns distance in kilometers
+        """
+        R = 6371  # Earth's radius in kilometers
+        
+        lat1_rad = math.radians(lat1)
+        lat2_rad = math.radians(lat2)
+        delta_lat = math.radians(lat2 - lat1)
+        delta_lon = math.radians(lon2 - lon1)
+        
+        a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        
+        return R * c
+    
+    async def register_doctor(self, doctor_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Register a new doctor in MySQL (using Firebase UID if provided)"""
+        db = SessionLocal()
+        try:
+            # Use provided doctor_id (Firebase UID) or generate new
+            doctor_id = doctor_data.get('doctor_id') or str(uuid.uuid4())
+            
+            # Check if doctor already exists
+            existing_doctor = db.query(Doctor).filter(Doctor.doctor_id == doctor_id).first()
+            if existing_doctor:
+                logger.info(f"Doctor {doctor_id} already exists. Returning existing profile.")
+                return {
+                    "success": True,
+                    "doctor_id": existing_doctor.doctor_id,
+                    "data": {
+                        "id": existing_doctor.id,
+                        "doctor_id": existing_doctor.doctor_id,
+                        "name": existing_doctor.name,
+                        "specialization": existing_doctor.specialization
+                    }
+                }
+            
+            new_doctor = Doctor(
+                doctor_id=doctor_id,
+                name=doctor_data['name'],
+                email=doctor_data.get('email'),
+                phone=doctor_data.get('phone'),
+                specialization=doctor_data.get('specialization', 'General Physician'),
+                qualifications=doctor_data.get('qualifications', []),
+                experience_years=doctor_data.get('experience_years', 0),
+                consultation_fee=doctor_data.get('consultation_fee', 500),
+                languages=doctor_data.get('languages', ['English']),
+                location=doctor_data.get('location', {}),
+                available_days=doctor_data.get('available_days', []),
+                available_times=doctor_data.get('available_times', {}),
+                rating=0,
+                total_reviews=0,
+                total_consultations=0,
+                is_active=True,
+                profile_image=doctor_data.get('profile_image'),
+                bio=doctor_data.get('bio')
+            )
+            
+            db.add(new_doctor)
+            db.commit()
+            db.refresh(new_doctor)
+            
+            logger.info(f"✅ Doctor {doctor_id} registered in MySQL")
+            
+            return {
+                "success": True,
+                "doctor_id": doctor_id,
+                "data": {
+                    "id": new_doctor.id,
+                    "doctor_id": new_doctor.doctor_id,
+                    "name": new_doctor.name,
+                    "specialization": new_doctor.specialization
+                }
+            }
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error registering doctor: {e}")
+            raise
+        finally:
+            db.close()
+    
+    async def get_doctor(self, doctor_id: str) -> Dict[str, Any]:
+        """Get doctor by ID from MySQL"""
+        db = SessionLocal()
+        try:
+            doctor = db.query(Doctor).filter(Doctor.doctor_id == doctor_id).first()
+            
+            if doctor:
+                return {
+                    "success": True,
+                    "data": {
+                        "doctor_id": doctor.doctor_id,
+                        "name": doctor.name,
+                        "email": doctor.email,
+                        "phone": doctor.phone,
+                        "specialization": doctor.specialization,
+                        "qualifications": doctor.qualifications,
+                        "experience_years": doctor.experience_years,
+                        "consultation_fee": doctor.consultation_fee,
+                        "languages": doctor.languages,
+                        "location": doctor.location,
+                        "available_days": doctor.available_days,
+                        "available_times": doctor.available_times,
+                        "rating": doctor.rating,
+                        "bio": doctor.bio,
+                        "is_active": doctor.is_active
+                    }
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "Doctor not found"
+                }
+                
+        except Exception as e:
+            logger.error(f"Error getting doctor: {e}")
+            raise
+        finally:
+            db.close()
+    
+    async def search_nearby_doctors(
+        self,
+        latitude: float,
+        longitude: float,
+        radius_km: float = 10.0,
+        specialization: Optional[str] = None,
+        limit: int = 20
+    ) -> Dict[str, Any]:
+        """Search for doctors near a location in MySQL"""
+        db = SessionLocal()
+        try:
+            # Get all active doctors
+            query = db.query(Doctor).filter(Doctor.is_active == True)
+            
+            if specialization:
+                query = query.filter(Doctor.specialization == specialization)
+            
+            doctors = query.all()
+            
+            # Calculate distances and filter
+            nearby_doctors = []
+            for doctor in doctors:
+                if doctor.location and isinstance(doctor.location, dict) and 'latitude' in doctor.location:
+                    doc_lat = doctor.location['latitude']
+                    doc_lon = doctor.location['longitude']
+                    
+                    distance = self.haversine_distance(latitude, longitude, doc_lat, doc_lon)
+                    
+                    if distance <= radius_km:
+                        doc_dict = {
+                            "doctor_id": doctor.doctor_id,
+                            "name": doctor.name,
+                            "specialization": doctor.specialization,
+                            "distance_km": round(distance, 2),
+                            "consultation_fee": doctor.consultation_fee,
+                            "rating": doctor.rating
+                        }
+                        nearby_doctors.append(doc_dict)
+            
+            # Sort by distance
+            nearby_doctors.sort(key=lambda x: x['distance_km'])
+            
+            # Apply limit
+            nearby_doctors = nearby_doctors[:limit]
+            
+            return {
+                "success": True,
+                "count": len(nearby_doctors),
+                "radius_km": radius_km,
+                "doctors": nearby_doctors
+            }
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Database error searching nearby doctors, falling back to mock data: {e}")
+            from .mock_doctor_data import get_mock_doctors
+            mock_doctors = get_mock_doctors(specialization=specialization, limit=limit)
+            
+            # Add distance_km to mock data for compatibility
+            # In a real scenario, we'd calculate distance for mock locations too
+            for doc in mock_doctors:
+                doc['distance_km'] = 1.0  # Dummy distance
+                
+            return {
+                "success": True,
+                "count": len(mock_doctors),
+                "radius_km": radius_km,
+                "doctors": mock_doctors,
+                "is_mock": True
+            }
+        finally:
+            db.close()
+    
+    async def get_all_doctors(self, specialization: Optional[str] = None, limit: int = 50) -> List[Dict[str, Any]]:
+        """Get list of all active doctors for Astra"""
+        
+        # Try database first
+        if SessionLocal:
+            db = SessionLocal()
+            try:
+                query = db.query(Doctor).filter(Doctor.is_active == True)
+                
+                if specialization:
+                    # Case-insensitive partial match for specialization
+                    query = query.filter(Doctor.specialization.ilike(f"%{specialization}%"))
+                    
+                doctors = query.limit(limit).all()
+                
+                logger.info(f"🔍 Found {len(doctors)} doctors from database with specialization: {specialization}")
+                
+                return [
+                    {
+                        "doctor_id": d.doctor_id,
+                        "name": d.name,
+                        "specialization": d.specialization,
+                        "experience_years": d.experience_years,
+                        "consultation_fee": d.consultation_fee,
+                        "location": d.location.get('city') if d.location and isinstance(d.location, dict) else "Online"
+                    } for d in doctors
+                ]
+            except Exception as e:
+                logger.warning(f"⚠️ Database error, falling back to mock data: {e}")
+            finally:
+                db.close()
+        
+        # Fallback to mock data
+        logger.info("📋 Using mock doctor data (database not accessible)")
+        from .mock_doctor_data import get_mock_doctors
+        mock_doctors = get_mock_doctors(specialization=specialization, limit=limit)
+        return mock_doctors
+
+    async def update_doctor(self, doctor_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+        """Update doctor profile in MySQL"""
+        db = SessionLocal()
+        try:
+            doctor = db.query(Doctor).filter(Doctor.doctor_id == doctor_id).first()
+            if not doctor:
+                return {"success": False, "error": "Doctor not found"}
+            
+            for key, value in updates.items():
+                if hasattr(doctor, key):
+                    setattr(doctor, key, value)
+            
+            db.commit()
+            db.refresh(doctor)
+            
+            return {
+                "success": True,
+                "data": {"doctor_id": doctor.doctor_id, "name": doctor.name}
+            }
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error updating doctor: {e}")
+            raise
+        finally:
+            db.close()
+
+# Global instance
+doctor_service = DoctorService()

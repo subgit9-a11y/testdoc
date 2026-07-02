@@ -1,0 +1,699 @@
+"""
+Astra Brain Client - Unified API Connector for api.ayureze.in
+Version: 4.0.0
+Description: Connects ALL AI endpoints to automate features with the Astra AI Model
+
+Endpoints Connected:
+- POST /api/v1/brain/chat - Core conversational AI with RAG
+- POST /v1/autopilot - Intent routing (Booking/Pharmacy/Chat)
+- POST /v1/fill - Structured data extraction
+- POST /v1/shop_assist - E-commerce product mapping
+- POST /v1/extract_schedule - Prescription reminder extraction
+- POST /v1/doctor_summary - Clinical scribe/summarization
+- POST /v1/analyze_safety - Safety sentinel (PII, self-harm)
+- POST /v1/detect_emotion - Sentiment analysis
+- POST /v1/profile_analysis - Buddy matching/risk assessment
+- POST /v1/generate_wellness - Meditation/yoga generation
+- POST /v1/adjust_tone - Empathetic text rewriting
+- GET /health - Health check
+"""
+
+import logging
+import httpx
+import asyncio
+from typing import Optional, Dict, Any, List
+from dataclasses import dataclass
+from enum import Enum
+
+logger = logging.getLogger(__name__)
+
+# ============================================================================
+# Data Models
+# ============================================================================
+
+class Intent(str, Enum):
+    """Autopilot intent types"""
+    CHAT = "CHAT"
+    SHOP_ASSIST = "SHOP_ASSIST"
+    BOOKING = "BOOKING"
+    UNKNOWN = "UNKNOWN"
+
+@dataclass
+class ChatResponse:
+    answer: str
+    mode: str
+    success: bool = True
+
+@dataclass  
+class AutopilotResponse:
+    intent: Intent
+    status: str
+    confidence: float = 1.0
+
+@dataclass
+class SafetyAnalysis:
+    is_safe: bool
+    flags: List[str]
+    risk_level: str = "low"
+
+@dataclass
+class EmotionResult:
+    emotion: str
+    intensity: str
+    confidence: float = 0.8
+
+@dataclass
+class ScheduleResult:
+    reminders: List[Dict[str, Any]]
+    raw_json: str
+
+# ============================================================================
+# Main Client
+# ============================================================================
+
+# ============================================================================
+# Ayurvedic Fallback Knowledge Base
+# ============================================================================
+
+AYURVEDIC_FALLBACKS = {
+    "stress|anxiety|tension|panic|worry|overwhelmed|nervous": """🧘 **Ayurvedic Guidance for Stress & Anxiety**
+
+Stress in Ayurveda is linked to Vata and Pitta imbalance. Here's your personalized Ayurvedic protocol:
+
+**Immediate Remedies:**
+• Drink warm **Ashwagandha milk** (1 tsp Ashwagandha + warm milk + honey) before bed
+• Practice **Nadi Shodhana** (Alternate Nostril Breathing) — 10 min daily
+• Apply **Brahmi oil** on forehead and feet before sleep
+
+**Daily Routine (Dinacharya):**
+• Wake at **Brahma Muhurta** (6 AM)
+• 15 min morning meditation + Surya Namaskar
+• Avoid excessive screen time after sunset
+• Eat your heaviest meal at noon
+
+**Key Herbs:**
+• **Ashwagandha** (500mg twice daily) — adaptogen for cortisol regulation
+• **Brahmi** — enhances mental clarity and calm
+• **Jatamansi** — natural sedative for deep relaxation
+• **Shankhapushpi** — for mental peace and memory
+
+⚠️ *Consult an Ayurvedic doctor for personalized dosha-based treatment.*""",
+
+    "digestion|stomach|acidity|gas|bloat|constipation|ibs|acid|gut|bowel": """🌿 **Ayurvedic Digestive Healing Protocol**
+
+Digestive issues in Ayurveda are rooted in weak **Agni** (digestive fire). Here's the fix:
+
+**Morning Ritual:**
+• Drink **warm water with lemon** + pinch of rock salt on empty stomach
+• **Ginger tea** 30 minutes before meals to kindle Agni
+• **Triphala** (1 tsp with warm water) every night before bed
+
+**Dietary Rules:**
+• Eat your largest meal at noon (Pitta time — strongest digestion)
+• Never drink cold water with meals
+• Chew food 32 times per bite
+• Avoid raw salads at night
+
+**Powerful Herbs:**
+• **Triphala Churna** — regulates bowels, clears Ama (toxins)
+• **Trikatu** (ginger + pepper + pippali) — stimulates digestive fire
+• **Hingvastak Churna** — for bloating and gas
+• **Fresh ginger** with rock salt before meals
+
+*Avoid fried, cold, heavy, and processed foods. Favor warm, cooked meals.*""",
+
+    "sleep|insomnia|tired|fatigue|exhausted|rest|awake|night": """🌙 **Ayurvedic Sleep Restoration Guide**
+
+Insomnia is primarily a Vata aggravation. The mind needs grounding:
+
+**Evening Protocol:**
+• Turn off screens 1 hour before bed
+• **Warm Ashwagandha + Nutmeg milk** (1 cup) 30 min before sleep
+• **Abhyanga** (self-oil massage) with warm sesame oil on feet
+• Light dinner before 7 PM — khichdi or moong soup
+
+**Bedtime Herbs:**
+• **Ashwagandha** — reduces cortisol for deeper sleep
+• **Valerian root** or **Tagara** — natural sleep inducers
+• **Nutmeg** (1/4 tsp with warm milk) — natural sedative
+• **Brahmi** + **Jatamansi** combination
+
+**Lifestyle Changes:**
+• Sleep by 10 PM (Pitta time starts — body repairs)
+• Keep bedroom dark and cool
+• Practice **Yoga Nidra** (body scan meditation) before sleep
+
+*Consistent sleep-wake cycle is the foundation of Ayurvedic health.*""",
+
+    "weight|obesity|fat|slim|diet|metabolism|kapha": """⚖️ **Ayurvedic Weight Management Protocol**
+
+Weight gain in Ayurveda is primarily a **Kapha** imbalance. The approach:
+
+**Core Principles:**
+• Eat only when genuinely hungry — no snacking
+• Largest meal at noon, lightest at dinner
+• **Intermittent fasting** (sunset to sunrise) — Ayurvedic tradition
+• Exercise in the morning during **Kapha time** (6-10 AM)
+
+**Fat-Burning Herbs:**
+• **Triphala** — detoxifies and boosts metabolism
+• **Guggul** — reduces cholesterol and visceral fat
+• **Vrikshamla** (Garcinia) — appetite suppressant
+• **Trikatu** — kindling Agni and burning Ama
+• **Ajwain** + **Jeera** + **Methi** water in the morning
+
+**Daily Routine:**
+• Warm water with lemon + honey + ginger every morning
+• 30 min brisk walk or Surya Namaskar
+• Avoid daytime sleeping, cold drinks, and dairy excess
+
+*Results take 2-3 months. Patience and consistency are key.*""",
+
+    "immunity|infection|cold|fever|flu|cough|weak|viral": """🛡️ **Ayurvedic Immunity Booster Protocol**
+
+Strong immunity (Ojas) in Ayurveda comes from balanced doshas and strong Agni:
+
+**Daily Immunity Boosters:**
+• **Golden Milk** (Haldi + milk + pepper + ginger + honey) every morning
+• 1 tsp **Chyawanprash** with warm milk every morning
+• **Tulsi** (Holy Basil) tea — 2-3 cups daily
+• **Giloy** (Guduchi) juice — the 'Root of Immortality'
+
+**Core Immune Herbs:**
+• **Ashwagandha** — adaptogen + immune modulator
+• **Amla** (Indian Gooseberry) — highest Vitamin C source
+• **Giloy** — fever reducer, immune stimulant
+• **Pippali** — respiratory immunity
+• **Shilajit** — cellular energy and mineral replenishment
+
+**Preventive Practices:**
+• **Nasya** (Anu Taila oil in nostrils) daily
+• **Oil pulling** with sesame or coconut oil
+• Stay warm, avoid cold and damp environments
+• Regular Surya Namaskar + Pranayama
+
+*These practices build Ojas over 1-3 months of regular practice.*""",
+
+    "joint|arthritis|knee|pain|inflammation|vata|bones|muscle": """💪 **Ayurvedic Joint & Pain Relief Protocol**
+
+Joint pain is **Vata** and **Ama** (toxins) accumulation in Ayurveda:
+
+**External Treatments:**
+• **Mahanarayan Oil** massage on affected joints (twice daily)
+• **Pinda Sweda** (warm herbal poultice) — reduces swelling
+• **Castor oil** (1 tsp with warm water at night) — detoxifies Vata
+
+**Pain Relief Herbs:**
+• **Boswellia (Shallaki)** — clinically proven anti-inflammatory
+• **Guggul** — breaks down Ama in joints
+• **Maharasnadi Kwath** (decoction) — classical Vata formula
+• **Turmeric + Black Pepper** — curcumin absorption maximizer
+• **Nirgundi** (Five-Leaved Chaste Tree) — fastest pain relief
+
+**Diet for Joints:**
+• Warm, cooked, moist foods
+• Ghee — lubricates joints internally
+• Avoid dry, cold foods, raw vegetables
+• Sesame seeds and walnuts — anti-inflammatory
+
+*Panchakarma (specifically Basti) is the gold standard for arthritis.*""",
+
+    "skin|acne|rash|eczema|psoriasis|glow|beauty|hair|scalp": """✨ **Ayurvedic Skin & Hair Wellness Protocol**
+
+Skin issues reflect internal imbalances — usually **Pitta** or **Ama**:
+
+**For Glowing Skin:**
+• **Kumkumadi Tailam** (saffron oil) — nightly face massage
+• Drink **rose water** daily for Pitta cooling
+• **Neem + Turmeric** face pack weekly
+• Manjistha capsules — the best Ayurvedic blood purifier
+
+**For Hair Health:**
+• **Bhringraj oil** massage — 2x/week scalp massage
+• **Amla + Shikakai** hair pack monthly
+• **Brahmi** + **Bhringraj** capsules internally
+• Avoid excessive heat styling and chemical products
+
+**Blood Purifying Herbs:**
+• **Manjistha** — lymphatic and blood cleanser
+• **Neem** — antibacterial, antifungal
+• **Sariva** (Indian Sarsaparilla) — skin cooler
+• **Amla** — Vitamin C for collagen synthesis
+
+*Internal and external treatments work together for lasting results.*""",
+
+    "ayurveda|dosha|vata|pitta|question|what is|explain|tell me|how does": """🌸 **Welcome! I'm Astra — Your Ayurvedic Wellness Companion**
+
+**What is Ayurveda?**
+Ayurveda ("Science of Life") is the world's oldest holistic healthcare system from India, 5000+ years old. It views each person as unique, determined by their **Prakriti** (constitution).
+
+**The Three Doshas (Bio-energies):**
+
+🌬️ **VATA** (Air + Space)
+• Governs: Movement, breathing, circulation, nervous system
+• In balance: Creative, energetic, adaptable
+• Out of balance: Anxiety, insomnia, dry skin, joint pain
+• Herbs: Ashwagandha, Shatavari, Bala
+
+🔥 **PITTA** (Fire + Water)
+• Governs: Digestion, metabolism, intellect, body temperature
+        
+        last_error = "None"
+        for url in urls_to_try:
+            try:
+                async with httpx.AsyncClient(timeout=3.0) as client:
+                    response = await client.get(f"{url}/health")
+                    if response.status_code == 200:
+                        data = response.json()
+                        self._connected = True
+                        if url != self.base_url:
+                            logger.info(f"🔄 Brain loopback detected: Switching to internal URL {url}")
+                            self.base_url = url
+                        logger.info(f"✅ Astra Brain Online at {url}")
+                        return {"status": "online", "data": data}
+            except Exception as e:
+                last_error = str(e)
+                continue
+                
+        logger.error(f"❌ All Brain connection paths failed. Last error: {last_error}")
+        return {"status": "offline", "error": last_error}
+    
+    async def ensure_connected(self) -> bool:
+        """Ensure connection is established"""
+        if not self._connected:
+            result = await self.check_health()
+            self._connected = result.get("status") == "online"
+        return self._connected
+    
+    # =========================================================================
+    # 1. Core Chat & Intelligence
+    # =========================================================================
+    
+    async def chat(self, query: str, language: str = "en") -> ChatResponse:
+        """
+        POST /api/v1/brain/chat - Main conversational interface with RAG + Agent Persona
+        Falls back to built-in Ayurvedic knowledge base when Brain is offline.
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/api/v1/brain/chat",
+                    json={"query": query, "temperature": 0.7, "max_tokens": 512}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    answer = data.get("answer", "")
+                    # If Brain returns empty or error answer, use local fallback
+                    if not answer or answer == "I'm having trouble connecting. Please try again.":
+                        logger.warning("⚠️ Brain returned empty answer — using Ayurvedic fallback")
+                        return ChatResponse(
+                            mode="chat",
+                            success=True
+                        )
+                    logger.info(f"✅ Chat response [mode: {data.get('mode', 'unknown')}]")
+                    return ChatResponse(
+                        answer=answer,
+                        mode="chat",
+                        success=True
+                    )
+                else:
+                    logger.warning(f"⚠️ Brain Chat returned {response.status_code} — using Ayurvedic fallback")
+                    return ChatResponse(
+                        mode="chat",
+                        success=True
+                    )
+        except Exception as e:
+            logger.warning(f"⚠️ Brain Chat offline ({type(e).__name__}) — using Ayurvedic fallback")
+            return ChatResponse(
+                mode="chat",
+                success=True
+            )
+    
+    # =========================================================================
+    # 2. Utility & Automation
+    # =========================================================================
+    
+    async def autopilot(self, query: str) -> AutopilotResponse:
+        """
+        POST /v1/autopilot - Auto-router for intent detection
+        
+        Input: {"query": "I want to buy ashwagandha"}
+        Output: {"intent": "SHOP_ASSIST", "status": "success"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/autopilot",
+                    json={"query": query}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    intent_str = data.get("intent", "UNKNOWN")
+                    try:
+                        intent = Intent(intent_str)
+                    except ValueError:
+                        intent = Intent.UNKNOWN
+                    
+                    logger.info(f"✅ Autopilot: {intent.value}")
+                    return AutopilotResponse(
+                        intent=intent,
+                        status=data.get("status", "success")
+                    )
+                else:
+                    return AutopilotResponse(intent=Intent.CHAT, status="fallback")
+        except Exception as e:
+            logger.error(f"❌ Autopilot error: {e}")
+            return AutopilotResponse(intent=Intent.CHAT, status="error")
+    
+    async def fill(self, text: str, schema_definition: str) -> Dict[str, Any]:
+        """
+        POST /v1/fill - Structured Data Extraction
+        
+        Input: {"text": "My name is Ravi, age 30", "schema_definition": "{name: str, age: int}"}
+        Output: {"extracted_data": "{\"name\": \"Ravi\", \"age\": 30}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/fill",
+                    json={"text": text, "schema_definition": schema_definition}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info("✅ Data extraction complete")
+                    return {
+                        "success": True,
+                        "extracted_data": data.get("extracted_data", "{}"),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Fill error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 3. Specialized Features
+    # =========================================================================
+    
+    async def shop_assist(self, query: str) -> Dict[str, Any]:
+        """
+        POST /v1/shop_assist - E-commerce helper for product mapping
+        Falls back to Ayurvedic herb recommendations when Brain is offline.
+        """
+        # Keyword-to-product mapping fallback
+        SHOP_FALLBACKS = {
+            "stress|anxiety|sleep|insomnia|calm": '{"suggested_products": ["Ashwagandha Capsules (500mg)", "Brahmi Tablets", "Jatamansi Powder", "Stress Relief Tea (Ashwagandha + Tulsi)"], "primary_recommendation": "Ashwagandha Churna", "dosage": "500mg twice daily with warm milk"}',
+            "digest|stomach|acidity|gas|bloat|gut": '{"suggested_products": ["Triphala Churna", "Hingvastak Churna", "Avipattikar Churna", "Digestive Trikatu Tablets"], "primary_recommendation": "Triphala Churna", "dosage": "1 tsp at night with warm water"}',
+            "immunity|cold|fever|flu|infection|viral": '{"suggested_products": ["Chyawanprash", "Giloy Tablets", "Amla Juice", "Tulsi Drops", "Sudarshan Churna"], "primary_recommendation": "Chyawanprash", "dosage": "1-2 tsp with warm milk every morning"}',
+            "joint|arthritis|knee|pain|inflammation": '{"suggested_products": ["Boswellia (Shallaki) Capsules", "Mahanarayan Oil", "Guggul Tablets", "Maharasnadi Kwath"], "primary_recommendation": "Shallaki 400mg + Guggul combo", "dosage": "400mg Shallaki twice daily after meals"}',
+            "weight|fat|obesity|metabolism|kapha": '{"suggested_products": ["Triphala Churna", "Vrikshamla (Garcinia) Capsules", "Guggul Tablets", "Medohar Guggul"], "primary_recommendation": "Medohar Guggul", "dosage": "2 tablets twice daily before meals"}',
+            "hair|scalp|baldness|growth": '{"suggested_products": ["Bhringraj Oil", "Brahmi Amla Hair Oil", "Bhringraj Tablets", "Amla Powder"], "primary_recommendation": "Bhringraj Oil (scalp massage)", "dosage": "Massage 2-3 times per week"}',
+            "skin|acne|glow|complexion": '{"suggested_products": ["Manjistha Capsules", "Neem Tablets", "Kumkumadi Oil", "Aloe Vera Gel"], "primary_recommendation": "Manjistha blood purifier", "dosage": "500mg twice daily after meals"}',
+            "energy|fatigue|tired|weakness|stamina": '{"suggested_products": ["Shilajit Resin", "Ashwagandha Capsules", "Shatavari Powder", "Musli Power Capsules"], "primary_recommendation": "Shilajit (100mg)", "dosage": "100mg with warm milk every morning"}',
+        }
+        query_lower = query.lower()
+        fallback_result = None
+        for keywords, product_json in SHOP_FALLBACKS.items():
+            if any(kw.strip() in query_lower for kw in keywords.split("|")):
+                fallback_result = product_json
+                break
+        if not fallback_result:
+            fallback_result = '{"suggested_products": ["Ashwagandha", "Triphala", "Chyawanprash", "Brahmi"], "note": "General Ayurvedic wellness products"}'
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/shop_assist",
+                    json={"query": query}
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    result = data.get("result", "")
+                    if result and result != "{}":
+                        logger.info("✅ Shop assist response received")
+                        return {"success": True, "result": result, "raw": data}
+                    # Fall through to fallback if empty result
+                logger.warning("⚠️ Brain shop_assist offline — using product fallback")
+                return {"success": True, "result": fallback_result, "source": "ayurveda_fallback"}
+        except Exception as e:
+            logger.warning(f"⚠️ Brain shop_assist error ({type(e).__name__}) — using product fallback")
+            return {"success": True, "result": fallback_result, "source": "ayurveda_fallback"}
+    
+    async def extract_schedule(self, prescription_text: str) -> ScheduleResult:
+        """
+        POST /v1/extract_schedule - Reminder AI for prescription times
+        
+        Input: {"prescription_text": "Take pill after breakfast"}
+        Output: {"schedule_json": "{\"reminders\": [{\"time\": \"09:00\"}]}"}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/extract_schedule",
+                    json={"prescription_text": prescription_text}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    schedule_json = data.get("schedule_json", "{}")
+                    
+                    # Parse reminders
+                    import json
+                    try:
+                        parsed = json.loads(schedule_json)
+                        reminders = parsed.get("reminders", [])
+                    except:
+                        reminders = []
+                    
+                    logger.info(f"✅ Extracted {len(reminders)} reminders")
+                    return ScheduleResult(reminders=reminders, raw_json=schedule_json)
+                else:
+                    return ScheduleResult(reminders=[], raw_json="{}")
+        except Exception as e:
+            logger.error(f"❌ Schedule extraction error: {e}")
+            return ScheduleResult(reminders=[], raw_json="{}")
+    
+    async def doctor_summary(self, patient_notes: str) -> Dict[str, Any]:
+        """
+        POST /v1/doctor_summary - Clinical Scribe for patient notes
+        
+        Input: {"patient_notes": "User has been feeling dizzy since..."}
+        Output: {"summary_data": "..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/doctor_summary",
+                    json={"patient_notes": patient_notes}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info("✅ Doctor summary generated")
+                    return {
+                        "success": True,
+                        "summary": data.get("summary_data", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Doctor summary error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 4. Analysis & Safety
+    # =========================================================================
+    
+    async def analyze_safety(self, user_text: str) -> SafetyAnalysis:
+        """
+        POST /v1/analyze_safety - Safety Sentinel for PII, self-harm, emergencies
+        
+        Input: {"user_text": "I want to hurt myself"}
+        Output: {"is_safe": false, "flags": ["self_harm"]}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/analyze_safety",
+                    json={"user_text": user_text}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    is_safe = data.get("is_safe", True)
+                    flags = data.get("flags", [])
+                    
+                    risk = "high" if not is_safe else "low"
+                    logger.info(f"✅ Safety analysis: safe={is_safe}, flags={flags}")
+                    
+                    return SafetyAnalysis(
+                        is_safe=is_safe,
+                        flags=flags,
+                        risk_level=risk
+                    )
+                else:
+                    # Default to safe if API fails
+                    return SafetyAnalysis(is_safe=True, flags=[], risk_level="unknown")
+        except Exception as e:
+            logger.error(f"❌ Safety analysis error: {e}")
+            return SafetyAnalysis(is_safe=True, flags=["api_error"], risk_level="unknown")
+    
+    async def detect_emotion(self, query: str) -> EmotionResult:
+        """
+        POST /v1/detect_emotion - Sentiment Analysis with local fallback.
+        """
+        # Local keyword-based emotion detection fallback
+        def _local_emotion(text: str) -> tuple:
+            text = text.lower()
+            if any(w in text for w in ["terrible", "awful", "horrible", "worst", "suicidal", "hopeless"]):
+                return "Distressed", "Very High"
+            elif any(w in text for w in ["sad", "depressed", "crying", "low", "unhappy", "miserable"]):
+                return "Sad", "High"
+            elif any(w in text for w in ["anxious", "worried", "nervous", "panic", "scared", "fear"]):
+                return "Anxious", "High"
+            elif any(w in text for w in ["stressed", "overwhelmed", "pressure", "tension"]):
+                return "Stressed", "Medium"
+            elif any(w in text for w in ["tired", "exhausted", "fatigue", "no energy", "drained"]):
+                return "Fatigued", "Medium"
+            elif any(w in text for w in ["angry", "frustrated", "irritated", "annoyed"]):
+                return "Frustrated", "Medium"
+            elif any(w in text for w in ["happy", "great", "wonderful", "excellent", "feeling good", "amazing"]):
+                return "Positive", "High"
+            elif any(w in text for w in ["okay", "fine", "alright", "normal", "average"]):
+                return "Neutral", "Low"
+            return "Neutral", "Medium"
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/detect_emotion",
+                    json={"query": query}
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    result_str = data.get("result", "{}")
+                    import json as _json
+                    try:
+                        parsed = _json.loads(result_str)
+                        emotion = parsed.get("emotion", "Neutral")
+                        intensity = parsed.get("intensity", "Medium")
+                        if emotion and emotion != "Neutral":
+                            logger.info(f"✅ Emotion: {emotion} ({intensity})")
+                            return EmotionResult(emotion=emotion, intensity=intensity)
+                    except:
+                        pass
+                # Fallback to local detection
+                logger.warning("⚠️ Brain emotion offline — using local keyword detection")
+                emotion, intensity = _local_emotion(query)
+                return EmotionResult(emotion=emotion, intensity=intensity)
+        except Exception as e:
+            logger.warning(f"⚠️ Brain emotion error ({type(e).__name__}) — using local fallback")
+            emotion, intensity = _local_emotion(query)
+            return EmotionResult(emotion=emotion, intensity=intensity)
+    
+    async def profile_analysis(
+        self, 
+        profile_data_a: str, 
+        task: str = "buddy_match",
+        profile_data_b: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        POST /v1/profile_analysis - Predictive Analytics for buddy matching/risk
+        
+        Input: {"profile_data_a": "...", "task": "buddy_match"}
+        Output: {"analysis": "..."}
+        """
+        try:
+            payload = {"profile_data_a": profile_data_a, "task": task}
+            if profile_data_b:
+                payload["profile_data_b"] = profile_data_b
+                
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/profile_analysis",
+                    json=payload
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Profile analysis complete for task: {task}")
+                    return {
+                        "success": True,
+                        "analysis": data.get("analysis", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Profile analysis error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    # =========================================================================
+    # 5. Content Generation
+    # =========================================================================
+    
+    async def generate_wellness(self, topic: str, duration: str = "5 mins") -> Dict[str, Any]:
+        """
+        POST /v1/generate_wellness - Generate meditations, yoga plans, tips
+        
+        Input: {"topic": "Sleep Meditation", "duration": "5 mins"}
+        Output: {"content": "..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/generate_wellness",
+                    json={"topic": topic, "duration": duration}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Wellness content generated: {topic}")
+                    return {
+                        "success": True,
+                        "content": data.get("content", ""),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "error": f"Status {response.status_code}"}
+        except Exception as e:
+            logger.error(f"❌ Wellness generation error: {e}")
+            return {"success": False, "error": str(e)}
+    
+    async def adjust_tone(self, text: str, target_tone: str = "polite") -> Dict[str, Any]:
+        """
+        POST /v1/adjust_tone - Rewrite text to be more empathetic/professional
+        
+        Input: {"text": "You are late.", "target_tone": "polite"}
+        Output: {"rewritten_text": "I noticed you are running a bit behind schedule..."}
+        """
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/v1/adjust_tone",
+                    json={"text": text, "target_tone": target_tone}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"✅ Tone adjusted to: {target_tone}")
+                    return {
+                        "success": True,
+                        "rewritten_text": data.get("rewritten_text", text),
+                        "raw": data
+                    }
+                else:
+                    return {"success": False, "rewritten_text": text}
+        except Exception as e:
+            logger.error(f"❌ Tone adjustment error: {e}")
+            return {"success": False, "rewritten_text": text, "error": str(e)}
+
+
+# ============================================================================
+# Global Singleton Instance
+# ============================================================================
+
+_brain_client: Optional[AstraBrainClient] = None

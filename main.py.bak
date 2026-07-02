@@ -1,0 +1,305 @@
+"""
+Astra AI Healthcare - Advanced Main Application Core
+Version: 3.1.0 (Non-Blocking Startup)
+Description: High-performance FastAPI backend for Ayurvedic health management.
+
+ARCHITECTURE:
+- FastAPI starts INSTANTLY (no model loading at startup)
+- Models load asynchronously in background threads
+- /health always responds immediately with model status
+- Zero blocking on the event loop
+"""
+
+import os
+import time
+import uuid
+import logging
+import asyncio
+import traceback
+import contextlib
+from datetime import datetime, timezone
+from typing import Optional
+
+import uvicorn
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+# --- Critical: Import model registry FIRST (before any model-dependent modules) ---
+from app.model_registry import model_registry
+
+# --- INTERNAL MODULE IMPORTS ---
+from app.config import settings
+
+# Astra Core Modules (these now use lazy loading via model_registry)
+from app.astra.pipeline import AstraPipeline
+from app.astra.capabilities import CapabilityAgent
+from app.astra.consent import ConsentManager
+from app.astra.memory import RAGMemory
+from app.astra.rate_limit import RateLimiter
+from app.astra.routes import initialize_astra_routes, router as astra_router
+
+# Legacy Wrapper (Refactored - now uses lazy loading)
+from app.enhanced_inference import AstraModelInference
+
+# Route Imports (Preserving existing routes)
+from app.auth_routes import auth_router, chat_router
+from app.smart_auto_cart import router as smart_auto_cart_router
+from app.medicine_reminders.webhook_handler import router as whatsapp_webhook_router
+from app.medicine_reminders.routes import router as medicine_reminder_router
+from app.astra_fill.routes import router as astra_fill_router
+from app.astra_autopilot.routes import router as autopilot_router
+from app.documents.routes import router as documents_router
+from app.family_routes import router as family_router
+from app.patient_management import router as patient_management_router
+from app.notification_routes import router as notification_router
+from app.indictrans2_routes import router as indictrans2_router
+from app.catchy_prescription.routes import router as catchy_prescription_router
+from app.order_management import router as order_management_router
+from app.prescription_pdf_endpoint import router as prescription_pdf_router
+from app.multilang.routes import router as multilang_router
+from app.advanced_notifications.routes import router as advanced_notifications_router
+from app.api.compliance_routes import router as compliance_router
+from app.unified_prescription_workflow import router as unified_prescription_router
+from app.companion_api import router as companion_router
+from app.buddy_routes import router as buddy_router
+from app.prescriptions.prescription_routes import router as prescription_router
+from app.treatment_centers.center_routes import router as treatment_centers_router
+from app.doctors.doctor_routes import router as doctor_router
+from app.ai_agent_api import router as ai_agent_router
+from app.shopify_webhook import router as shopify_webhook_router
+
+# Initialize Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("AstraMain")
+
+# Global State
+model_inference: Optional[AstraModelInference] = None
+startup_time: float = time.time()
+
+
+async def initialize_astra_components(app: FastAPI):
+    """
+    Initialize Astra components with lazy model loading.
+    This runs AFTER FastAPI has started serving requests.
+    """
+    global model_inference
+    
+    try:
+        # Initialize Inference Engine (lazy - doesn't load models immediately)
+        model_inference = AstraModelInference()
+        
+        # Start background model loading (non-blocking)
+        # The brain client connection will be checked lazily
+        logger.info("✅ ModelInference Engine configured (lazy mode)")
+
+        # Initialize Pipeline with Inference
+        capability = CapabilityAgent()
+        consent = ConsentManager()
+        memory = RAGMemory()
+        limiter = RateLimiter()
+
+        # Initialize Pipeline with Inference AND Capabilities
+        pipeline = AstraPipeline(inference=model_inference, capability_agent=capability)
+        
+        # Inject into Routes
+        initialize_astra_routes(pipeline, capability, consent, memory, limiter)
+        
+        # Inject into Global ModelService (for Astra Fill / extraction)
+        from app.model_service import ModelService
+        ModelService.set_model_inference(model_inference)
+        
+        # Store in Application State
+        app.state.astra_pipeline = pipeline
+        app.state.capability_agent = capability
+        app.state.consent_manager = consent
+        app.state.rag_memory = memory
+        app.state.rate_limiter = limiter
+        app.state.models_ready = False  # Will be set to True when models are loaded
+        
+        logger.info("✅ [ASTRA] Core Modules Initialized & Injected")
+        
+        # Now start background model loading (non-blocking)
+        # This happens in thread pool, won't block event loop
+        model_registry.start_background_loading()
+        
+        # Mark pipeline ready (models still loading in background)
+        app.state.models_ready = True
+        
+    except Exception as e:
+        logger.error(f"❌ [ASTRA] Component Initialization Error: {e}")
+        logger.error(traceback.format_exc())
+        # Don't crash - service can still work with reduced functionality
+
+
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Astra Lifecycle Management - NON-BLOCKING
+    
+    FastAPI starts IMMEDIATELY. All model loading happens in background.
+    """
+    global model_inference
+    
+    start = time.time()
+    logger.info("🚀 [SYSTEM] STARTING ASTRA HEALTHCARE KERNEL...")
+    logger.info("⚡ FastAPI is starting in NON-BLOCKING mode")
+    
+    # Schedule component initialization as a background task
+    # This runs AFTER FastAPI starts serving requests
+    asyncio.create_task(initialize_astra_components(app))
+    
+    # FastAPI is ready to serve immediately
+    elapsed = (time.time() - start) * 1000
+    logger.info(f"✅ [SYSTEM] FastAPI ready in {elapsed:.0f}ms (models loading in background)")
+    
+    yield
+    
+    # Shutdown
+    logger.info("🛑 [SYSTEM] SHUTTING DOWN...")
+    
+    if model_inference:
+        model_inference.cleanup()
+    
+    model_registry.cleanup()
+    
+    logger.info("🛑 [SYSTEM] SHUTDOWN COMPLETE")
+
+
+app = FastAPI(
+    title="Astra AI Healthcare",
+    version="3.1.0",
+    lifespan=lifespan
+)
+
+# Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Exception Handlers
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"🔥 UNHANDLED ERROR: {exc}\n{traceback.format_exc()}")
+    return JSONResponse(status_code=500, content={"error": "Internal Server Error"})
+
+
+# ==================== HEALTH ENDPOINTS ====================
+
+@app.get("/")
+async def root():
+    """Root endpoint - always responds immediately"""
+    return {
+        "status": "Astra Online",
+        "backend": "Python/FastAPI",
+        "version": "3.1.0",
+        "uptime_seconds": round(time.time() - startup_time, 1)
+    }
+
+
+@app.get("/health")
+async def health():
+    """
+    Health check endpoint - ALWAYS responds immediately.
+    
+    Returns model loading status without blocking.
+    This endpoint is safe to use with load balancers and k8s probes.
+    """
+    model_status = model_registry.get_all_status()
+    
+    # Check if critical models are ready
+    embeddings_ready = model_registry.is_ready("embeddings")
+    all_ready = model_registry.is_all_ready()
+    
+    # Pipeline ready check
+    pipeline_ready = getattr(app.state, "astra_pipeline", None) is not None
+    
+    return {
+        "status": "ok",
+        "uptime_seconds": round(time.time() - startup_time, 1),
+        "api_ready": True,  # API is always ready
+        "pipeline_ready": pipeline_ready,
+        "models": model_status,
+        "all_models_ready": all_ready,
+        "ai_connected": pipeline_ready
+    }
+
+
+@app.get("/health/live")
+async def health_live():
+    """
+    Kubernetes liveness probe - always returns 200 if process is alive.
+    """
+    return {"status": "alive"}
+
+
+@app.get("/health/ready")
+async def health_ready():
+    """
+    Kubernetes readiness probe - returns 200 only when fully ready.
+    """
+    if not getattr(app.state, "astra_pipeline", None):
+        raise HTTPException(status_code=503, detail="Pipeline initializing")
+    
+    if not model_registry.is_all_ready():
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "loading",
+                "detail": "Models still loading",
+                "models": model_registry.get_all_status()
+            }
+        )
+    
+    return {"status": "ready"}
+
+
+# ==================== REGISTER ROUTERS ====================
+
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
+app.include_router(astra_router, prefix="/api/v1")
+app.include_router(smart_auto_cart_router, prefix="/api/v1")
+app.include_router(medicine_reminder_router, prefix="/api/v1")
+app.include_router(whatsapp_webhook_router, prefix="/api/v1")
+app.include_router(astra_fill_router, prefix="/api/v1")
+app.include_router(autopilot_router, prefix="/api/v1")
+
+# Include others
+app.include_router(documents_router, prefix="/api/v1")
+app.include_router(family_router, prefix="/api/v1")
+app.include_router(patient_management_router, prefix="/api/v1")
+app.include_router(notification_router, prefix="/api/v1")
+app.include_router(indictrans2_router, prefix="/api/v1")
+app.include_router(catchy_prescription_router, prefix="/api/v1")
+app.include_router(order_management_router, prefix="/api/v1")
+app.include_router(prescription_pdf_router, prefix="/api/v1")
+app.include_router(multilang_router, prefix="/api/v1")
+app.include_router(advanced_notifications_router, prefix="/api/v1")
+app.include_router(compliance_router, prefix="/api/v1")
+app.include_router(unified_prescription_router, prefix="/api/v1")
+app.include_router(companion_router, prefix="/api/v1")
+app.include_router(buddy_router, prefix="/api/v1")
+app.include_router(prescription_router, prefix="/api/v1")
+app.include_router(treatment_centers_router, prefix="/api/v1")
+app.include_router(doctor_router, prefix="/api/v1")
+app.include_router(ai_agent_router, prefix="/api/v1")
+app.include_router(shopify_webhook_router, prefix="/api/v1")
+
+# Brain API Routes (Unified AI Endpoints)
+from app.astra.brain_routes import router as brain_router
+app.include_router(brain_router, prefix="/api/v1")
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=5000,
+        reload=True,
+        timeout_keep_alive=120  # Increased timeout for long-running requests
+    )
