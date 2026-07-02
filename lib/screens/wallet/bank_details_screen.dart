@@ -47,7 +47,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> with SingleTicker
     });
 
     try {
-      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctor_id);
+      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctorId);
       String url = "${Apis.baseUrl}finance/wallet/$doctorId/bank-details";
       
       Map<String, dynamic> data = {

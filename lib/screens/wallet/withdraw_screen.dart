@@ -35,7 +35,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     });
 
     try {
-      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctor_id);
+      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctorId);
       String url = "${Apis.baseUrl}finance/wallet/$doctorId/withdraw";
       
       var response = await Dio().post(url, data: {"amount": amount});

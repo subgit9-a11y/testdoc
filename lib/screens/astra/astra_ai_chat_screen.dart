@@ -317,7 +317,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Astra AI Assistant", 
+                  Text("Astra AI Assistant", 
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: AyurezeTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
                   Row(
@@ -369,7 +369,7 @@ class _AstraAIChatScreenState extends State<AstraAIChatScreen> {
                 children: [
                    SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2, color: AyurezeTheme.forestDeep)),
                    const SizedBox(width: 10),
-                    const Text("Astra is thinking...", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 12)),
+                    Text("Astra is thinking...", style: TextStyle(color: AyurezeTheme.textSecondary, fontSize: 12)),
                 ],
               ),
             ),
