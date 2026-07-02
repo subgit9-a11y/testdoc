@@ -226,7 +226,7 @@ class HomePageState extends State<HomePage> {
                           child: Text(
                             userChat.nickname,
                             maxLines: 1,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary),
                           ),
                           alignment: Alignment.centerLeft,
@@ -236,7 +236,7 @@ class HomePageState extends State<HomePage> {
                           child: Text(
                             userChat.content,
                             maxLines: 1,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary),
                           ),
                           alignment: Alignment.centerLeft,

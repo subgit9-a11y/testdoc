@@ -31,7 +31,7 @@ class _WalletScreenState extends State<WalletScreen> {
       isLoading = true;
     });
     try {
-      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctor_id);
+      int? doctorId = SharedPreferenceHelper.getInt(Preferences.doctorId);
       String url = "${Apis.baseUrl}finance/wallet/$doctorId";
       
       var response = await Dio().get(url);

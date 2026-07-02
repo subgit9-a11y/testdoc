@@ -245,7 +245,7 @@ class ChatPageState extends State<ChatPage> {
                       child: Text(
                         messageChat.content,
                         style:
-                            const TextStyle(color: Theme.of(context).colorScheme.primary),
+                            TextStyle(color: Theme.of(context).colorScheme.primary),
                       ),
                       padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
                       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
@@ -267,7 +267,7 @@ class ChatPageState extends State<ChatPage> {
                                   ImageChunkEvent? loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: Theme.of(context).colorScheme.surfaceVariant,
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(8),
@@ -417,7 +417,7 @@ class ChatPageState extends State<ChatPage> {
                                         ImageChunkEvent? loadingProgress) {
                                       if (loadingProgress == null) return child;
                                       return Container(
-                                        decoration: const BoxDecoration(
+                                        decoration: BoxDecoration(
                                           color: Theme.of(context).colorScheme.surfaceVariant,
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(8),
@@ -500,7 +500,7 @@ class ChatPageState extends State<ChatPage> {
                         _timestampFormatter.format(
                             DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(messageChat.timestamp))),
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                             fontStyle: FontStyle.italic),
@@ -572,7 +572,7 @@ class ChatPageState extends State<ChatPage> {
         backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         title: Text(
           this.peerNickname ?? '',
-          style: const TextStyle(color: Theme.of(context).colorScheme.primary),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         centerTitle: true,
         leading: InkWell(
@@ -637,7 +637,7 @@ class ChatPageState extends State<ChatPage> {
               onSubmitted: (value) {
                 onSendMessage(textEditingController.text, TypeMessage.text);
               },
-              style: const TextStyle(
+              style: TextStyle(
                   color: Theme.of(context).colorScheme.primary, fontSize: 15),
               controller: textEditingController,
               decoration: InputDecoration.collapsed(
