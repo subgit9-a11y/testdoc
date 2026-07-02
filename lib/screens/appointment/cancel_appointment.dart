@@ -157,12 +157,12 @@ class _CancelAppointmentScreen extends State<CancelAppointmentScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.14),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: const Text(
+            child: Text(
               "Cancelled ledger",
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,

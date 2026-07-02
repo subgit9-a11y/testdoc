@@ -30,11 +30,11 @@ class OslerCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(24),
           child: Container(
-            padding: padding ?? const EdgeInsets.all(20),
+            padding: padding ?? EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: showBorder ? Border.all(color: AyurezeTheme.border) : null,
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: Theme.of(context).shadowColor.withOpacity(0.06),
                   blurRadius: 18,

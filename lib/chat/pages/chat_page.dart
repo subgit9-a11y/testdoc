@@ -225,7 +225,7 @@ class ChatPageState extends State<ChatPage> {
       chatProvider.sendNotification(
           content, widget.token, currentUserId, type, peerAvatar, peerNickname);
       listScrollController.animateTo(0,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
       Fluttertoast.showToast(
           msg: getTranslated(context, AppString.nothing_send).toString(),
@@ -247,7 +247,7 @@ class ChatPageState extends State<ChatPage> {
                         style:
                             TextStyle(color: Theme.of(context).colorScheme.primary),
                       ),
-                      padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                       decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surfaceVariant,
@@ -375,7 +375,7 @@ class ChatPageState extends State<ChatPage> {
                               );
                             },
                             errorBuilder: (context, object, stackTrace) {
-                              return const Icon(
+                              return Icon(
                                 Icons.account_circle,
                                 size: 35,
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -396,9 +396,9 @@ class ChatPageState extends State<ChatPage> {
                           child: Container(
                             child: Text(
                               messageChat.content,
-                              style: const TextStyle(color: colorWhite),
+                              style: TextStyle(color: colorWhite),
                             ),
-                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                             constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                             decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.primary,
@@ -623,9 +623,9 @@ class ChatPageState extends State<ChatPage> {
         children: <Widget>[
           Material(
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 1),
+              margin: EdgeInsets.symmetric(horizontal: 1),
               child: IconButton(
-                icon: const Icon(Icons.image),
+                icon: Icon(Icons.image),
                 onPressed: _modalBottomSheetMenu,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -650,9 +650,9 @@ class ChatPageState extends State<ChatPage> {
           ),
           Material(
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
+              margin: EdgeInsets.symmetric(horizontal: 8),
               child: IconButton(
-                icon: const Icon(Icons.send),
+                icon: Icon(Icons.send),
                 onPressed: () =>
                     onSendMessage(textEditingController.text, TypeMessage.text),
                 color: Theme.of(context).colorScheme.primary,
@@ -664,7 +664,7 @@ class ChatPageState extends State<ChatPage> {
       ),
       width: double.infinity,
       height: 50,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           border: Border(
               top: BorderSide(color: Theme.of(context).colorScheme.surfaceVariant, width: 0.5)),
           color: colorWhite),
@@ -696,7 +696,7 @@ class ChatPageState extends State<ChatPage> {
                             .toString()));
                   }
                 } else {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -704,7 +704,7 @@ class ChatPageState extends State<ChatPage> {
                 }
               },
             )
-          : const Center(
+          : Center(
               child: CircularProgressIndicator(
                 color: Theme.of(context).colorScheme.primary,
               ),

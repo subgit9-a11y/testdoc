@@ -144,7 +144,7 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         } else {
-                          return const Center(
+                          return Center(
                             child: CircularProgressIndicator(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -203,14 +203,14 @@ class HomePageState extends State<HomePage> {
                             );
                           },
                           errorBuilder: (context, object, stackTrace) {
-                            return const Icon(
+                            return Icon(
                               Icons.account_circle,
                               size: 50,
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             );
                           },
                         )
-                      : const Icon(
+                      : Icon(
                           Icons.account_circle,
                           size: 50,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,

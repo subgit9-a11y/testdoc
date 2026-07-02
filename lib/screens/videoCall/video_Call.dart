@@ -124,7 +124,7 @@ class _VideoCallState extends State<VideoCall> {
                   child: Container(
                     height: 55,
                     width: 55,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -506,7 +506,7 @@ class _VideoCallState extends State<VideoCall> {
       );
     } else {
       return Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
