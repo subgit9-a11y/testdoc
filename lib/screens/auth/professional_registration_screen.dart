@@ -14,7 +14,7 @@ import 'package:doctro/retrofit/api_header.dart';
 import 'package:doctro/retrofit/network_api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
-// import 'package:doctro/services/supabase_service.dart';
+import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/constant/preferences.dart';
 import 'package:doctro/constant/prefConstatnt.dart';
 import 'package:doctro/services/secure_shared_preference_helper.dart';
@@ -70,7 +70,7 @@ class _ProfessionalRegistrationScreenState extends State<ProfessionalRegistratio
   String? _selectedTreatmentId = "1"; // Default or null if backend allows
   String? _selectedCategoryId = "1"; // Default or null if backend allows
 
-  // final SupabaseService _supabaseService = SupabaseService();
+  final SupabaseService _supabaseService = SupabaseService();
 
   DateTime? _parseDobFlexible(String raw) {
     final value = raw.trim();
