@@ -23,7 +23,7 @@ import 'package:doctro/screens/auth/forgotpassword.dart';
 import 'package:doctro/screens/auth/phoneverification.dart';
 import 'package:doctro/screens/home%20page/login_home.dart';
 import 'package:doctro/model/setting.dart';
-import 'package:doctro/services/supabase_service.dart';
+// import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_input.dart';

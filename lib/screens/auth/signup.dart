@@ -20,7 +20,7 @@ import 'package:doctro/screens/auth/phoneverification.dart';
 import 'package:doctro/screens/auth/forgotpassword.dart';
 import 'package:doctro/screens/auth/professional_registration_screen.dart';
 import 'package:doctro/screens/auth/registration_success_screen.dart';
-import 'package:doctro/services/supabase_service.dart';
+// import 'package:doctro/services/supabase_service.dart';
 import 'package:doctro/theme/ayureze_theme.dart';
 import 'package:doctro/widgets/osler_button.dart';
 import 'package:doctro/widgets/osler_input.dart';
@@ -90,7 +90,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
   bool _isFaceVerified = false;
   String? _capturedImagePath;
-  final SupabaseService _supabaseService = SupabaseService();
+  // final SupabaseService _supabaseService = SupabaseService();
 
   @override
   Widget build(BuildContext context) {
