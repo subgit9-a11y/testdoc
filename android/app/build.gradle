@@ -22,7 +22,7 @@ android {
 
     
     // In 2026, we use specific versions or follow the flutter object
-    compileSdk 36 
+    compileSdk 34 
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -47,7 +47,7 @@ android {
 
         // Ensure minSdk is at least 21 for multidex/desugaring support
         minSdk 24 
-        targetSdk 36
+        targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
