@@ -80,6 +80,7 @@ Future<void> main() async {
   _onMessageSub = null;
   _onMessageOpenedSub = null;
 
+/*
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
@@ -111,6 +112,7 @@ Future<void> main() async {
   } else {
     if (kDebugMode) debugPrint("Supabase not initialized: missing SUPABASE_URL or SUPABASE_ANON_KEY.");
   }
+*/
   
   // Use a safer initialization sequence
   SharedPreferences? _prefs;
