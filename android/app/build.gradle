@@ -22,7 +22,7 @@ android {
 
     
     // In 2026, we use specific versions or follow the flutter object
-    compileSdk 34 
+    compileSdk 36 
     ndkVersion flutter.ndkVersion
 
     compileOptions {

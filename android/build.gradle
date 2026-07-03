@@ -21,7 +21,7 @@ subprojects {
     if (project.name != 'app') {
         afterEvaluate {
             if (project.hasProperty('android')) {
-                project.android.compileSdk = 34
+                project.android.compileSdk = 36
             }
         }
     }
