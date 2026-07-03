@@ -5,7 +5,7 @@ import 'package:doctro/services/session_service.dart';
 import 'package:doctro/services/secure_shared_preference_helper.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../helpers/logger.dart';
 
@@ -105,7 +105,7 @@ class RetroApi {
     try {
       String? apiKey;
       try {
-        apiKey = dotenv.maybeGet('FIREBASE_API_KEY');
+        apiKey = null; // dotenv.maybeGet('FIREBASE_API_KEY');
       } catch (_) {
         apiKey = null;
       }
